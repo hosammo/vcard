@@ -1,0 +1,10 @@
+Django==5.1.4
+djangorestframework==3.15.2
+Pillow==11.0.0
+qrcode[pil]==8.0
+python-decouple==3.8
+psycopg2-binary==2.9.10
+vobject==0.9.6.1
+gunicorn==21.2.0
+whitenoise==6.6.0
+requests==2.31.0

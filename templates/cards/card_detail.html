@@ -1,0 +1,298 @@
+{% extends 'cards/base.html' %}
+
+{% block title %}{{ card.full_name }} - Digital Business Card{% endblock %}
+
+{% block og_title %}{{ card.full_name }}{% if card.display_title %} - {{ card.display_title }}{% endif %}{% endblock %}
+{% block og_description %}{% if card.bio %}{{ card.bio|truncatewords:20 }}{% else %}Professional digital business card for {{ card.full_name }}{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Custom colors for this card */
+    body {
+        background: {{ card.gradient_style }};
+    }
+    
+    .hero-section {
+        background: {{ card.gradient_style }};
+        color: {{ card.text_color }};
+    }
+    
+    .banner-section {
+        position: relative;
+        height: 200px;
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    
+    .banner-text {
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: 600;
+        text-align: center;
+    }
+    
+    .phone-info {
+        flex: 1;
+    }
+    
+    .phone-actions {
+        display: flex;
+        gap: 5px;
+        margin-left: 10px;
+    }
+    
+    .phone-btn {
+        padding: 4px 8px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 11px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        min-width: 28px;
+        text-align: center;
+    }
+    
+    .phone-btn.call {
+        background: #10b981;
+        color: white;
+    }
+    
+    .phone-btn.whatsapp {
+        background: #25d366;
+        color: white;
+    }
+    
+    .phone-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .primary-badge {
+        background: #3b82f6;
+        color: white;
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 10px;
+        margin-left: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <!-- Banner Section (if banner image exists) -->
+        {% if card.banner_image %}
+        <div class="banner-section" style="background-image: url('{{ card.banner_image.url }}');">
+            {% if card.banner_text %}
+                <div class="banner-text">{{ card.banner_text }}</div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Hero Section with Profile -->
+        <div class="hero-section">
+            {% if card.profile_photo %}
+                <img src="{{ card.profile_photo.url }}" alt="{{ card.full_name }}" class="profile-photo">
+            {% else %}
+                <div class="profile-photo" style="background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 36px;">
+                    👤
+                </div>
+            {% endif %}
+            
+            <h1 class="name">{{ card.full_name }}</h1>
+            
+            {% if card.display_title %}
+                <p class="title">{{ card.display_title }}</p>
+            {% endif %}
+            
+            {% if card.company_logo %}
+                <img src="{{ card.company_logo.url }}" alt="{{ card.company }}" class="company-logo">
+            {% endif %}
+        </div>
+        
+        <!-- Contact Information -->
+        <div class="content">
+            {% if card.email %}
+            <div class="contact-item">
+                <svg class="contact-icon" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                </svg>
+                <div class="contact-info">
+                    <div class="contact-label">Email</div>
+                    <div class="contact-value">
+                        <a href="mailto:{{ card.email }}">{{ card.email }}</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Multiple Phone Numbers -->
+            {% if card.phone_numbers.all %}
+                {% for phone in card.phone_numbers.all %}
+                <div class="contact-item">
+                    <svg class="contact-icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
+                    </svg>
+                    <div class="phone-info">
+                        <div class="contact-label">
+                            {{ phone.get_label_display }}
+                            {% if phone.is_primary %}
+                                <span class="primary-badge">PRIMARY</span>
+                            {% endif %}
+                        </div>
+                        <div class="contact-value">{{ phone.formatted_number }}</div>
+                    </div>
+                    <div class="phone-actions">
+                        <a href="tel:{{ phone.full_number }}" class="phone-btn call">📞</a>
+                        {% if phone.is_whatsapp %}
+                            <a href="{{ phone.whatsapp_url }}" target="_blank" class="phone-btn whatsapp">💬</a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% elif card.phone %}
+            <!-- Fallback for old phone field -->
+            <div class="contact-item">
+                <svg class="contact-icon" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
+                </svg>
+                <div class="contact-info">
+                    <div class="contact-label">Phone</div>
+                    <div class="contact-value">
+                        <a href="tel:{{ card.phone }}">{{ card.phone }}</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if card.website %}
+            <div class="contact-item">
+                <svg class="contact-icon" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4.083 9h1.946c.089-1.546.383-2.97.837-4.118A6.004 6.004 0 004.083 9zM10 2a8 8 0 100 16 8 8 0 000-16zm0 2c-.076 0-.232.032-.465.262-.238.234-.497.623-.737 1.182-.389.907-.673 2.142-.766 3.556h3.936c-.093-1.414-.377-2.649-.766-3.556-.24-.56-.5-.948-.737-1.182C10.232 4.032 10.076 4 10 4zm3.971 5c-.089-1.546-.383-2.97-.837-4.118A6.004 6.004 0 0115.917 9h-1.946zm-2.003 2H8.032c.093 1.414.377 2.649.766 3.556.24.56.5.948.737 1.182.233.23.389.262.465.262.076 0 .232-.032.465-.262.238-.234.498-.623.737-1.182.389-.907.673-2.142.766-3.556zm1.166 4.118c.454-1.147.748-2.572.837-4.118h1.946a6.004 6.004 0 01-2.783 4.118zm-6.268 0C6.412 13.97 6.118 12.546 6.03 11H4.083a6.004 6.004 0 002.783 4.118z" clip-rule="evenodd"></path>
+                </svg>
+                <div class="contact-info">
+                    <div class="contact-label">Website</div>
+                    <div class="contact-value">
+                        <a href="{{ card.website }}" target="_blank">{{ card.website|slice:"8:" }}</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if card.address %}
+            <div class="contact-item">
+                <svg class="contact-icon" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                </svg>
+                <div class="contact-info">
+                    <div class="contact-label">Address</div>
+                    <div class="contact-value">{{ card.address }}</div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Bio Section -->
+            {% if card.bio %}
+            <div class="bio-section">
+                <h3 class="bio-title">About</h3>
+                <p class="bio-text">{{ card.bio }}</p>
+            </div>
+            {% endif %}
+            
+            <!-- Skills Section -->
+            {% if card.skills %}
+            <div class="bio-section">
+                <h3 class="bio-title">Skills & Services</h3>
+                <p class="bio-text">{{ card.skills }}</p>
+            </div>
+            {% endif %}
+            
+            <!-- Social Links -->
+            {% if card.linkedin_url or card.twitter_url or card.instagram_url or card.facebook_url or card.portfolio_url or card.custom_link_1_url %}
+            <div class="social-links">
+                {% if card.linkedin_url %}
+                <a href="{{ card.linkedin_url }}" target="_blank" class="social-link linkedin">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                    </svg>
+                </a>
+                {% endif %}
+                
+                {% if card.twitter_url %}
+                <a href="{{ card.twitter_url }}" target="_blank" class="social-link twitter">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                    </svg>
+                </a>
+                {% endif %}
+                
+                {% if card.instagram_url %}
+                <a href="{{ card.instagram_url }}" target="_blank" class="social-link instagram">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                </a>
+                {% endif %}
+                
+                {% if card.facebook_url %}
+                <a href="{{ card.facebook_url }}" target="_blank" class="social-link facebook">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                </a>
+                {% endif %}
+                
+                {% if card.portfolio_url %}
+                <a href="{{ card.portfolio_url }}" target="_blank" class="social-link portfolio">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h2zm4-3a1 1 0 00-1 1v1h2V4a1 1 0 00-1-1zM4 9v2h2V9H4zm0 4v2h2v-2H4zm4-4v2h2V9H8zm0 4v2h2v-2H8zm4-4v2h2V9h-2zm0 4v2h2v-2h-2z" clip-rule="evenodd"></path>
+                    </svg>
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <a href="{% url 'download_vcard' card.custom_url %}" class="btn btn-primary">
+                📱 Save Contact
+            </a>
+            {% if card.primary_phone %}
+            <a href="tel:{{ card.primary_phone.full_number }}" class="btn btn-secondary">
+                📞 Call
+            </a>
+            {% elif card.phone %}
+            <a href="tel:{{ card.phone }}" class="btn btn-secondary">
+                📞 Call
+            </a>
+            {% elif card.email %}
+            <a href="mailto:{{ card.email }}" class="btn btn-secondary">
+                ✉️ Email
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Track interaction analytics
+document.addEventListener('DOMContentLoaded', function() {
+    // Track button clicks
+    document.querySelectorAll('.btn, .social-link, .contact-value a, .phone-btn').forEach(function(element) {
+        element.addEventListener('click', function() {
+            console.log('User interaction:', this.textContent || this.href);
+        });
+    });
+});
+</script>
+{% endblock %}

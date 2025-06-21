@@ -1,0 +1,52 @@
+{% extends 'cards/base.html' %}
+
+{% block title %}Virtual Business Cards - hosammo.com{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="hero-section">
+            <div style="font-size: 48px; margin-bottom: 20px;">💼</div>
+            <h1 class="name">Virtual Business Cards</h1>
+            <p class="title">Professional Digital Networking</p>
+        </div>
+        
+        <div class="content">
+            <div class="bio-section">
+                <h3 class="bio-title">Welcome</h3>
+                <p class="bio-text">
+                    Discover modern networking with our digital business cards. 
+                    Simply scan an NFC tag or QR code to instantly access professional contact information 
+                    and save it directly to your phone.
+                </p>
+            </div>
+            
+            <div class="bio-section">
+                <h3 class="bio-title">Features</h3>
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span>📱</span>
+                        <span>Instant contact sharing</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span>🔗</span>
+                        <span>Social media integration</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span>📊</span>
+                        <span>Analytics tracking</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span>🌱</span>
+                        <span>Eco-friendly solution</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <a href="/admin/" class="btn btn-primary">Admin Panel</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
