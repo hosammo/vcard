@@ -1,11 +1,29 @@
 # cards/views.py
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
-from .models import BusinessCard, CardView, ContactDownload
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+from django.db.models import Count, Q
+from datetime import timedelta
+import json
 import vobject
+import user_agents
+from urllib.parse import urlparse
+from collections import defaultdict, Counter
+from django.contrib.admin.views.decorators import staff_member_required
+from django.db.models import Count, Q
+from .models import BusinessCard, CardView, ContactDownload
+from .auth_forms import CustomUserRegistrationForm, UserLoginForm, BusinessCardForm, PhoneNumberFormSet
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
+from django.contrib import messages
+from .auth_forms import CustomUserRegistrationForm, UserLoginForm
+from .auth_forms import CustomUserRegistrationForm, UserLoginForm, BusinessCardForm, PhoneNumberFormSet
 
 
 def get_client_ip(request):
@@ -92,74 +110,136 @@ def card_detail(request, url_slug):
 
 
 def download_vcard(request, url_slug):
-    """Download vCard file"""
-    card = get_object_or_404(BusinessCard, custom_url=url_slug, is_active=True)
+    """Download vCard file with complete phone numbers support"""
+    try:
+        card = get_object_or_404(BusinessCard, custom_url=url_slug, is_active=True)
 
-    # Track the download
-    ContactDownload.objects.create(
-        card=card,
-        ip_address=get_client_ip(request),
-        download_type='vcard'
-    )
-
-    # Create vCard
-    vcard = vobject.vCard()
-
-    # Name
-    vcard.add('fn')
-    vcard.fn.value = card.full_name
-
-    vcard.add('n')
-    vcard.n.value = vobject.vcard.Name(
-        family=card.last_name,
-        given=card.first_name
-    )
-
-    # Contact details
-    if card.email:
-        vcard.add('email')
-        vcard.email.value = card.email
-        vcard.email.type_param = ['INTERNET']
-
-    if card.phone:
-        vcard.add('tel')
-        vcard.tel.value = card.phone
-        vcard.tel.type_param = ['CELL']
-
-    if card.website:
-        vcard.add('url')
-        vcard.url.value = card.website
-
-    # Organization
-    if card.company:
-        vcard.add('org')
-        vcard.org.value = [card.company]
-
-    if card.job_title:
-        vcard.add('title')
-        vcard.title.value = card.job_title
-
-    # Address
-    if card.address:
-        vcard.add('adr')
-        vcard.adr.value = vobject.vcard.Address(
-            street=card.address
+        # Track the download
+        ContactDownload.objects.create(
+            card=card,
+            ip_address=get_client_ip(request),
+            download_type='vcard'
         )
 
-    # Note/Bio
-    if card.bio:
-        vcard.add('note')
-        vcard.note.value = card.bio
+        # Create vCard
+        vcard = vobject.vCard()
 
-    # Generate response
-    response = HttpResponse(
-        vcard.serialize(),
-        content_type='text/vcard; charset=utf-8'
-    )
-    response['Content-Disposition'] = f'attachment; filename="{card.first_name}_{card.last_name}.vcf"'
+        # Name
+        vcard.add('fn')
+        vcard.fn.value = card.full_name
 
-    return response
+        vcard.add('n')
+        vcard.n.value = vobject.vcard.Name(
+            family=card.last_name,
+            given=card.first_name
+        )
 
+        # Contact details
+        if card.email:
+            vcard.add('email')
+            vcard.email.value = card.email
+            vcard.email.type_param = ['INTERNET']
+
+        # FIXED: Handle multiple phone numbers properly
+        phone_numbers = card.phone_numbers.all()
+        if phone_numbers.exists():
+            for phone in phone_numbers:
+                tel = vcard.add('tel')
+                tel.value = phone.full_number
+
+                # Set phone type based on label
+                type_params = []
+                if phone.label == 'mobile':
+                    type_params.append('CELL')
+                elif phone.label == 'work':
+                    type_params.append('WORK')
+                elif phone.label == 'home':
+                    type_params.append('HOME')
+                elif phone.label == 'fax':
+                    type_params.append('FAX')
+                else:
+                    type_params.append('VOICE')
+
+                # Add primary designation
+                if phone.is_primary:
+                    type_params.append('PREF')
+
+                # Add WhatsApp note if applicable
+                if phone.is_whatsapp:
+                    type_params.append('WHATSAPP')
+
+                tel.type_param = type_params
+
+        # Fallback to old phone field if no new phone numbers exist
+        elif card.phone:
+            tel = vcard.add('tel')
+            tel.value = card.phone
+            tel.type_param = ['CELL']
+
+        if card.website:
+            vcard.add('url')
+            vcard.url.value = card.website
+
+        # Organization
+        if card.company:
+            vcard.add('org')
+            vcard.org.value = [card.company]
+
+        if card.job_title:
+            vcard.add('title')
+            vcard.title.value = card.job_title
+
+        # Address
+        if card.address:
+            vcard.add('adr')
+            vcard.adr.value = vobject.vcard.Address(
+                street=card.address
+            )
+
+        # Note/Bio with social media
+        notes = []
+        if card.bio:
+            notes.append(card.bio)
+
+        # Add social media URLs
+        social_urls = []
+        if card.linkedin_url:
+            social_urls.append(f"LinkedIn: {card.linkedin_url}")
+        if card.twitter_url:
+            social_urls.append(f"Twitter: {card.twitter_url}")
+        if card.instagram_url:
+            social_urls.append(f"Instagram: {card.instagram_url}")
+        if card.facebook_url:
+            social_urls.append(f"Facebook: {card.facebook_url}")
+        if card.portfolio_url:
+            social_urls.append(f"Portfolio: {card.portfolio_url}")
+        if card.custom_link_1_url and card.custom_link_1_title:
+            social_urls.append(f"{card.custom_link_1_title}: {card.custom_link_1_url}")
+        if card.custom_link_2_url and card.custom_link_2_title:
+            social_urls.append(f"{card.custom_link_2_title}: {card.custom_link_2_url}")
+
+        if social_urls:
+            notes.append("Social Media:")
+            notes.extend(social_urls)
+
+        if notes:
+            vcard.add('note')
+            vcard.note.value = "\n".join(notes)
+
+        # Generate response
+        response = HttpResponse(
+            vcard.serialize(),
+            content_type='text/vcard; charset=utf-8'
+        )
+        response['Content-Disposition'] = f'attachment; filename="{card.first_name}_{card.last_name}.vcf"'
+
+        return response
+
+    except Exception as e:
+        print(f"Error in download_vcard: {e}")
+        import traceback
+        traceback.print_exc()
+        return HttpResponse(f"Error generating vCard: {str(e)}", status=500)
 
 @csrf_exempt
 def card_stats(request, url_slug):
@@ -199,15 +279,6 @@ def card_stats(request, url_slug):
         'recent_downloads': recent_downloads,
         'views_by_day': views_by_day,
     })
-
-
-# Add these views to cards/views.py
-
-from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Count, Q
-from django.utils import timezone
-from datetime import timedelta
-import json
 
 
 @staff_member_required
@@ -442,14 +513,6 @@ def simple_card_statistics(request, card_id):
 
     return render(request, 'admin/cards/simple_statistics.html', context)
 
-
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect
-from django.contrib import messages
-from .auth_forms import CustomUserRegistrationForm, UserLoginForm
-
-
 def user_register(request):
     """User registration view"""
     if request.user.is_authenticated:
@@ -510,9 +573,6 @@ def user_dashboard(request):
     }
 
     return render(request, 'auth/dashboard.html', context)
-
-
-from .auth_forms import CustomUserRegistrationForm, UserLoginForm, BusinessCardForm, PhoneNumberFormSet
 
 
 @login_required

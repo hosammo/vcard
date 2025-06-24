@@ -1,4 +1,4 @@
-<!-- Replace your templates/auth/edit_card.html with this version (same layout as create): -->
+<!-- COMPLETE FIXED templates/auth/edit_card.html -->
 {% extends 'cards/base.html' %}
 
 {% block title %}Edit {{ card.full_name }}{% endblock %}
@@ -93,6 +93,85 @@
         color: #64748b;
         margin-top: 10px;
     }
+    
+    /* Phone Numbers Styling */
+    .phone-form-row {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        transition: all 0.2s ease;
+    }
+    .phone-form-row:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    .phone-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr 2fr auto;
+        gap: 20px;
+        align-items: end;
+    }
+    .phone-field {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .phone-label {
+        font-weight: 600;
+        color: #374151;
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+    .phone-checkboxes {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding-top: 8px;
+    }
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+        color: #4b5563;
+    }
+    .form-check-input {
+        width: 18px;
+        height: 18px;
+        border: 2px solid #d1d5db;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .add-phone-btn {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border: none;
+        padding: 14px 28px;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .phone-tips {
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        border: 2px solid #bfdbfe;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+    
     @media (max-width: 768px) {
         .form-grid.two-col,
         .form-grid.three-col {
@@ -100,6 +179,9 @@
         }
         .section-card {
             padding: 20px;
+        }
+        .phone-grid {
+            grid-template-columns: 1fr;
         }
     }
 </style>
@@ -184,9 +266,9 @@
                             {{ form.email }}
                         </div>
                         <div class="form-field">
-                            <label class="form-label">Phone Number</label>
+                            <label class="form-label">Phone Number (Legacy)</label>
                             {{ form.phone }}
-                            <div class="form-help">Include country code (e.g., +965 12345678)</div>
+                            <div class="form-help">{{ form.phone.help_text }}</div>
                         </div>
                     </div>
                     
@@ -200,315 +282,307 @@
                         {{ form.address }}
                     </div>
                 </div>
-                
-                <!-- STEP 6: Replace the phone numbers section in BOTH create_card.html and edit_card.html with this: -->
 
-<!-- Phone Numbers Management -->
-<div class="section-card contact">
-    <h3 class="section-title">
-        <span>📱</span> Phone Numbers
-    </h3>
-    
-    {{ phone_formset.management_form }}
-    
-    <div id="phone-formset">
-        {% for phone_form in phone_formset %}
-            <div class="phone-form-row">
-                {{ phone_form.non_field_errors }}
-                
-                <div class="phone-grid">
-                    <div class="phone-field">
-                        <label class="phone-label">Type</label>
-                        {{ phone_form.label }}
-                    </div>
+                <!-- Phone Numbers Management -->
+                <div class="section-card contact">
+                    <h3 class="section-title">
+                        <span>📱</span> Phone Numbers
+                    </h3>
                     
-                    <div class="phone-field">
-                        <label class="phone-label">Country</label>
-                        {{ phone_form.country_code }}
-                    </div>
+                    {{ phone_formset.management_form }}
                     
-                    <div class="phone-field">
-                        <label class="phone-label">Number</label>
-                        <div class="number-input-group">
-                            {{ phone_form.number }}
-                        </div>
-                    </div>
-                    
-                    <div class="phone-checkboxes">
-                        <div class="checkbox-group">
-                            <label class="checkbox-label">
-                                {{ phone_form.is_primary }}
-                                <span class="checkbox-text">Primary</span>
-                            </label>
-                        </div>
-                        
-                        <div class="checkbox-group">
-                            <label class="checkbox-label">
-                                {{ phone_form.is_whatsapp }}
-                                <span class="checkbox-text">WhatsApp</span>
-                            </label>
-                        </div>
-                        
-                        {% if phone_form.instance.pk %}
-                            <div class="checkbox-group">
-                                <label class="checkbox-label delete-checkbox">
-                                    {{ phone_form.DELETE }}
-                                    <span class="checkbox-text">Delete</span>
-                                </label>
+                    <div id="phone-formset">
+                        {% for phone_form in phone_formset %}
+                            <div class="phone-form-row">
+                                {{ phone_form.non_field_errors }}
+                                
+                                <div class="phone-grid">
+                                    <div class="phone-field">
+                                        <label class="phone-label">Type</label>
+                                        {{ phone_form.label }}
+                                    </div>
+                                    
+                                    <div class="phone-field">
+                                        <label class="phone-label">Country</label>
+                                        {{ phone_form.country_code }}
+                                    </div>
+                                    
+                                    <div class="phone-field">
+                                        <label class="phone-label">Number</label>
+                                        {{ phone_form.number }}
+                                    </div>
+                                    
+                                    <div class="phone-checkboxes">
+                                        <div class="checkbox-group">
+                                            <label class="checkbox-label">
+                                                {{ phone_form.is_primary }}
+                                                <span>Primary</span>
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="checkbox-group">
+                                            <label class="checkbox-label">
+                                                {{ phone_form.is_whatsapp }}
+                                                <span>WhatsApp</span>
+                                            </label>
+                                        </div>
+                                        
+                                        {% if phone_form.instance.pk %}
+                                            <div class="checkbox-group">
+                                                <label class="checkbox-label" style="color: #dc2626;">
+                                                    {{ phone_form.DELETE }}
+                                                    <span>Delete</span>
+                                                </label>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                {% for hidden in phone_form.hidden_fields %}
+                                    {{ hidden }}
+                                {% endfor %}
                             </div>
-                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    
+                    <div style="text-align: center; margin: 25px 0;">
+                        <button type="button" id="add-phone" class="add-phone-btn">
+                            <span>➕</span>
+                            Add Another Phone Number
+                        </button>
+                    </div>
+                    
+                    <div class="phone-tips">
+                        <div style="display: flex; align-items: center; gap: 10px; color: #1e40af; font-size: 15px; margin-bottom: 12px;">
+                            <span style="font-size: 18px;">💡</span>
+                            <strong>Phone Number Tips:</strong>
+                        </div>
+                        <ul style="margin: 0; padding-left: 20px; color: #1e40af;">
+                            <li>Mark one number as <strong>"Primary"</strong> - this will be the main contact number</li>
+                            <li>Check <strong>"WhatsApp"</strong> for numbers that have WhatsApp enabled</li>
+                            <li>Enter only the number without the country code (e.g., 12345678)</li>
+                            <li>You can add multiple numbers for different purposes (work, mobile, etc.)</li>
+                        </ul>
                     </div>
                 </div>
-                
-                {% for hidden in phone_form.hidden_fields %}
-                    {{ hidden }}
-                {% endfor %}
-            </div>
-        {% endfor %}
-    </div>
-    
-    <div class="add-phone-container">
-        <button type="button" id="add-phone" class="add-phone-btn">
-            <span class="add-icon">➕</span>
-            Add Another Phone Number
-        </button>
-    </div>
-    
-    <div class="phone-tips">
-        <div class="tips-header">
-            <span class="tips-icon">💡</span>
-            <strong>Phone Number Tips:</strong>
+
+                <!-- About Section -->
+                <div class="section-card about">
+                    <h3 class="section-title">
+                        <span>📖</span> About You
+                    </h3>
+                    <div class="form-field">
+                        <label class="form-label">Bio / Description</label>
+                        {{ form.bio }}
+                        <div class="form-help">Tell people about yourself, your expertise, and what makes you unique</div>
+                    </div>
+                    
+                    <div class="form-field" style="margin-top: 20px;">
+                        <label class="form-label">Skills & Services</label>
+                        {{ form.skills }}
+                        <div class="form-help">List your skills, services, or areas of expertise</div>
+                    </div>
+                </div>
+
+                <!-- Images Section -->
+                <div class="section-card images">
+                    <h3 class="section-title">
+                        <span>🖼️</span> Images & Banner
+                    </h3>
+                    <div class="form-grid two-col">
+                        <div class="form-field">
+                            <label class="form-label">Profile Photo</label>
+                            {{ form.profile_photo }}
+                            {% if card.profile_photo %}
+                                <div style="margin-top: 10px;">
+                                    <small style="color: #6b7280;">Current image:</small><br>
+                                    <img src="{{ card.profile_photo.url }}" alt="Current profile photo" class="current-image">
+                                </div>
+                            {% endif %}
+                            <div class="form-help">Upload your profile picture (recommended: square image, max 2MB)</div>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label">Company Logo</label>
+                            {{ form.company_logo }}
+                            {% if card.company_logo %}
+                                <div style="margin-top: 10px;">
+                                    <small style="color: #6b7280;">Current logo:</small><br>
+                                    <img src="{{ card.company_logo.url }}" alt="Current company logo" class="current-image">
+                                </div>
+                            {% endif %}
+                            <div class="form-help">Upload your company logo (recommended: rectangular, max 2MB)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-field" style="margin-top: 20px;">
+                        <label class="form-label">Banner Image</label>
+                        {{ form.banner_image }}
+                        {% if card.banner_image %}
+                            <div style="margin-top: 10px;">
+                                <small style="color: #6b7280;">Current banner:</small><br>
+                                <img src="{{ card.banner_image.url }}" alt="Current banner" style="max-width: 200px; max-height: 100px; border-radius: 8px; border: 2px solid #e5e7eb;">
+                            </div>
+                        {% endif %}
+                        <div class="form-help">Upload a banner image for the top of your card (recommended: 800x200px, max 2MB)</div>
+                    </div>
+                    
+                    <div class="form-field" style="margin-top: 20px;">
+                        <label class="form-label">Banner Text</label>
+                        {{ form.banner_text }}
+                        <div class="form-help">Optional text to display over your banner image</div>
+                    </div>
+                </div>
+
+                <!-- Color Customization -->
+                <div class="section-card colors">
+                    <h3 class="section-title">
+                        <span>🎨</span> Card Colors
+                    </h3>
+                    <div class="form-grid three-col">
+                        <div class="form-field">
+                            <label class="form-label">Background Color</label>
+                            {{ form.background_color }}
+                            <div class="form-help">Primary gradient color</div>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label">Accent Color</label>
+                            {{ form.accent_color }}
+                            <div class="form-help">Secondary gradient color</div>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label">Text Color</label>
+                            {{ form.text_color }}
+                            <div class="form-help">Text color for the hero section</div>
+                        </div>
+                    </div>
+                    
+                    <div class="preview-section">
+                        <div style="margin-bottom: 10px;">🎨 Color Preview</div>
+                        <div id="color-preview" style="height: 60px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; background: {{ card.gradient_style }};">
+                            {{ card.full_name }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Media -->
+                <div class="section-card social">
+                    <h3 class="section-title">
+                        <span>🔗</span> Social Media & Links
+                    </h3>
+                    <div class="form-grid two-col">
+                        <div class="form-field">
+                            <label class="form-label">🔗 LinkedIn</label>
+                            {{ form.linkedin_url }}
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label">🐦 Twitter</label>
+                            {{ form.twitter_url }}
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label">📸 Instagram</label>
+                            {{ form.instagram_url }}
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label">📘 Facebook</label>
+                            {{ form.facebook_url }}
+                        </div>
+                    </div>
+                    
+                    <div class="form-field" style="margin-top: 20px;">
+                        <label class="form-label">💼 Portfolio Website</label>
+                        {{ form.portfolio_url }}
+                    </div>
+                    
+                    <h4 style="margin: 25px 0 15px 0; color: #6b7280;">Custom Links</h4>
+                    <div class="form-grid two-col">
+                        <div class="form-field">
+                            <label class="form-label">Custom Link 1 Title</label>
+                            {{ form.custom_link_1_title }}
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label">Custom Link 1 URL</label>
+                            {{ form.custom_link_1_url }}
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label">Custom Link 2 Title</label>
+                            {{ form.custom_link_2_title }}
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label">Custom Link 2 URL</label>
+                            {{ form.custom_link_2_url }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Errors -->
+                {% if form.errors or phone_formset.errors %}
+                    <div style="background: #fee; padding: 20px; border-radius: 8px; color: #dc2626; border: 1px solid #fecaca; margin-bottom: 20px;">
+                        <h4 style="margin-top: 0;">❌ Please fix these errors:</h4>
+                        {% for field, errors in form.errors.items %}
+                            <div style="margin: 10px 0;">
+                                <strong>{{ field|title }}:</strong>
+                                {% for error in errors %}
+                                    <div style="margin-left: 15px;">• {{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                        {% for form_error in phone_formset.errors %}
+                            {% if form_error %}
+                                <div style="margin: 10px 0;">
+                                    <strong>Phone Numbers:</strong>
+                                    {% for field, errors in form_error.items %}
+                                        {% for error in errors %}
+                                            <div style="margin-left: 15px;">• {{ error }}</div>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 15px; justify-content: center; margin-top: 30px; flex-wrap: wrap;">
+                    <button type="submit" class="btn btn-primary" style="font-size: 16px; padding: 15px 30px;">
+                        💾 Save Changes
+                    </button>
+                    <a href="{{ card.get_absolute_url }}" target="_blank" class="btn" style="background: #10b981; color: white; font-size: 16px; padding: 15px 30px; text-decoration: none; border-radius: 6px;">
+                        👁️ Preview Card
+                    </a>
+                    <a href="{% url 'user_dashboard' %}" class="btn btn-secondary" style="font-size: 16px; padding: 15px 30px;">
+                        ❌ Cancel
+                    </a>
+                </div>
+            </form>
         </div>
-        <ul class="tips-list">
-            <li>Mark one number as <strong>"Primary"</strong> - this will be the main contact number</li>
-            <li>Check <strong>"WhatsApp"</strong> for numbers that have WhatsApp enabled</li>
-            <li>Enter only the number without the country code (e.g., 12345678)</li>
-            <li>You can add multiple numbers for different purposes (work, mobile, etc.)</li>
-        </ul>
     </div>
 </div>
 
-<style>
-/* Phone Numbers Styling */
-.phone-form-row {
-    background: white;
-    border: 2px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 20px;
-    transition: all 0.2s ease;
-    position: relative;
-}
-
-.phone-form-row:hover {
-    border-color: #cbd5e1;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.phone-grid {
-    display: grid;
-    grid-template-columns: 1fr 1.5fr 2fr auto;
-    gap: 20px;
-    align-items: end;
-}
-
-.phone-field {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.phone-label {
-    font-weight: 600;
-    color: #374151;
-    font-size: 14px;
-    margin-bottom: 5px;
-}
-
-.phone-field .form-control {
-    height: 44px;
-    font-size: 15px;
-    border: 2px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 10px 12px;
-    transition: all 0.2s ease;
-}
-
-.phone-field .form-control:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.number-input-group {
-    position: relative;
-}
-
-.phone-checkboxes {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding-top: 8px;
-}
-
-.checkbox-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 500;
-    color: #4b5563;
-    transition: color 0.2s ease;
-}
-
-.checkbox-label:hover {
-    color: #1f2937;
-}
-
-.checkbox-label.delete-checkbox {
-    color: #dc2626;
-}
-
-.checkbox-label.delete-checkbox:hover {
-    color: #b91c1c;
-}
-
-.checkbox-text {
-    user-select: none;
-}
-
-.form-check-input {
-    width: 18px;
-    height: 18px;
-    border: 2px solid #d1d5db;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.form-check-input:checked {
-    background-color: #3b82f6;
-    border-color: #3b82f6;
-}
-
-.form-check-input[name*="DELETE"]:checked {
-    background-color: #dc2626;
-    border-color: #dc2626;
-}
-
-.add-phone-container {
-    text-align: center;
-    margin: 25px 0;
-}
-
-.add-phone-btn {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-    border: none;
-    padding: 14px 28px;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-}
-
-.add-phone-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
-}
-
-.add-phone-btn:active {
-    transform: translateY(0);
-}
-
-.add-icon {
-    font-size: 16px;
-}
-
-.phone-tips {
-    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-    border: 2px solid #bfdbfe;
-    border-radius: 12px;
-    padding: 20px;
-    margin-top: 20px;
-}
-
-.tips-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: #1e40af;
-    font-size: 15px;
-    margin-bottom: 12px;
-}
-
-.tips-icon {
-    font-size: 18px;
-}
-
-.tips-list {
-    margin: 0;
-    padding-left: 20px;
-    color: #1e40af;
-}
-
-.tips-list li {
-    margin-bottom: 6px;
-    line-height: 1.5;
-}
-
-.tips-list li:last-child {
-    margin-bottom: 0;
-}
-
-/* Mobile Responsive */
-@media (max-width: 768px) {
-    .phone-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-    
-    .phone-checkboxes {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 15px;
-        justify-content: space-around;
-        padding: 15px;
-        background: #f9fafb;
-        border-radius: 8px;
-        border: 1px solid #e5e7eb;
-    }
-    
-    .phone-form-row {
-        padding: 15px;
-    }
-    
-    .add-phone-btn {
-        width: 100%;
-        justify-content: center;
-    }
-}
-
-/* Empty form state */
-.phone-form-row.empty-form {
-    display: none;
-}
-</style>
-
 <script>
-// Enhanced JavaScript for phone number management
+// JavaScript for phone number management and color preview
 document.addEventListener('DOMContentLoaded', function() {
+    // Live color preview
+    const bgColor = document.querySelector('input[name="background_color"]');
+    const accentColor = document.querySelector('input[name="accent_color"]');
+    const textColor = document.querySelector('input[name="text_color"]');
+    const preview = document.getElementById('color-preview');
+    
+    function updatePreview() {
+        const bg = bgColor.value || '#667eea';
+        const accent = accentColor.value || '#764ba2';
+        const text = textColor.value || '#ffffff';
+        
+        preview.style.background = `linear-gradient(135deg, ${bg} 0%, ${accent} 100%)`;
+        preview.style.color = text;
+    }
+    
+    if (bgColor && accentColor && textColor && preview) {
+        bgColor.addEventListener('change', updatePreview);
+        accentColor.addEventListener('change', updatePreview);
+        textColor.addEventListener('change', updatePreview);
+    }
+
+    // Phone number management
     const addButton = document.getElementById('add-phone');
     const formset = document.getElementById('phone-formset');
     const totalForms = document.getElementById('id_phones-TOTAL_FORMS');
@@ -518,11 +592,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const formCount = parseInt(totalForms.value);
             const emptyForm = document.querySelector('.phone-form-row').cloneNode(true);
             
-            // Update form index in the new form
+            // Update form index
             const formRegex = /phones-\d+-/g;
             emptyForm.innerHTML = emptyForm.innerHTML.replace(formRegex, `phones-${formCount}-`);
             
-            // Clear the values in the new form
+            // Clear values
             const inputs = emptyForm.querySelectorAll('input, select');
             inputs.forEach(function(input) {
                 if (input.type === 'checkbox') {
@@ -532,42 +606,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
             
-            // Remove any delete checkbox from new forms
+            // Remove delete checkbox from new forms
             const deleteCheckbox = emptyForm.querySelector('input[name*="DELETE"]');
             if (deleteCheckbox) {
                 deleteCheckbox.closest('.checkbox-group').remove();
             }
             
-            // Add animation
-            emptyForm.style.opacity = '0';
-            emptyForm.style.transform = 'translateY(-20px)';
-            
-            // Add the new form to the formset
             formset.appendChild(emptyForm);
-            
-            // Animate in
-            setTimeout(() => {
-                emptyForm.style.transition = 'all 0.3s ease';
-                emptyForm.style.opacity = '1';
-                emptyForm.style.transform = 'translateY(0)';
-            }, 10);
-            
-            // Update the total forms count
             totalForms.value = formCount + 1;
-            
-            // Focus on the first input of the new form
-            const firstInput = emptyForm.querySelector('select, input[type="text"]');
-            if (firstInput) {
-                firstInput.focus();
-            }
         });
     }
     
-    // Handle primary phone selection (only one can be primary)
+    // Primary phone selection
     document.addEventListener('change', function(e) {
         if (e.target.name && e.target.name.includes('is_primary')) {
             if (e.target.checked) {
-                // Uncheck all other primary checkboxes
                 const allPrimaryCheckboxes = document.querySelectorAll('input[name*="is_primary"]');
                 allPrimaryCheckboxes.forEach(function(checkbox) {
                     if (checkbox !== e.target) {
@@ -579,13 +632,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-
-                <!-- About Section -->
-                <div class="section-card about">
-                    <h3 class="section-title">
-                        <span>📖</span> About You
-                    </h3>
-                    <div class="form-field">
-                        <label class="form-label">Bio / Description</label>
-                        {{ form.bio }}
-                        <div class="
+{% endblock %}

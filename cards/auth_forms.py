@@ -1,7 +1,8 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-
+from .models import BusinessCard, ProfileType, PhoneNumber, CountryCode
+from django.forms import inlineformset_factory
 
 class CustomUserRegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -46,44 +47,24 @@ class UserLoginForm(forms.Form):
         })
 
 
-from .models import BusinessCard, ProfileType
-
-
 class BusinessCardForm(forms.ModelForm):
     class Meta:
         model = BusinessCard
         fields = [
-            # Basic Info
             'profile_type', 'custom_url', 'first_name', 'last_name',
-            'job_title', 'company',
-
-            # Contact Information
-            'email', 'phone', 'website', 'address',
-
-            # About
-            'bio', 'skills',
-
-            # Images
-            'profile_photo', 'company_logo', 'banner_image', 'banner_text',
-
-            # UI Customization
-            'background_color', 'accent_color', 'text_color',
-
-            # Social Media
+            'job_title', 'company', 'email', 'phone', 'website', 'address',
+            'bio', 'skills', 'profile_photo', 'company_logo', 'banner_image',
+            'banner_text', 'background_color', 'accent_color', 'text_color',
             'linkedin_url', 'twitter_url', 'instagram_url', 'facebook_url',
-
-            # Custom Links
             'portfolio_url', 'custom_link_1_title', 'custom_link_1_url',
             'custom_link_2_title', 'custom_link_2_url'
         ]
 
         widgets = {
-            'bio': forms.Textarea(attrs={'rows': 4,
-                                         'placeholder': 'Tell people about yourself, your expertise, and what makes you unique...'}),
-            'skills': forms.Textarea(
-                attrs={'rows': 3, 'placeholder': 'List your skills, services, or areas of expertise...'}),
-            'address': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Your business address or location...'}),
-            'banner_text': forms.TextInput(attrs={'placeholder': 'Optional text to display on your banner'}),
+            'bio': forms.Textarea(attrs={'rows': 4}),
+            'skills': forms.Textarea(attrs={'rows': 3}),
+            'address': forms.Textarea(attrs={'rows': 3}),
+            'banner_text': forms.TextInput(attrs={'placeholder': 'Optional text for banner'}),
             'background_color': forms.TextInput(attrs={'type': 'color'}),
             'accent_color': forms.TextInput(attrs={'type': 'color'}),
             'text_color': forms.TextInput(attrs={'type': 'color'}),
@@ -95,7 +76,7 @@ class BusinessCardForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Add CSS classes to all fields
+        # Add CSS classes
         for field_name, field in self.fields.items():
             if field_name in ['background_color', 'accent_color', 'text_color']:
                 field.widget.attrs['class'] = 'form-control color-picker'
@@ -104,47 +85,16 @@ class BusinessCardForm(forms.ModelForm):
             else:
                 field.widget.attrs['class'] = 'form-control'
 
-        # Custom field labels and help text
+        # Set help text
+        self.fields['custom_url'].help_text = 'Leave blank for auto-generation'
         self.fields[
-            'custom_url'].help_text = 'Leave blank for auto-generation. Only letters, numbers, and hyphens allowed.'
-        self.fields['profile_photo'].help_text = 'Upload your profile picture (recommended: square image, max 2MB)'
-        self.fields['company_logo'].help_text = 'Upload your company logo (recommended: rectangular, max 2MB)'
-        self.fields[
-            'banner_image'].help_text = 'Upload a banner image for the top of your card (recommended: 800x200px, max 2MB)'
-        self.fields['background_color'].help_text = 'Primary gradient color'
-        self.fields['accent_color'].help_text = 'Secondary gradient color'
-        self.fields['text_color'].help_text = 'Text color for the hero section'
-
-        # Set placeholders
-        placeholders = {
-            'custom_url': 'my-custom-url (optional)',
-            'first_name': 'Your first name',
-            'last_name': 'Your last name',
-            'job_title': 'e.g., Marketing Manager, CEO, Freelance Designer',
-            'company': 'Your company or organization name',
-            'email': 'your.email@example.com',
-            'phone': '+965 12345678',
-            'website': 'https://yourwebsite.com',
-            'linkedin_url': 'https://linkedin.com/in/yourprofile',
-            'twitter_url': 'https://twitter.com/yourusername',
-            'instagram_url': 'https://instagram.com/yourusername',
-            'facebook_url': 'https://facebook.com/yourpage',
-            'portfolio_url': 'https://yourportfolio.com',
-            'custom_link_1_title': 'e.g., Blog, YouTube, GitHub',
-            'custom_link_1_url': 'https://your-custom-link.com',
-            'custom_link_2_title': 'e.g., Calendar, Store, App',
-            'custom_link_2_url': 'https://another-link.com',
-        }
-
-        for field_name, placeholder in placeholders.items():
-            if field_name in self.fields:
-                self.fields[field_name].widget.attrs['placeholder'] = placeholder
+            'phone'].help_text = 'Include country code (e.g., +965 12345678) - or use phone numbers section below'
 
     def clean_custom_url(self):
         """Validate custom URL"""
         custom_url = self.cleaned_data.get('custom_url')
         if custom_url:
-            # Check if URL already exists (excluding current instance)
+            # Check if URL already exists
             existing = BusinessCard.objects.filter(custom_url=custom_url)
             if self.instance.pk:
                 existing = existing.exclude(pk=self.instance.pk)
@@ -154,19 +104,11 @@ class BusinessCardForm(forms.ModelForm):
 
         return custom_url
 
-
-# STEP 5: Add these to your cards/auth_forms.py
-
-from .models import BusinessCard, ProfileType, PhoneNumber, CountryCode
-from django.forms import inlineformset_factory
-
-
 class PhoneNumberForm(forms.ModelForm):
     class Meta:
         model = PhoneNumber
         fields = ['label', 'country_code', 'number', 'is_primary', 'is_whatsapp']
         widgets = {
-            'country_code': forms.Select(),
             'number': forms.TextInput(attrs={'placeholder': '12345678'}),
         }
 
@@ -174,7 +116,7 @@ class PhoneNumberForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Add CSS classes
         for field_name, field in self.fields.items():
-            if field_name == 'is_primary' or field_name == 'is_whatsapp':
+            if field_name in ['is_primary', 'is_whatsapp']:
                 field.widget.attrs['class'] = 'form-check-input'
             else:
                 field.widget.attrs['class'] = 'form-control'
@@ -186,6 +128,34 @@ class PhoneNumberForm(forms.ModelForm):
         self.fields['is_primary'].label = 'Primary'
         self.fields['is_whatsapp'].label = 'WhatsApp'
 
+
+try:
+    PhoneNumberFormSet = inlineformset_factory(
+        BusinessCard,
+        PhoneNumber,
+        form=PhoneNumberForm,
+        extra=1,
+        can_delete=True,
+        min_num=0,
+        validate_min=False
+    )
+except Exception as e:
+    print(f"Error creating PhoneNumberFormSet: {e}")
+
+
+    # Fallback empty formset
+    class EmptyFormSet:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def is_valid(self):
+            return True
+
+        def save(self):
+            pass
+
+
+    PhoneNumberFormSet = EmptyFormSet
 
 # Create the formset for managing multiple phone numbers
 PhoneNumberFormSet = inlineformset_factory(

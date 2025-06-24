@@ -1,10 +1,13 @@
-# cards/admin.py - Clean Complete Version
+# cards/admin.py
+
 from django.contrib import admin
 from django.utils.html import format_html
-from django.urls import reverse
+from django.urls import reverse, path
 from django.utils.safestring import mark_safe
+from django.shortcuts import redirect
 from .models import BusinessCard, CardView, ContactDownload, CountryCode, PhoneNumber
 from .forms import BusinessCardAdminForm, PhoneNumberAdminForm
+
 
 
 class PhoneNumberInline(admin.TabularInline):
@@ -87,10 +90,19 @@ class BusinessCardAdmin(admin.ModelAdmin):
     )
 
     def primary_phone_display(self, obj):
-        primary = obj.primary_phone
-        if primary:
-            return primary.formatted_number
-        return "No primary phone"
+        try:
+            primary = obj.phone_numbers.filter(is_primary=True).first()
+            if primary:
+                return primary.formatted_number
+            elif obj.phone_numbers.exists():
+                first_phone = obj.phone_numbers.first()
+                return f"{first_phone.formatted_number} (first)"
+            elif obj.phone:  # Fallback to old phone field
+                return obj.phone
+            else:
+                return "No phone"
+        except Exception as e:
+            return f"Phone error: {e}"
 
     primary_phone_display.short_description = "Primary Phone"
 
@@ -106,7 +118,27 @@ class BusinessCardAdmin(admin.ModelAdmin):
             )
         return "0 views"
 
-    view_count.short_description = "Views"
+    def enhanced_view_count(self, obj):
+        """Enhanced view count with clickable analytics link"""
+        count = obj.views.count()
+        if count > 0:
+            try:
+                # Use the correct URL name
+                url = f"/statistics/{obj.id}/"
+                return format_html(
+                    '<a href="{}" style="color: #0066cc; text-decoration: none; font-weight: 600; padding: 4px 8px; border-radius: 4px; background: #f0f8ff; border: 1px solid #0066cc20; transition: all 0.2s ease;" '
+                    'onmouseover="this.style.background=\'#0066cc\'; this.style.color=\'white\';" '
+                    'onmouseout="this.style.background=\'#f0f8ff\'; this.style.color=\'#0066cc\';">'
+                    '📊 {} views</a>',
+                    url, count
+                )
+            except Exception as e:
+                return f"{count} views (stats unavailable)"
+        else:
+            return "0 views"
+
+    enhanced_view_count.short_description = "Views"
+    enhanced_view_count.allow_tags = True
 
     view_count.short_description = "Views"
 
@@ -188,6 +220,32 @@ class BusinessCardAdmin(admin.ModelAdmin):
         self.message_user(request, f"Regenerated QR codes for {queryset.count()} cards.")
 
     regenerate_qr_codes.short_description = "Regenerate QR codes"
+
+    def get_urls(self):
+        """FIXED: Add custom admin URLs with proper error handling"""
+        from django.urls import path
+        urls = super().get_urls()
+        try:
+            custom_urls = [
+                path(
+                    '<uuid:card_id>/analytics/',
+                    self.admin_site.admin_view(self.analytics_redirect),
+                    name='cards_businesscard_analytics',
+                ),
+            ]
+            return custom_urls + urls
+        except Exception as e:
+            print(f"Error adding custom admin URLs: {e}")
+            return urls
+
+    def analytics_redirect(self, request, card_id):
+        """FIXED: Redirect to analytics with error handling"""
+        try:
+            return redirect('simple_card_statistics', card_id=card_id)
+        except Exception as e:
+            from django.contrib import messages
+            messages.error(request, f"Analytics unavailable: {e}")
+            return redirect('admin:cards_businesscard_changelist')
 
 
 @admin.register(CardView)
