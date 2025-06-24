@@ -1,16 +1,31 @@
-# cards/models.py
+# cards/models.py - COMPLETE FILE
 import uuid
 import qrcode
 import os
+import re
 from io import BytesIO
 from django.db import models
 from django.core.files import File
 from django.urls import reverse
 from django.utils.text import slugify
 from django.core.validators import RegexValidator
-from django.contrib.auth.models import User
-
+from django.core.exceptions import ValidationError
+from django.contrib.auth import get_user_model
 from PIL import Image
+
+User = get_user_model()
+
+
+def validate_hex_color(value):
+    """Validate hex color format"""
+    if not re.match(r'^#[0-9A-Fa-f]{6}$', value):
+        raise ValidationError('Enter a valid hex color code (e.g., #FF0000)')
+
+
+def validate_phone_number(value):
+    """Validate phone number format"""
+    if value and not re.match(r'^\+?[\d\s\-\(\)]+$', value):
+        raise ValidationError('Enter a valid phone number')
 
 
 class ProfileType(models.TextChoices):
@@ -38,9 +53,10 @@ class CountryCode(models.Model):
 
 
 class BusinessCard(models.Model):
-    # Basic Info
+    # Owner relationship
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='business_cards', null=True, blank=True)
 
+    # Basic Info
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     profile_type = models.CharField(
         max_length=20,
@@ -64,7 +80,12 @@ class BusinessCard(models.Model):
 
     # Contact Details
     email = models.EmailField(blank=True)
-    phone = models.CharField(max_length=20, blank=True)  # Keep for backward compatibility
+    phone = models.CharField(
+        max_length=20,
+        blank=True,
+        validators=[validate_phone_number],
+        help_text="Include country code (e.g., +965 12345678)"
+    )
     website = models.URLField(blank=True)
     address = models.TextField(blank=True)
 
@@ -80,19 +101,19 @@ class BusinessCard(models.Model):
     background_color = models.CharField(
         max_length=7,
         default='#667eea',
-        validators=[RegexValidator(r'^#[0-9A-Fa-f]{6}$', 'Enter a valid hex color code')],
+        validators=[validate_hex_color],
         help_text="Background gradient start color (hex format: #667eea)"
     )
     accent_color = models.CharField(
         max_length=7,
         default='#764ba2',
-        validators=[RegexValidator(r'^#[0-9A-Fa-f]{6}$', 'Enter a valid hex color code')],
+        validators=[validate_hex_color],
         help_text="Background gradient end color (hex format: #764ba2)"
     )
     text_color = models.CharField(
         max_length=7,
         default='#ffffff',
-        validators=[RegexValidator(r'^#[0-9A-Fa-f]{6}$', 'Enter a valid hex color code')],
+        validators=[validate_hex_color],
         help_text="Text color for hero section (hex format: #ffffff)"
     )
 
@@ -169,30 +190,6 @@ class BusinessCard(models.Model):
         """Get full URL for QR code and NFC"""
         return f"https://hosammo.com{self.get_absolute_url()}"
 
-    def get_location_stats(self):
-        """Get visitor location statistics"""
-        from django.db.models import Count
-        return self.views.values('country', 'city').annotate(
-            count=Count('id')
-        ).order_by('-count')
-
-    def get_daily_views(self, days=30):
-        """Get daily view counts for the last N days"""
-        from django.utils import timezone
-        from django.db.models import Count
-        from datetime import timedelta
-
-        end_date = timezone.now()
-        start_date = end_date - timedelta(days=days)
-
-        return self.views.filter(
-            timestamp__gte=start_date
-        ).extra(
-            select={'day': 'date(timestamp)'}
-        ).values('day').annotate(
-            views=Count('id')
-        ).order_by('day')
-
     def save(self, *args, **kwargs):
         # Auto-generate custom_url if not provided
         if not self.custom_url:
@@ -214,29 +211,32 @@ class BusinessCard(models.Model):
 
     def generate_qr_code(self):
         """Generate QR code for the business card URL"""
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=10,
-            border=4,
-        )
-        qr.add_data(self.get_full_url())
-        qr.make(fit=True)
+        try:
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=10,
+                border=4,
+            )
+            qr.add_data(self.get_full_url())
+            qr.make(fit=True)
 
-        img = qr.make_image(fill_color="black", back_color="white")
+            img = qr.make_image(fill_color="black", back_color="white")
 
-        # Save to BytesIO
-        buffer = BytesIO()
-        img.save(buffer, format='PNG')
-        buffer.seek(0)
+            # Save to BytesIO
+            buffer = BytesIO()
+            img.save(buffer, format='PNG')
+            buffer.seek(0)
 
-        # Save to model field
-        filename = f"qr_{self.custom_url}.png"
-        self.qr_code.save(filename, File(buffer), save=False)
-        buffer.close()
+            # Save to model field
+            filename = f"qr_{self.custom_url}.png"
+            self.qr_code.save(filename, File(buffer), save=False)
+            buffer.close()
 
-        # Save the model (without triggering save() again)
-        BusinessCard.objects.filter(pk=self.pk).update(qr_code=self.qr_code)
+            # Save the model (without triggering save() again)
+            BusinessCard.objects.filter(pk=self.pk).update(qr_code=self.qr_code)
+        except Exception as e:
+            print(f"Error generating QR code: {e}")
 
 
 class PhoneNumber(models.Model):
