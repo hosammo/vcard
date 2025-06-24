@@ -8,6 +8,8 @@ from django.core.files import File
 from django.urls import reverse
 from django.utils.text import slugify
 from django.core.validators import RegexValidator
+from django.contrib.auth.models import User
+
 from PIL import Image
 
 
@@ -37,6 +39,8 @@ class CountryCode(models.Model):
 
 class BusinessCard(models.Model):
     # Basic Info
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='business_cards', null=True, blank=True)
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     profile_type = models.CharField(
         max_length=20,

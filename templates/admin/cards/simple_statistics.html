@@ -1,0 +1,187 @@
+<!-- Replace your templates/admin/cards/simple_statistics.html with this version: -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Statistics - {{ card.full_name }}</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .header { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0; }
+        .stat-box { background: white; border: 1px solid #ddd; padding: 20px; text-align: center; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .stat-number { font-size: 2em; color: #0066cc; font-weight: bold; }
+        .stat-label { color: #666; margin-top: 5px; }
+        .chart-container { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .chart-canvas { position: relative; height: 300px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+        th { background: #f8f9fa; font-weight: 600; }
+        tr:hover { background: #f8f9fa; }
+        .back-link { display: inline-block; margin: 20px 0; padding: 10px 20px; background: #0066cc; color: white; text-decoration: none; border-radius: 5px; }
+        .back-link:hover { background: #0052a3; }
+        .country-flag { font-size: 1.5em; margin-right: 10px; }
+        .country-name { display: flex; align-items: center; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 Statistics for {{ card.full_name }}</h1>
+        <p style="color: #666; margin: 0;">{{ card.display_title|default:"Digital Business Card" }}</p>
+        {% if is_owner %}
+        <p style="color: #10b981; margin: 5px 0 0 0; font-size: 14px;">✅ This is your business card</p>
+        {% endif %}
+    </div>
+
+    <div class="stats">
+        <div class="stat-box">
+            <div class="stat-number">{{ total_views }}</div>
+            <div class="stat-label">Total Views</div>
+        </div>
+        
+        <div class="stat-box">
+            <div class="stat-number">{{ total_downloads }}</div>
+            <div class="stat-label">Downloads</div>
+        </div>
+        
+        <div class="stat-box">
+            <div class="stat-number">{{ countries|length }}</div>
+            <div class="stat-label">Countries</div>
+        </div>
+        
+        <div class="stat-box">
+            <div class="stat-number">
+                {% if total_views > 0 %}
+                    {{ total_downloads }}:{{ total_views }}
+                {% else %}
+                    0:0
+                {% endif %}
+            </div>
+            <div class="stat-label">Download:View Ratio</div>
+        </div>
+    </div>
+
+    <!-- Chart Section -->
+    <div class="chart-container">
+        <h2 style="margin-top: 0;">📈 Daily Views (Last 14 Days)</h2>
+        <div class="chart-canvas">
+            <canvas id="dailyViewsChart"></canvas>
+        </div>
+    </div>
+
+    <h2>🌍 Top Countries</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Country</th>
+                <th>Views</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for country in countries %}
+            <tr>
+                <td>
+                    <div class="country-name">
+                        <span class="country-flag">{{ country.flag }}</span>
+                        {{ country.country|default:"Unknown" }}
+                    </div>
+                </td>
+                <td>{{ country.count }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2">No country data available</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>⏰ Recent Activity</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Location</th>
+                <th>IP Address</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for view in recent_views %}
+            <tr>
+                <td>{{ view.timestamp|date:"M d, Y H:i" }}</td>
+                <td>
+                    {% if view.city and view.country %}
+                        {{ view.city }}, {{ view.country }}
+                    {% elif view.country %}
+                        {{ view.country }}
+                    {% else %}
+                        Unknown
+                    {% endif %}
+                </td>
+                <td>{{ view.ip_address }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">No views yet</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Different back links based on user type -->
+    {% if is_owner %}
+        <a href="/dashboard/" class="back-link">← Back to Dashboard</a>
+    {% else %}
+        <a href="/admin/cards/businesscard/" class="back-link">← Back to Business Cards</a>
+    {% endif %}
+
+    <!-- Chart JavaScript -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const chartData = {{ chart_data|safe }};
+        
+        const ctx = document.getElementById('dailyViewsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartData.map(d => {
+                    const date = new Date(d.date);
+                    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                }),
+                datasets: [{
+                    label: 'Daily Views',
+                    data: chartData.map(d => d.views),
+                    borderColor: '#0066cc',
+                    backgroundColor: 'rgba(0, 102, 204, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#f0f0f0'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    });
+    </script>
+</body>
+</html>

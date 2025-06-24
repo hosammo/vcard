@@ -11,4 +11,14 @@ urlpatterns = [
     # Admin statistics URLs
     path('admin/cards/statistics/', views.global_statistics, name='global_statistics'),
     path('admin/cards/<uuid:card_id>/statistics/', views.card_statistics, name='card_statistics'),
+    path('statistics/<uuid:card_id>/', views.simple_card_statistics, name='simple_card_statistics'),
+
+    path('register/', views.user_register, name='user_register'),
+    path('login/', views.user_login, name='user_login'),
+    path('logout/', views.user_logout, name='user_logout'),
+    path('dashboard/', views.user_dashboard, name='user_dashboard'),
+
+    path('create-card/', views.create_business_card, name='create_business_card'),
+    path('edit-card/<uuid:card_id>/', views.edit_business_card, name='edit_business_card'),
+    path('delete-card/<uuid:card_id>/', views.delete_business_card, name='delete_business_card'),
 ]

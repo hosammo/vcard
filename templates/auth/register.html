@@ -1,0 +1,97 @@
+{% extends 'cards/base.html' %}
+
+{% block title %}Register - Virtual Business Cards{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card" style="max-width: 500px;">
+        <div class="hero-section" style="text-align: center;">
+            <div style="font-size: 48px; margin-bottom: 20px;">👤</div>
+            <h1 class="name">Create Account</h1>
+            <p class="title">Join Virtual Business Cards</p>
+        </div>
+        
+        <div class="content">
+            {% if messages %}
+                {% for message in messages %}
+                    <div style="background: {% if message.tags == 'error' %}#fee{% else %}#efe{% endif %}; padding: 10px; border-radius: 5px; margin-bottom: 15px; color: {% if message.tags == 'error' %}#c00{% else %}#060{% endif %};">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" style="display: flex; flex-direction: column; gap: 15px;">
+                {% csrf_token %}
+                
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600;">Username</label>
+                    {{ form.username }}
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">First Name</label>
+                        {{ form.first_name }}
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Last Name</label>
+                        {{ form.last_name }}
+                    </div>
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600;">Email</label>
+                    {{ form.email }}
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600;">Password</label>
+                    {{ form.password1 }}
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600;">Confirm Password</label>
+                    {{ form.password2 }}
+                </div>
+
+                {% if form.errors %}
+                    <div style="background: #fee; padding: 10px; border-radius: 5px; color: #c00;">
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <style>
+                    .form-control {
+                        width: 100%;
+                        padding: 12px;
+                        border: 1px solid #ddd;
+                        border-radius: 6px;
+                        font-size: 16px;
+                        box-sizing: border-box;
+                    }
+                    .form-control:focus {
+                        outline: none;
+                        border-color: #0066cc;
+                        box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
+                    }
+                </style>
+
+                <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
+                    🚀 Create Account
+                </button>
+            </form>
+        </div>
+        
+        <div class="action-buttons" style="text-align: center;">
+            <p>Already have an account?</p>
+            <a href="{% url 'user_login' %}" class="btn btn-secondary">
+                🔑 Sign In
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

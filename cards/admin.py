@@ -94,13 +94,19 @@ class BusinessCardAdmin(admin.ModelAdmin):
 
     primary_phone_display.short_description = "Primary Phone"
 
+
     def view_count(self, obj):
         count = obj.views.count()
-        url = reverse('card_statistics', kwargs={'card_id': obj.id})
-        return format_html(
-            '<a href="{}" style="color: #0066cc;">{} views</a>',
-            url, count
-        )
+        if count > 0:
+            # Simple clickable link to statistics
+            url = f"/statistics/{obj.id}/"
+            return format_html(
+                '<a href="{}" style="color: #0066cc; text-decoration: none;">{} views</a>',
+                url, count
+            )
+        return "0 views"
+
+    view_count.short_description = "Views"
 
     view_count.short_description = "Views"
 

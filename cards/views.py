@@ -4,6 +4,7 @@ from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from .models import BusinessCard, CardView, ContactDownload
+from django.contrib.auth.decorators import login_required
 import vobject
 
 
@@ -310,3 +311,278 @@ def global_statistics(request):
     }
 
     return render(request, 'admin/cards/global_statistics.html', context)
+
+
+@login_required
+def simple_card_statistics(request, card_id):
+    """Simple statistics page - accessible by card owner or admin"""
+    card = get_object_or_404(BusinessCard, id=card_id)
+
+    # Check permissions: user must be the owner OR staff member
+    if not (request.user.is_staff or card.owner == request.user):
+        messages.error(request, "You don't have permission to view these statistics.")
+        return redirect('user_dashboard')
+
+    # Basic stats
+    total_views = card.views.count()
+    total_downloads = card.downloads.count()
+
+    # Simple country count with flags
+    countries = card.views.exclude(country='').values('country').annotate(
+        count=Count('id')
+    ).order_by('-count')[:10]
+
+    # Add flags to countries
+    country_flags = {
+        'Kuwait': '🇰🇼',
+        'United States': '🇺🇸',
+        'United Kingdom': '🇬🇧',
+        'Canada': '🇨🇦',
+        'Germany': '🇩🇪',
+        'France': '🇫🇷',
+        'Italy': '🇮🇹',
+        'Spain': '🇪🇸',
+        'Netherlands': '🇳🇱',
+        'Australia': '🇦🇺',
+        'Japan': '🇯🇵',
+        'South Korea': '🇰🇷',
+        'China': '🇨🇳',
+        'India': '🇮🇳',
+        'Brazil': '🇧🇷',
+        'Mexico': '🇲🇽',
+        'Argentina': '🇦🇷',
+        'Saudi Arabia': '🇸🇦',
+        'United Arab Emirates': '🇦🇪',
+        'Qatar': '🇶🇦',
+        'Bahrain': '🇧🇭',
+        'Oman': '🇴🇲',
+        'Egypt': '🇪🇬',
+        'Jordan': '🇯🇴',
+        'Lebanon': '🇱🇧',
+        'Turkey': '🇹🇷',
+        'Russia': '🇷🇺',
+        'Sweden': '🇸🇪',
+        'Norway': '🇳🇴',
+        'Denmark': '🇩🇰',
+        'Finland': '🇫🇮',
+        'Switzerland': '🇨🇭',
+        'Austria': '🇦🇹',
+        'Belgium': '🇧🇪',
+        'Portugal': '🇵🇹',
+        'Ireland': '🇮🇪',
+        'Poland': '🇵🇱',
+        'Czech Republic': '🇨🇿',
+        'Hungary': '🇭🇺',
+        'Greece': '🇬🇷',
+        'South Africa': '🇿🇦',
+        'Nigeria': '🇳🇬',
+        'Kenya': '🇰🇪',
+        'Morocco': '🇲🇦',
+        'Israel': '🇮🇱',
+        'Singapore': '🇸🇬',
+        'Malaysia': '🇲🇾',
+        'Thailand': '🇹🇭',
+        'Philippines': '🇵🇭',
+        'Indonesia': '🇮🇩',
+        'Vietnam': '🇻🇳',
+        'New Zealand': '🇳🇿',
+        'Local': '🏠',
+        'Development': '💻',
+    }
+
+    # Add flags to country data
+    countries_with_flags = []
+    for country in countries:
+        country_name = country['country'] or 'Unknown'
+        countries_with_flags.append({
+            'country': country_name,
+            'count': country['count'],
+            'flag': country_flags.get(country_name, '🌍')  # Default flag if not found
+        })
+
+    # Recent views
+    recent_views = card.views.order_by('-timestamp')[:20]
+
+    # Daily views for the last 14 days
+    from datetime import timedelta
+    end_date = timezone.now().date()
+    start_date = end_date - timedelta(days=14)
+
+    daily_views = card.views.filter(
+        timestamp__date__gte=start_date
+    ).values('timestamp__date').annotate(
+        views=Count('id')
+    ).order_by('timestamp__date')
+
+    # Convert to the format we need
+    views_dict = {}
+    for item in daily_views:
+        date_key = item['timestamp__date'].strftime('%Y-%m-%d')
+        views_dict[date_key] = item['views']
+
+    chart_data = []
+    current_date = start_date
+    while current_date <= end_date:
+        date_str = current_date.strftime('%Y-%m-%d')
+        chart_data.append({
+            'date': date_str,
+            'views': views_dict.get(date_str, 0)
+        })
+        current_date += timedelta(days=1)
+
+    context = {
+        'card': card,
+        'total_views': total_views,
+        'total_downloads': total_downloads,
+        'countries': countries_with_flags,
+        'recent_views': recent_views,
+        'chart_data': json.dumps(chart_data),
+        'is_owner': card.owner == request.user,  # Add this to show if user is owner
+    }
+
+    return render(request, 'admin/cards/simple_statistics.html', context)
+
+
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
+from django.contrib import messages
+from .auth_forms import CustomUserRegistrationForm, UserLoginForm
+
+
+def user_register(request):
+    """User registration view"""
+    if request.user.is_authenticated:
+        return redirect('user_dashboard')
+
+    if request.method == 'POST':
+        form = CustomUserRegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            username = form.cleaned_data.get('username')
+            messages.success(request, f'Account created for {username}! You can now log in.')
+            return redirect('user_login')
+    else:
+        form = CustomUserRegistrationForm()
+
+    return render(request, 'auth/register.html', {'form': form})
+
+
+def user_login(request):
+    """User login view"""
+    if request.user.is_authenticated:
+        return redirect('user_dashboard')
+
+    if request.method == 'POST':
+        form = UserLoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('user_dashboard')
+            else:
+                messages.error(request, 'Invalid username or password.')
+    else:
+        form = UserLoginForm()
+
+    return render(request, 'auth/login.html', {'form': form})
+
+
+def user_logout(request):
+    """User logout view"""
+    logout(request)
+    messages.success(request, 'You have been logged out successfully.')
+    return redirect('home')
+
+
+@login_required
+def user_dashboard(request):
+    """User dashboard - shows their business cards"""
+    user_cards = request.user.business_cards.all().order_by('-created_at')
+
+    context = {
+        'user_cards': user_cards,
+        'total_cards': user_cards.count(),
+        'total_views': sum(card.views.count() for card in user_cards),
+        'total_downloads': sum(card.downloads.count() for card in user_cards),
+    }
+
+    return render(request, 'auth/dashboard.html', context)
+
+
+from .auth_forms import CustomUserRegistrationForm, UserLoginForm, BusinessCardForm, PhoneNumberFormSet
+
+
+@login_required
+def create_business_card(request):
+    """Create a new business card with phone numbers"""
+    if request.method == 'POST':
+        form = BusinessCardForm(request.POST, request.FILES)
+        phone_formset = PhoneNumberFormSet(request.POST, prefix='phones')
+
+        if form.is_valid() and phone_formset.is_valid():
+            card = form.save(commit=False)
+            card.owner = request.user  # Set the owner to current user
+            card.save()
+
+            # Save phone numbers
+            phone_formset.instance = card
+            phone_formset.save()
+
+            messages.success(request, f'Business card "{card.full_name}" created successfully!')
+            return redirect('user_dashboard')
+    else:
+        # Pre-fill form with user data
+        initial_data = {
+            'first_name': request.user.first_name,
+            'last_name': request.user.last_name,
+            'email': request.user.email,
+        }
+        form = BusinessCardForm(initial=initial_data)
+        phone_formset = PhoneNumberFormSet(prefix='phones')
+
+    return render(request, 'auth/create_card.html', {
+        'form': form,
+        'phone_formset': phone_formset
+    })
+
+
+@login_required
+def edit_business_card(request, card_id):
+    """Edit an existing business card with phone numbers"""
+    card = get_object_or_404(BusinessCard, id=card_id, owner=request.user)
+
+    if request.method == 'POST':
+        form = BusinessCardForm(request.POST, request.FILES, instance=card)
+        phone_formset = PhoneNumberFormSet(request.POST, instance=card, prefix='phones')
+
+        if form.is_valid() and phone_formset.is_valid():
+            form.save()
+            phone_formset.save()
+            messages.success(request, f'Business card "{card.full_name}" updated successfully!')
+            return redirect('user_dashboard')
+    else:
+        form = BusinessCardForm(instance=card)
+        phone_formset = PhoneNumberFormSet(instance=card, prefix='phones')
+
+    return render(request, 'auth/edit_card.html', {
+        'form': form,
+        'phone_formset': phone_formset,
+        'card': card
+    })
+
+
+@login_required
+def delete_business_card(request, card_id):
+    """Delete a business card"""
+    card = get_object_or_404(BusinessCard, id=card_id, owner=request.user)
+
+    if request.method == 'POST':
+        card_name = card.full_name
+        card.delete()
+        messages.success(request, f'Business card "{card_name}" deleted successfully!')
+        return redirect('user_dashboard')
+
+    return render(request, 'auth/delete_card.html', {'card': card})

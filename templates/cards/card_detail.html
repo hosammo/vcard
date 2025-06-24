@@ -11,12 +11,12 @@
     body {
         background: {{ card.gradient_style }};
     }
-    
+
     .hero-section {
         background: {{ card.gradient_style }};
         color: {{ card.text_color }};
     }
-    
+
     .banner-section {
         position: relative;
         height: 200px;
@@ -27,7 +27,7 @@
         justify-content: center;
         margin-bottom: 20px;
     }
-    
+
     .banner-text {
         background: rgba(0, 0, 0, 0.6);
         color: white;
@@ -37,17 +37,17 @@
         font-weight: 600;
         text-align: center;
     }
-    
+
     .phone-info {
         flex: 1;
     }
-    
+
     .phone-actions {
         display: flex;
         gap: 5px;
         margin-left: 10px;
     }
-    
+
     .phone-btn {
         padding: 4px 8px;
         border-radius: 4px;
@@ -58,22 +58,22 @@
         min-width: 28px;
         text-align: center;
     }
-    
+
     .phone-btn.call {
         background: #10b981;
         color: white;
     }
-    
+
     .phone-btn.whatsapp {
         background: #25d366;
         color: white;
     }
-    
+
     .phone-btn:hover {
         transform: translateY(-1px);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
-    
+
     .primary-badge {
         background: #3b82f6;
         color: white;
@@ -106,18 +106,18 @@
                     👤
                 </div>
             {% endif %}
-            
+
             <h1 class="name">{{ card.full_name }}</h1>
-            
+
             {% if card.display_title %}
                 <p class="title">{{ card.display_title }}</p>
             {% endif %}
-            
+
             {% if card.company_logo %}
                 <img src="{{ card.company_logo.url }}" alt="{{ card.company }}" class="company-logo">
             {% endif %}
         </div>
-        
+
         <!-- Contact Information -->
         <div class="content">
             {% if card.email %}
@@ -134,7 +134,7 @@
                 </div>
             </div>
             {% endif %}
-            
+
             <!-- Multiple Phone Numbers -->
             {% if card.phone_numbers.all %}
                 {% for phone in card.phone_numbers.all %}
@@ -173,7 +173,7 @@
                 </div>
             </div>
             {% endif %}
-            
+
             {% if card.website %}
             <div class="contact-item">
                 <svg class="contact-icon" fill="currentColor" viewBox="0 0 20 20">
@@ -187,7 +187,7 @@
                 </div>
             </div>
             {% endif %}
-            
+
             {% if card.address %}
             <div class="contact-item">
                 <svg class="contact-icon" fill="currentColor" viewBox="0 0 20 20">
@@ -199,7 +199,7 @@
                 </div>
             </div>
             {% endif %}
-            
+
             <!-- Bio Section -->
             {% if card.bio %}
             <div class="bio-section">
@@ -207,7 +207,7 @@
                 <p class="bio-text">{{ card.bio }}</p>
             </div>
             {% endif %}
-            
+
             <!-- Skills Section -->
             {% if card.skills %}
             <div class="bio-section">
@@ -215,7 +215,7 @@
                 <p class="bio-text">{{ card.skills }}</p>
             </div>
             {% endif %}
-            
+
             <!-- Social Links -->
             {% if card.linkedin_url or card.twitter_url or card.instagram_url or card.facebook_url or card.portfolio_url or card.custom_link_1_url %}
             <div class="social-links">
@@ -226,7 +226,7 @@
                     </svg>
                 </a>
                 {% endif %}
-                
+
                 {% if card.twitter_url %}
                 <a href="{{ card.twitter_url }}" target="_blank" class="social-link twitter">
                     <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
@@ -234,7 +234,7 @@
                     </svg>
                 </a>
                 {% endif %}
-                
+
                 {% if card.instagram_url %}
                 <a href="{{ card.instagram_url }}" target="_blank" class="social-link instagram">
                     <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
@@ -242,7 +242,7 @@
                     </svg>
                 </a>
                 {% endif %}
-                
+
                 {% if card.facebook_url %}
                 <a href="{{ card.facebook_url }}" target="_blank" class="social-link facebook">
                     <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
@@ -250,7 +250,7 @@
                     </svg>
                 </a>
                 {% endif %}
-                
+
                 {% if card.portfolio_url %}
                 <a href="{{ card.portfolio_url }}" target="_blank" class="social-link portfolio">
                     <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
@@ -261,7 +261,7 @@
             </div>
             {% endif %}
         </div>
-        
+
         <!-- Action Buttons -->
         <div class="action-buttons">
             <a href="{% url 'download_vcard' card.custom_url %}" class="btn btn-primary">
@@ -294,5 +294,90 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Enhanced interaction tracking
+document.addEventListener('DOMContentLoaded', function() {
+    const cardId = '{{ card.id }}';
+
+    // Track phone clicks
+    document.querySelectorAll('a[href^="tel:"]').forEach(function(element) {
+        element.addEventListener('click', function() {
+            trackInteraction('phone_click', {
+                phone_number: this.href.replace('tel:', '')
+            });
+        });
+    });
+
+    // Track email clicks
+    document.querySelectorAll('a[href^="mailto:"]').forEach(function(element) {
+        element.addEventListener('click', function() {
+            trackInteraction('email_click', {
+                link_url: this.href
+            });
+        });
+    });
+
+    // Track WhatsApp clicks
+    document.querySelectorAll('a[href*="wa.me"]').forEach(function(element) {
+        element.addEventListener('click', function() {
+            trackInteraction('whatsapp_click', {
+                link_url: this.href
+            });
+        });
+    });
+
+    // Track social media clicks
+    document.querySelectorAll('.social-link').forEach(function(element) {
+        element.addEventListener('click', function() {
+            let interactionType = 'social_other';
+            if (this.href.includes('linkedin')) interactionType = 'social_linkedin';
+            else if (this.href.includes('twitter')) interactionType = 'social_twitter';
+            else if (this.href.includes('instagram')) interactionType = 'social_instagram';
+            else if (this.href.includes('facebook')) interactionType = 'social_facebook';
+
+            trackInteraction(interactionType, {
+                link_url: this.href
+            });
+        });
+    });
+
+    // Track vCard downloads
+    document.querySelectorAll('a[href*="/vcard/"]').forEach(function(element) {
+        element.addEventListener('click', function() {
+            trackInteraction('vcard_download');
+        });
+    });
+
+    function trackInteraction(type, data = {}) {
+        fetch('/api/track-interaction/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                card_id: cardId,
+                interaction_type: type,
+                ...data
+            })
+        }).catch(console.error);
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+
 </script>
 {% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'cards/base.html' %}
+
+{% block title %}Delete {{ card.full_name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card" style="max-width: 500px;">
+        <div class="hero-section" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+            <div style="font-size: 48px; margin-bottom: 20px;">🗑️</div>
+            <h1 class="name">Delete Business Card</h1>
+            <p class="title">This action cannot be undone</p>
+        </div>
+        
+        <div class="content" style="text-align: center;">
+            <div style="background: #fee; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #fecaca;">
+                <h3 style="color: #dc2626; margin-top: 0;">⚠️ Warning</h3>
+                <p>You are about to permanently delete:</p>
+                <div style="background: white; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                    <strong>{{ card.full_name }}</strong><br>
+                    <small style="color: #666;">{{ card.display_title }}</small>
+                </div>
+                <p><strong>This will also delete:</strong></p>
+                <ul style="text-align: left; color: #666;">
+                    <li>{{ card.views.count }} view records</li>
+                    <li>{{ card.downloads.count }} download records</li>
+                    <li>All analytics data</li>
+                    <li>QR code and images</li>
+                </ul>
+            </div>
+
+            <form method="post" style="display: flex; gap: 10px; justify-content: center;">
+                {% csrf_token %}
+                <button type="submit" class="btn" style="background: #dc2626; color: white;">
+                    🗑️ Yes, Delete Forever
+                </button>
+                <a href="{% url 'user_dashboard' %}" class="btn btn-secondary">
+                    🔙 Cancel
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
