@@ -9,9 +9,7 @@ urlpatterns = [
     path('api/card/<slug:url_slug>/stats/', views.card_stats, name='card_stats'),
 
     # Admin statistics URLs
-    path('admin/cards/statistics/', views.global_statistics, name='global_statistics'),
-    path('admin/cards/<uuid:card_id>/statistics/', views.card_statistics, name='card_statistics'),
-    path('statistics/<uuid:card_id>/', views.simple_card_statistics, name='simple_card_statistics'),
+    path('statistics/<uuid:card_id>/', views.simple_card_statistics, name='card_statistics'),
 
     path('register/', views.user_register, name='user_register'),
     path('login/', views.user_login, name='user_login'),

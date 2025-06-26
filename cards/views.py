@@ -281,108 +281,6 @@ def card_stats(request, url_slug):
     })
 
 
-@staff_member_required
-def card_statistics(request, card_id):
-    """Detailed statistics for a specific card"""
-    card = get_object_or_404(BusinessCard, id=card_id)
-
-    # Time periods
-    today = timezone.now().date()
-    week_ago = today - timedelta(days=7)
-    month_ago = today - timedelta(days=30)
-
-    # Basic stats
-    total_views = card.views.count()
-    total_downloads = card.downloads.count()
-
-    # Time-based stats
-    today_views = card.views.filter(timestamp__date=today).count()
-    week_views = card.views.filter(timestamp__date__gte=week_ago).count()
-    month_views = card.views.filter(timestamp__date__gte=month_ago).count()
-
-    # Location stats
-    country_stats = card.views.values('country').annotate(
-        count=Count('id')
-    ).order_by('-count')[:10]
-
-    city_stats = card.views.values('city', 'country').annotate(
-        count=Count('id')
-    ).order_by('-count')[:10]
-
-    # Daily views for the last 30 days
-    daily_views = []
-    for i in range(30):
-        date = today - timedelta(days=i)
-        views = card.views.filter(timestamp__date=date).count()
-        daily_views.append({
-            'date': date.strftime('%Y-%m-%d'),
-            'views': views
-        })
-    daily_views.reverse()
-
-    # Recent views with location
-    recent_views = card.views.select_related().order_by('-timestamp')[:20]
-
-    context = {
-        'card': card,
-        'total_views': total_views,
-        'total_downloads': total_downloads,
-        'today_views': today_views,
-        'week_views': week_views,
-        'month_views': month_views,
-        'country_stats': country_stats,
-        'city_stats': city_stats,
-        'daily_views': json.dumps(daily_views),
-        'recent_views': recent_views,
-    }
-
-    return render(request, 'admin/cards/card_statistics.html', context)
-
-
-@staff_member_required
-def global_statistics(request):
-    """Global statistics across all cards"""
-    # Total stats
-    total_cards = BusinessCard.objects.filter(is_active=True).count()
-    total_views = CardView.objects.count()
-    total_downloads = ContactDownload.objects.count()
-
-    # Time-based stats
-    today = timezone.now().date()
-    week_ago = today - timedelta(days=7)
-    month_ago = today - timedelta(days=30)
-
-    today_views = CardView.objects.filter(timestamp__date=today).count()
-    week_views = CardView.objects.filter(timestamp__date__gte=week_ago).count()
-    month_views = CardView.objects.filter(timestamp__date__gte=month_ago).count()
-
-    # Top cards by views
-    top_cards = BusinessCard.objects.annotate(
-        view_count=Count('views')
-    ).order_by('-view_count')[:10]
-
-    # Geographic distribution
-    country_distribution = CardView.objects.values('country').annotate(
-        count=Count('id')
-    ).order_by('-count')[:15]
-
-    # Recent activity
-    recent_views = CardView.objects.select_related('card').order_by('-timestamp')[:20]
-
-    context = {
-        'total_cards': total_cards,
-        'total_views': total_views,
-        'total_downloads': total_downloads,
-        'today_views': today_views,
-        'week_views': week_views,
-        'month_views': month_views,
-        'top_cards': top_cards,
-        'country_distribution': country_distribution,
-        'recent_views': recent_views,
-    }
-
-    return render(request, 'admin/cards/global_statistics.html', context)
-
 
 @login_required
 def simple_card_statistics(request, card_id):
@@ -511,7 +409,7 @@ def simple_card_statistics(request, card_id):
         'is_owner': card.owner == request.user,  # Add this to show if user is owner
     }
 
-    return render(request, 'admin/cards/simple_statistics.html', context)
+    return render(request, 'admin/cards/card_statistics.html', context)
 
 def user_register(request):
     """User registration view"""
