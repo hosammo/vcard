@@ -12,6 +12,7 @@ from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from PIL import Image
+from .utils import process_uploaded_image
 
 User = get_user_model()
 
@@ -191,6 +192,16 @@ class BusinessCard(models.Model):
         return f"https://hosammo.com{self.get_absolute_url()}"
 
     def save(self, *args, **kwargs):
+        # Process images before saving if they're new uploads
+        if self.profile_photo and hasattr(self.profile_photo, 'file'):
+            self.profile_photo = process_uploaded_image(self.profile_photo, 'profile')
+
+        if self.company_logo and hasattr(self.company_logo, 'file'):
+            self.company_logo = process_uploaded_image(self.company_logo, 'logo')
+
+        if self.banner_image and hasattr(self.banner_image, 'file'):
+            self.banner_image = process_uploaded_image(self.banner_image, 'banner')
+
         # Auto-generate custom_url if not provided
         if not self.custom_url:
             base_slug = slugify(f"{self.first_name}-{self.last_name}")
