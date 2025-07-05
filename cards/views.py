@@ -35,7 +35,6 @@ def get_client_ip(request):
         ip = request.META.get('REMOTE_ADDR')
     return ip
 
-
 def home(request):
     """Home page - simple landing page"""
     return render(request, 'cards/home.html')
@@ -81,7 +80,6 @@ def get_location_from_ip(ip_address):
         'longitude': None
     }
 
-
 def card_detail(request, url_slug):
     """Display a business card"""
     card = get_object_or_404(BusinessCard, custom_url=url_slug, is_active=True)
@@ -107,7 +105,6 @@ def card_detail(request, url_slug):
         'card': card,
     }
     return render(request, 'cards/card_detail.html', context)
-
 
 def download_vcard(request, url_slug):
     """Download vCard file with complete phone numbers support"""
@@ -279,8 +276,6 @@ def card_stats(request, url_slug):
         'recent_downloads': recent_downloads,
         'views_by_day': views_by_day,
     })
-
-
 
 @login_required
 def simple_card_statistics(request, card_id):
@@ -544,3 +539,21 @@ def delete_business_card(request, card_id):
         return redirect('user_dashboard')
 
     return render(request, 'auth/delete_card.html', {'card': card})
+
+
+# Add this to your views.py if you have file upload handling:
+
+def card_detail(request, url_slug):
+    # ... your existing view code ...
+
+    context = {
+        'card': card,
+        'supported_formats': ['JPEG', 'PNG', 'WebP', 'AVIF'],
+        'max_file_size': '5MB',
+        'image_limits': {
+            'profile': '400×400px',
+            'logo': '200×100px',
+            'banner': '800×300px'
+        }
+    }
+    return render(request, 'cards/card_detail.html', context)

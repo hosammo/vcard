@@ -95,9 +95,18 @@ class BusinessCard(models.Model):
     skills = models.TextField(blank=True, help_text="Skills or services offered")
 
     # Images
-    profile_photo = models.ImageField(upload_to='profiles/', blank=True, null=True)
-    company_logo = models.ImageField(upload_to='logos/', blank=True, null=True)
-
+    profile_photo = models.ImageField(
+        upload_to='profiles/',
+        blank=True,
+        null=True,
+        help_text="📸 Profile photo - Supports JPEG, PNG, WebP, AVIF formats. Max size: 5MB. Will be optimized to 400x400px automatically."
+    )
+    company_logo = models.ImageField(
+        upload_to='logos/',
+        blank=True,
+        null=True,
+        help_text="🏢 Company logo - Supports JPEG, PNG, WebP, AVIF formats. Max size: 5MB. Will be optimized to 200x100px automatically."
+    )
     # UI Customization
     background_color = models.CharField(
         max_length=7,
@@ -123,7 +132,7 @@ class BusinessCard(models.Model):
         upload_to='banners/',
         blank=True,
         null=True,
-        help_text="Banner image displayed at the top of the card"
+        help_text="🖼️ Banner image - Supports JPEG, PNG, WebP, AVIF formats. Max size: 5MB. Will be optimized to 800x300px automatically."
     )
     banner_text = models.CharField(
         max_length=100,

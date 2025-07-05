@@ -56,8 +56,18 @@ class BusinessCardAdmin(admin.ModelAdmin):
             'fields': ('email', 'website', 'address'),
             'description': 'Phone numbers are managed in the Phone Numbers section below.'
         }),
-        ('Images & Banner', {
-            'fields': ('profile_photo', 'company_logo', 'banner_image', 'banner_text', 'qr_code_preview')
+        ('Images & Media', {
+            'fields': ('profile_photo', 'company_logo', 'banner_image', 'banner_text', 'qr_code_preview'),
+            'description': '''
+                <div style="background: #f0f9ff; padding: 12px; border-radius: 6px; margin-bottom: 10px; border-left: 4px solid #3b82f6;">
+                    <strong>📸 Image Upload Guidelines:</strong><br/>
+                    • <strong>Supported formats:</strong> JPEG, PNG, WebP, AVIF<br/>
+                    • <strong>Maximum file size:</strong> 5MB per image<br/>
+                    • <strong>Auto-optimization:</strong> Images are automatically resized and compressed<br/>
+                    • <strong>Dimensions:</strong> Profile (400×400), Logo (200×100), Banner (800×300)<br/>
+                    <em>💡 Upload high-quality images - we'll optimize them automatically!</em>
+                </div>
+            '''
         }),
         ('UI Customization', {
             'fields': ('background_color', 'accent_color', 'text_color', 'color_preview'),
