@@ -1,0 +1,11 @@
+# Install image libraries that Pillow needs
+brew install libjpeg libpng libtiff webp
+
+Django==5.1.4
+djangorestframework==3.15.2
+Pillow==11.0.0
+qrcode[pil]==8.0
+python-decouple==3.8
+vobject==0.9.6.1
+whitenoise==6.6.0
+requests==2.31.0
