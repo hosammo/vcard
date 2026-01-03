@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Virtual Business Card</title>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --accent-color: #764ba2;
+            --dark-color: #1f2937;
+            --light-color: #f9fafb;
+        }
+        
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Animated background pattern */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>');
+            opacity: 0.3;
+            animation: movePattern 20s linear infinite;
+        }
+        
+        @keyframes movePattern {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(100px, 100px); }
+        }
+        
+        .login-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 450px;
+            padding: 0 20px;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 2rem 2.5rem;
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.75rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.25rem;
+        }
+        
+        .logo p {
+            color: #6b7280;
+            margin: 0;
+            font-size: 0.875rem;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.4rem;
+            font-size: 0.9rem;
+        }
+        
+        .form-control {
+            padding: 0.65rem 0.9rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .input-group {
+            position: relative;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 0.9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            z-index: 10;
+        }
+        
+        .form-control.has-icon {
+            padding-left: 2.75rem;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 0.9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            color: #9ca3af;
+            cursor: pointer;
+            z-index: 10;
+            transition: color 0.3s;
+            padding: 0;
+        }
+        
+        .password-toggle:hover {
+            color: var(--primary-color);
+        }
+        
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border: none;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            width: 100%;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-primary-custom:active {
+            transform: translateY(0);
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .form-check-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .forgot-password {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: color 0.3s;
+        }
+        
+        .forgot-password:hover {
+            color: var(--accent-color);
+        }
+        
+        .divider {
+            text-align: center;
+            margin: 1.25rem 0;
+            position: relative;
+        }
+        
+        .divider::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 100%;
+            height: 1px;
+            background: #e5e7eb;
+        }
+        
+        .divider span {
+            background: white;
+            padding: 0 1rem;
+            color: #9ca3af;
+            position: relative;
+            z-index: 1;
+            font-size: 0.85rem;
+        }
+        
+        .social-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .btn-social {
+            flex: 1;
+            padding: 0.65rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            background: white;
+            font-weight: 600;
+            color: var(--dark-color);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .btn-social:hover {
+            border-color: var(--primary-color);
+            background: #f9fafb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-social i {
+            font-size: 1.1rem;
+        }
+        
+        .btn-google i {
+            color: #ea4335;
+        }
+        
+        .btn-linkedin i {
+            color: #0077b5;
+        }
+        
+        .signup-link {
+            text-align: center;
+            margin-top: 1.25rem;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .signup-link a {
+            color: var(--primary-color);
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .signup-link a:hover {
+            color: var(--accent-color);
+        }
+        
+        .back-home {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: transform 0.3s;
+            z-index: 2;
+        }
+        
+        .back-home:hover {
+            transform: translateX(-5px);
+            color: white;
+        }
+        
+        .alert-custom {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 0.75rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: none;
+            font-size: 0.875rem;
+        }
+        
+        .alert-custom.show {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Loading state */
+        .btn-primary-custom.loading {
+            position: relative;
+            pointer-events: none;
+        }
+        
+        .btn-primary-custom.loading::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            top: 50%;
+            left: 50%;
+            margin-left: -9px;
+            margin-top: -9px;
+            border: 2px solid white;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spinner 0.6s linear infinite;
+        }
+        
+        @keyframes spinner {
+            to { transform: rotate(360deg); }
+        }
+        
+        .mb-3 {
+            margin-bottom: 1rem !important;
+        }
+        
+        /* Responsive */
+        @media (max-width: 576px) {
+            .login-card {
+                padding: 1.75rem 1.5rem;
+            }
+            
+            .logo h1 {
+                font-size: 1.35rem;
+            }
+            
+            .logo-icon {
+                width: 55px;
+                height: 55px;
+                font-size: 1.5rem;
+            }
+            
+            .back-home {
+                position: static;
+                margin-bottom: 1rem;
+                justify-content: center;
+                width: 100%;
+            }
+            
+            .login-wrapper {
+                padding: 10px;
+            }
+        }
+        
+        @media (max-height: 700px) {
+            .login-card {
+                padding: 1.5rem 2rem;
+            }
+            
+            .logo {
+                margin-bottom: 1rem;
+            }
+            
+            .logo-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .logo h1 {
+                font-size: 1.35rem;
+            }
+            
+            .divider {
+                margin: 1rem 0;
+            }
+            
+            .signup-link {
+                margin-top: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-home">
+        <i class="bi bi-arrow-left"></i>
+        Back to Home
+    </a>
+    
+    <div class="login-wrapper">
+        <div class="login-card">
+            <!-- Logo -->
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="bi bi-credit-card-2-front"></i>
+                </div>
+                <h1>Welcome Back</h1>
+                <p>Sign in to manage your digital business cards</p>
+            </div>
+            
+            <!-- Alert (Hidden by default) -->
+            <div class="alert-custom" id="errorAlert">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                <span id="errorMessage">Invalid email or password</span>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="loginForm">
+                <!-- Email Field -->
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email Address</label>
+                    <div class="input-group">
+                        <i class="bi bi-envelope input-icon"></i>
+                        <input 
+                            type="email" 
+                            class="form-control has-icon" 
+                            id="email" 
+                            name="email"
+                            placeholder="you@example.com"
+                            required
+                        >
+                    </div>
+                </div>
+                
+                <!-- Password Field -->
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="input-group">
+                        <i class="bi bi-lock input-icon"></i>
+                        <input 
+                            type="password" 
+                            class="form-control has-icon" 
+                            id="password" 
+                            name="password"
+                            placeholder="Enter your password"
+                            required
+                        >
+                        <button type="button" class="password-toggle" onclick="togglePassword()">
+                            <i class="bi bi-eye" id="toggleIcon"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Remember Me & Forgot Password -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="rememberMe" name="remember">
+                        <label class="form-check-label" for="rememberMe">
+                            Remember me
+                        </label>
+                    </div>
+                    <a href="/forgot-password/" class="forgot-password">
+                        Forgot password?
+                    </a>
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary-custom" id="submitBtn">
+                    <span id="btnText">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                    </span>
+                </button>
+            </form>
+            
+            <!-- Divider -->
+            <div class="divider">
+                <span>or continue with</span>
+            </div>
+            
+            <!-- Social Login Buttons -->
+            <div class="social-buttons">
+                <button type="button" class="btn btn-social btn-google">
+                    <i class="bi bi-google"></i>
+                    <span class="d-none d-sm-inline">Google</span>
+                </button>
+                
+                <button type="button" class="btn btn-social btn-linkedin">
+                    <i class="bi bi-linkedin"></i>
+                    <span class="d-none d-sm-inline">LinkedIn</span>
+                </button>
+            </div>
+            
+            <!-- Sign Up Link -->
+            <div class="signup-link">
+                Don't have an account? <a href="/register/">Create one now</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Toggle Password Visibility
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('bi-eye');
+                toggleIcon.classList.add('bi-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('bi-eye-slash');
+                toggleIcon.classList.add('bi-eye');
+            }
+        }
+        
+        // Form Submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('rememberMe').checked;
+            
+            // Show loading state
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            
+            btnText.style.opacity = '0';
+            submitBtn.classList.add('loading');
+            
+            // Simulate API call (replace with actual backend call)
+            setTimeout(() => {
+                // Reset button state
+                btnText.style.opacity = '1';
+                submitBtn.classList.remove('loading');
+                
+                // Example: Show error (remove this when integrating with backend)
+                // showError('Invalid email or password');
+                
+                // On success, redirect to dashboard
+                // window.location.href = '/dashboard/';
+                
+                console.log('Login attempt:', { email, password, remember });
+            }, 1500);
+        });
+        
+        // Show Error Alert
+        function showError(message) {
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            errorMessage.textContent = message;
+            errorAlert.classList.add('show');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                errorAlert.classList.remove('show');
+            }, 5000);
+        }
+        
+        // Auto-focus on email field
+        window.addEventListener('load', () => {
+            document.getElementById('email').focus();
+        });
+        
+        // Enter key on password field submits form
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+            }
+        });
+    </script>
+</body>
+</html>

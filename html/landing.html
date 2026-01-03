@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Business Card - Digital Networking Made Easy</title>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --accent-color: #764ba2;
+            --dark-color: #1f2937;
+            --light-color: #f9fafb;
+        }
+        
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        body {
+            overflow-x: hidden;
+        }
+        
+        /* Navbar */
+        .navbar {
+            padding: 1rem 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            color: var(--dark-color) !important;
+            margin: 0 0.5rem;
+            transition: color 0.3s;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+        
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border: none;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-outline-custom {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            background: transparent;
+            transition: all 0.3s;
+        }
+        
+        .btn-outline-custom:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            color: white;
+            padding: 120px 0 80px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            opacity: 0.95;
+            margin-bottom: 2rem;
+        }
+        
+        .hero-image {
+            max-width: 100%;
+            height: auto;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+            background: var(--light-color);
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid #e5e7eb;
+            height: 100%;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: white;
+        }
+        
+        .feature-card h3 {
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+        
+        .feature-card p {
+            color: #6b7280;
+            margin: 0;
+        }
+        
+        /* How It Works Section */
+        .how-it-works {
+            padding: 80px 0;
+            background: white;
+        }
+        
+        .step {
+            position: relative;
+            padding-left: 80px;
+            margin-bottom: 3rem;
+        }
+        
+        .step-number {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .step h4 {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+        }
+        
+        .step p {
+            color: #6b7280;
+            margin: 0;
+        }
+        
+        /* Pricing Section */
+        .pricing {
+            padding: 80px 0;
+            background: var(--light-color);
+        }
+        
+        .pricing-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s;
+            height: 100%;
+        }
+        
+        .pricing-card.featured {
+            border-color: var(--primary-color);
+            transform: scale(1.05);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .pricing-card.featured:hover {
+            transform: scale(1.05) translateY(-10px);
+        }
+        
+        .pricing-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+        
+        .pricing-card h3 {
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+        
+        .price {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin: 1rem 0;
+        }
+        
+        .price span {
+            font-size: 1.25rem;
+            font-weight: 400;
+            color: #6b7280;
+        }
+        
+        .pricing-features {
+            list-style: none;
+            padding: 0;
+            margin: 2rem 0;
+            text-align: left;
+        }
+        
+        .pricing-features li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .pricing-features li i {
+            color: #10b981;
+            margin-right: 0.5rem;
+        }
+        
+        /* CTA Section */
+        .cta {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+        
+        .cta h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        
+        .cta p {
+            font-size: 1.25rem;
+            opacity: 0.95;
+            margin-bottom: 2rem;
+        }
+        
+        .btn-white-custom {
+            background: white;
+            color: var(--primary-color);
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            border: none;
+            transition: transform 0.3s;
+        }
+        
+        .btn-white-custom:hover {
+            transform: scale(1.05);
+            color: var(--primary-color);
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--dark-color);
+            color: white;
+            padding: 60px 0 30px;
+        }
+        
+        footer h5 {
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        
+        footer ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        footer ul li {
+            margin-bottom: 0.75rem;
+        }
+        
+        footer a {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        footer a:hover {
+            color: white;
+        }
+        
+        .social-links a {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            margin-right: 0.5rem;
+            transition: background 0.3s;
+        }
+        
+        .social-links a:hover {
+            background: var(--primary-color);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .pricing-card.featured {
+                transform: scale(1);
+            }
+            
+            .step {
+                padding-left: 0;
+                padding-top: 70px;
+            }
+            
+            .step-number {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-credit-card-2-front"></i> VirtualCard
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#how-it-works">How It Works</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#pricing">Pricing</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login/">Login</a>
+                    </li>
+                    <li class="nav-item ms-3">
+                        <a href="/register/" class="btn btn-primary-custom">Get Started Free</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 hero-content">
+                    <h1>Your Digital Business Card, Always in Their Pocket</h1>
+                    <p>Create stunning, shareable digital business cards in minutes. No app required. Works with any smartphone via NFC or QR code.</p>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a href="/register/" class="btn btn-white-custom">
+                            <i class="bi bi-rocket-takeoff me-2"></i>Start Free Trial
+                        </a>
+                        <a href="#how-it-works" class="btn btn-outline-custom">
+                            <i class="bi bi-play-circle me-2"></i>Watch Demo
+                        </a>
+                    </div>
+                    <div class="mt-4">
+                        <small class="opacity-75">
+                            <i class="bi bi-check-circle me-2"></i>No credit card required
+                            <i class="bi bi-check-circle ms-3 me-2"></i>Cancel anytime
+                        </small>
+                    </div>
+                </div>
+                <div class="col-lg-6 mt-5 mt-lg-0">
+                    <img src="https://via.placeholder.com/600x500/667eea/ffffff?text=Business+Card+Preview" alt="Digital Business Card" class="hero-image img-fluid">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold">Everything You Need to Network Digitally</h2>
+                <p class="text-muted">Powerful features designed for modern professionals</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-qr-code"></i>
+                        </div>
+                        <h3>NFC & QR Codes</h3>
+                        <p>Share your card instantly with a tap or scan. Compatible with all smartphones without any app.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-palette"></i>
+                        </div>
+                        <h3>Fully Customizable</h3>
+                        <p>Choose colors, add your logo, banner images, and create a card that matches your brand perfectly.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <h3>Smart Analytics</h3>
+                        <p>Track who views your card, where they're from, and when they accessed it. Make data-driven decisions.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-phone"></i>
+                        </div>
+                        <h3>Contact Integration</h3>
+                        <p>One-tap save to contacts. Make it easy for people to keep your information in their phone.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-globe"></i>
+                        </div>
+                        <h3>Social Links</h3>
+                        <p>Add links to LinkedIn, Twitter, Instagram, portfolio, and any custom URLs you want to share.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h3>Always Updated</h3>
+                        <p>Update your information anytime and everyone who has your card sees the latest version instantly.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold">How It Works</h2>
+                <p class="text-muted">Get started in 3 simple steps</p>
+            </div>
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h4>Create Your Card</h4>
+                        <p>Sign up and fill in your details. Add your photo, logo, contact info, and social links. Customize colors to match your brand.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h4>Get Your NFC Tag or QR Code</h4>
+                        <p>We'll generate a unique QR code for you. Order an NFC tag or sticker from us, or write your card URL to any compatible NFC tag.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h4>Share & Track</h4>
+                        <p>Share your card by tapping NFC tags or showing your QR code. Track who views your card and measure your networking success.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold">Simple, Transparent Pricing</h2>
+                <p class="text-muted">Choose the plan that fits your needs</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="pricing-card">
+                        <h3>Free</h3>
+                        <div class="price">$0<span>/month</span></div>
+                        <p class="text-muted">Perfect to get started</p>
+                        <ul class="pricing-features">
+                            <li><i class="bi bi-check-circle-fill"></i> 1 Active Card</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Basic Analytics (7 days)</li>
+                            <li><i class="bi bi-check-circle-fill"></i> QR Code</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Standard Templates</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Contact Export</li>
+                        </ul>
+                        <a href="/register/" class="btn btn-outline-custom w-100">Get Started</a>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="pricing-card featured">
+                        <span class="pricing-badge">Most Popular</span>
+                        <h3>Pro</h3>
+                        <div class="price">$9.99<span>/month</span></div>
+                        <p class="text-muted">For professionals</p>
+                        <ul class="pricing-features">
+                            <li><i class="bi bi-check-circle-fill"></i> 5 Active Cards</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Advanced Analytics (90 days)</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Custom QR Design</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Premium Templates</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Remove Watermark</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Priority Support</li>
+                        </ul>
+                        <a href="/register/" class="btn btn-primary-custom w-100">Start Free Trial</a>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="pricing-card">
+                        <h3>Premium</h3>
+                        <div class="price">$29.99<span>/month</span></div>
+                        <p class="text-muted">For teams & businesses</p>
+                        <ul class="pricing-features">
+                            <li><i class="bi bi-check-circle-fill"></i> Unlimited Cards</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Lifetime Analytics</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Custom Branding</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Team Collaboration</li>
+                            <li><i class="bi bi-check-circle-fill"></i> API Access</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Dedicated Support</li>
+                        </ul>
+                        <a href="/register/" class="btn btn-outline-custom w-100">Contact Sales</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+        <div class="container">
+            <h2>Ready to Go Digital?</h2>
+            <p>Join thousands of professionals who've ditched paper business cards</p>
+            <a href="/register/" class="btn btn-white-custom btn-lg">
+                <i class="bi bi-rocket-takeoff me-2"></i>Create Your Card Now
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <h5><i class="bi bi-credit-card-2-front me-2"></i>VirtualCard</h5>
+                    <p class="text-muted">Making networking effortless with digital business cards that work everywhere.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="bi bi-twitter"></i></a>
+                        <a href="#"><i class="bi bi-linkedin"></i></a>
+                        <a href="#"><i class="bi bi-facebook"></i></a>
+                        <a href="#"><i class="bi bi-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-6 mb-4 mb-lg-0">
+                    <h5>Product</h5>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#pricing">Pricing</a></li>
+                        <li><a href="#">NFC Tags</a></li>
+                        <li><a href="#">Templates</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-6 mb-4 mb-lg-0">
+                    <h5>Company</h5>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-6 mb-4 mb-lg-0">
+                    <h5>Resources</h5>
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Tutorials</a></li>
+                        <li><a href="#">API Docs</a></li>
+                        <li><a href="#">Community</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-6">
+                    <h5>Legal</h5>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="#">GDPR</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="mt-5 mb-4" style="opacity: 0.1;">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <small class="text-muted">© 2026 VirtualCard. All rights reserved.</small>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <small class="text-muted">Made with <i class="bi bi-heart-fill text-danger"></i> for professionals worldwide</small>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Navbar background on scroll
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+            } else {
+                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+            }
+        });
+    </script>
+</body>
+</html>
