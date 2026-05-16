@@ -1,0 +1,38 @@
+name: Deploy to devvcard.hosammo.com
+
+on:
+  push:
+    branches: [dev]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEV_SSH_HOST }}
+          username: ${{ secrets.DEV_SSH_USER }}
+          key: ${{ secrets.DEV_SSH_KEY }}
+          port: ${{ secrets.DEV_SSH_PORT }}
+          script: |
+            set -e
+            cd ~/devvcard
+
+            echo "▶ Pulling latest dev branch..."
+            git pull origin dev
+
+            echo "▶ Installing dependencies..."
+            uv sync --frozen
+
+            echo "▶ Running migrations..."
+            uv run python manage.py migrate --settings=vcard_project.settings_dev
+
+            echo "▶ Collecting static files..."
+            uv run python manage.py collectstatic --noinput --settings=vcard_project.settings_dev
+
+            echo "▶ Restarting Passenger..."
+            mkdir -p tmp && touch tmp/restart.txt
+
+            echo "✅ Deploy complete → https://devvcard.hosammo.com"
