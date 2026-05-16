@@ -4,7 +4,6 @@ from . import views
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    path('', views.home, name='home'),
     path('card/<slug:url_slug>/', views.card_detail, name='card_detail'),
     path('card/<slug:url_slug>/vcard/', views.download_vcard, name='download_vcard'),
     path('api/card/<slug:url_slug>/stats/', views.card_stats, name='card_stats'),
