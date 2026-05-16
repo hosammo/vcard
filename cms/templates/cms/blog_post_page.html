@@ -1,0 +1,283 @@
+{% extends "cms/base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block title %}{{ page.title }}{% endblock %}
+{% block meta_description %}{% if page.excerpt %}{{ page.excerpt }}{% else %}{{ page.title }} — VCard Blog{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .post-hero-image {
+    width: 100%;
+    max-height: 440px;
+    overflow: hidden;
+    background: #f3f4f6;
+  }
+  .post-hero-image img {
+    width: 100%;
+    height: 440px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .post-container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .post-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #9ca3af;
+    text-decoration: none;
+    padding: 32px 0 0;
+    transition: color .12s;
+  }
+  .post-back:hover {
+    color: #6366f1;
+  }
+
+  .post-header {
+    padding: 24px 0 32px;
+    border-bottom: 1px solid #f3f4f6;
+    margin-bottom: 36px;
+  }
+
+  .post-label {
+    color: #6366f1;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+  }
+
+  .post-title {
+    font-size: 36px;
+    font-weight: 800;
+    color: #111827;
+    line-height: 1.2;
+    letter-spacing: -0.6px;
+    margin-bottom: 20px;
+  }
+
+  .post-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #9ca3af;
+  }
+  .post-meta-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .post-meta-author {
+    font-weight: 600;
+    color: #374151;
+  }
+  .post-meta-dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #d1d5db;
+    display: inline-block;
+  }
+
+  .post-excerpt {
+    font-size: 18px;
+    color: #6b7280;
+    line-height: 1.7;
+    margin-bottom: 36px;
+    font-style: italic;
+    border-left: 3px solid #6366f1;
+    padding-left: 18px;
+  }
+
+  /* StreamField body typography */
+  .post-body {
+    font-size: 17px;
+    line-height: 1.75;
+    color: #1f2937;
+    padding-bottom: 64px;
+  }
+  .post-body p {
+    margin-bottom: 1.4em;
+  }
+  .post-body h1,
+  .post-body h2,
+  .post-body h3,
+  .post-body h4 {
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    line-height: 1.25;
+    margin: 1.8em 0 0.6em;
+    color: #111827;
+  }
+  .post-body h1 { font-size: 30px; }
+  .post-body h2 { font-size: 24px; }
+  .post-body h3 { font-size: 20px; }
+  .post-body h4 { font-size: 17px; }
+  .post-body ul,
+  .post-body ol {
+    padding-left: 24px;
+    margin-bottom: 1.4em;
+  }
+  .post-body li { margin-bottom: 0.4em; }
+  .post-body blockquote {
+    border-left: 3px solid #6366f1;
+    padding-left: 20px;
+    margin: 1.6em 0;
+    color: #6b7280;
+    font-style: italic;
+  }
+  .post-body a {
+    color: #6366f1;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .post-body a:hover { color: #4f46e5; }
+  .post-body img {
+    max-width: 100%;
+    border-radius: 10px;
+    margin: 1.6em 0;
+    display: block;
+  }
+  .post-body code {
+    background: #f3f4f6;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: #6366f1;
+  }
+  .post-body pre {
+    background: #1f2937;
+    color: #f9fafb;
+    padding: 20px 24px;
+    border-radius: 10px;
+    overflow-x: auto;
+    margin: 1.6em 0;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .post-body pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+  }
+  .post-body hr {
+    border: none;
+    border-top: 1px solid #f3f4f6;
+    margin: 2em 0;
+  }
+
+  .post-footer {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 24px 72px;
+    border-top: 1px solid #f3f4f6;
+    padding-top: 32px;
+  }
+  .post-footer-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    text-decoration: none;
+    border: 1px solid #e5e7eb;
+    padding: 10px 18px;
+    border-radius: 8px;
+    transition: all .12s;
+  }
+  .post-footer-back:hover {
+    border-color: #6366f1;
+    color: #6366f1;
+    background: #eef2ff;
+  }
+
+  @media (max-width: 768px) {
+    .post-title { font-size: 26px; }
+    .post-body { font-size: 16px; }
+    .post-hero-image img { height: 260px; }
+    .post-excerpt { font-size: 16px; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero Image -->
+{% if page.hero_image %}
+<div class="post-hero-image">
+  {% load wagtailimages_tags %}
+  {% image page.hero_image fill-1200x440 as hero %}
+  <img src="{{ hero.url }}" alt="{{ hero.alt }}">
+</div>
+{% endif %}
+
+<!-- Back link (top) -->
+<div class="post-container">
+  <a href="{{ page.get_parent.url }}" class="post-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+    Back to Blog
+  </a>
+</div>
+
+<!-- Article Header -->
+<div class="post-container">
+  <header class="post-header">
+    <div class="post-label">Blog</div>
+    <h1 class="post-title">{{ page.title }}</h1>
+    <div class="post-meta">
+      {% if page.author %}
+      <div class="post-meta-avatar">{{ page.author|first|upper }}</div>
+      <span class="post-meta-author">{{ page.author }}</span>
+      {% endif %}
+      {% if page.author and page.published_date %}
+      <span class="post-meta-dot"></span>
+      {% endif %}
+      {% if page.published_date %}
+      <time datetime="{{ page.published_date|date:'Y-m-d' }}">{{ page.published_date|date:"F j, Y" }}</time>
+      {% endif %}
+    </div>
+  </header>
+
+  <!-- Excerpt -->
+  {% if page.excerpt %}
+  <p class="post-excerpt">{{ page.excerpt }}</p>
+  {% endif %}
+
+  <!-- Body (StreamField) -->
+  <div class="post-body">
+    {{ page.body }}
+  </div>
+</div>
+
+<!-- Footer / Back link -->
+<footer class="post-footer">
+  <a href="{{ page.get_parent.url }}" class="post-footer-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+    Back to Blog
+  </a>
+</footer>
+
+{% endblock %}

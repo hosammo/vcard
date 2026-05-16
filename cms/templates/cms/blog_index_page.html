@@ -1,0 +1,338 @@
+{% extends "cms/base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block title %}{{ page.title }}{% endblock %}
+{% block meta_description %}{% if page.intro %}{{ page.intro|striptags|truncatewords:25 }}{% else %}Insights, tips, and stories from the VCard team.{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .blog-hero {
+    text-align: center;
+    padding: 72px 24px 56px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .blog-hero .section-label {
+    display: inline-block;
+  }
+  .blog-hero .section-title {
+    margin-bottom: 12px;
+  }
+  .blog-intro {
+    color: #6b7280;
+    font-size: 17px;
+    line-height: 1.7;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+  .blog-intro p { margin: 0; }
+
+  .blog-grid-section {
+    padding: 56px 0 80px;
+  }
+
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+
+  .blog-card {
+    border: 1px solid #f3f4f6;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow .15s, border-color .15s;
+  }
+  .blog-card:hover {
+    box-shadow: 0 8px 32px rgba(99,102,241,0.08);
+    border-color: #e0e7ff;
+  }
+
+  .blog-card-thumb {
+    width: 100%;
+    aspect-ratio: 16/10;
+    overflow: hidden;
+    background: #f3f4f6;
+  }
+  .blog-card-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .3s;
+  }
+  .blog-card:hover .blog-card-thumb img {
+    transform: scale(1.03);
+  }
+  .blog-card-thumb-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
+  }
+  .blog-card-thumb-placeholder svg {
+    opacity: 0.25;
+  }
+
+  .blog-card-body {
+    padding: 22px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .blog-card-meta {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .blog-card-meta-dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #d1d5db;
+    display: inline-block;
+  }
+  .blog-card-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.35;
+    margin-bottom: 10px;
+    letter-spacing: -0.2px;
+  }
+  .blog-card-title a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .blog-card-title a:hover {
+    color: #6366f1;
+  }
+  .blog-card-excerpt {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.6;
+    flex: 1;
+    margin-bottom: 18px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .blog-card-readmore {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6366f1;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    align-self: flex-start;
+  }
+  .blog-card-readmore:hover {
+    color: #4f46e5;
+  }
+
+  .blog-empty {
+    text-align: center;
+    padding: 72px 24px;
+    color: #9ca3af;
+  }
+  .blog-empty-icon {
+    margin-bottom: 16px;
+    opacity: 0.4;
+  }
+  .blog-empty h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+  }
+  .blog-empty p {
+    font-size: 14px;
+  }
+
+  /* Pagination */
+  .blog-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 48px;
+  }
+  .page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    text-decoration: none;
+    background: #fff;
+    transition: all .12s;
+  }
+  .page-btn:hover {
+    border-color: #6366f1;
+    color: #6366f1;
+    background: #eef2ff;
+  }
+  .page-btn.active {
+    background: #6366f1;
+    border-color: #6366f1;
+    color: #fff;
+  }
+  .page-btn.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  @media (max-width: 900px) {
+    .blog-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .blog-grid { grid-template-columns: 1fr; }
+    .blog-hero { padding: 48px 20px 40px; }
+    .blog-grid-section { padding: 36px 0 60px; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Blog Header -->
+<section class="blog-hero">
+  <div class="section-label">Blog</div>
+  <h1 class="section-title">{{ page.title }}</h1>
+  {% if page.intro %}
+  <div class="blog-intro">{{ page.intro|richtext }}</div>
+  {% else %}
+  <p class="blog-intro">Insights, tips, and stories from the VCard team.</p>
+  {% endif %}
+</section>
+
+<!-- Blog Grid -->
+<section class="blog-grid-section">
+  <div class="container">
+
+    {% if posts %}
+    <div class="blog-grid">
+      {% for post in posts %}
+      <article class="blog-card">
+
+        <!-- Thumbnail -->
+        <div class="blog-card-thumb">
+          {% if post.hero_image %}
+            {% image post.hero_image fill-400x250 as thumb %}
+            <img src="{{ thumb.url }}" alt="{{ thumb.alt }}">
+          {% else %}
+          <div class="blog-card-thumb-placeholder">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.5">
+              <rect x="3" y="3" width="18" height="18" rx="3"/>
+              <path d="M3 9h18M9 21V9"/>
+            </svg>
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="blog-card-body">
+          <!-- Meta -->
+          <div class="blog-card-meta">
+            {% if post.author %}<span>{{ post.author }}</span>{% endif %}
+            {% if post.author and post.published_date %}<span class="blog-card-meta-dot"></span>{% endif %}
+            {% if post.published_date %}<time datetime="{{ post.published_date|date:'Y-m-d' }}">{{ post.published_date|date:"M j, Y" }}</time>{% endif %}
+          </div>
+
+          <!-- Title -->
+          <h2 class="blog-card-title">
+            <a href="{{ post.url }}">{{ post.title }}</a>
+          </h2>
+
+          <!-- Excerpt -->
+          {% if post.excerpt %}
+          <p class="blog-card-excerpt">{{ post.excerpt }}</p>
+          {% endif %}
+
+          <!-- Read more -->
+          <a href="{{ post.url }}" class="blog-card-readmore">
+            Read more
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+
+      </article>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if posts.paginator.num_pages > 1 %}
+    <nav class="blog-pagination" aria-label="Blog pagination">
+
+      {% if posts.has_previous %}
+      <a href="?page={{ posts.previous_page_number }}" class="page-btn" aria-label="Previous page">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </a>
+      {% else %}
+      <span class="page-btn disabled" aria-disabled="true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </span>
+      {% endif %}
+
+      {% for i in posts.paginator.page_range %}
+        {% if i == posts.number %}
+        <span class="page-btn active" aria-current="page">{{ i }}</span>
+        {% elif i >= posts.number|add:"-2" and i <= posts.number|add:"2" %}
+        <a href="?page={{ i }}" class="page-btn">{{ i }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if posts.has_next %}
+      <a href="?page={{ posts.next_page_number }}" class="page-btn" aria-label="Next page">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
+      {% else %}
+      <span class="page-btn disabled" aria-disabled="true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </span>
+      {% endif %}
+
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <!-- No posts -->
+    <div class="blog-empty">
+      <div class="blog-empty-icon">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.5">
+          <path d="M4 4h16v12H4zM8 20h8M12 16v4"/>
+        </svg>
+      </div>
+      <h3>No posts yet</h3>
+      <p>Check back soon — we're working on something great.</p>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+{% endblock %}

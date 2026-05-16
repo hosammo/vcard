@@ -1,0 +1,403 @@
+{% extends "cms/base.html" %}
+{% load wagtailcore_tags %}
+
+{% block title %}{{ page.heading|default:"Pricing" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ── Header ─────────────────────────────────────────────── */
+  .pricing-hero {
+    padding: 80px 48px 64px;
+    text-align: center;
+  }
+  .pricing-hero h1 {
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: -0.75px;
+    color: #111827;
+    margin-bottom: 14px;
+    line-height: 1.15;
+  }
+  .pricing-hero p {
+    color: #6b7280;
+    font-size: 18px;
+    line-height: 1.6;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* ── Tier grid ───────────────────────────────────────────── */
+  .pricing-grid-wrap {
+    padding: 0 48px 80px;
+  }
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    max-width: 1040px;
+    margin: 0 auto;
+  }
+  .tier-card {
+    background: #fff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 36px 32px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: box-shadow .2s;
+  }
+  .tier-card:hover {
+    box-shadow: 0 8px 30px rgba(0,0,0,.07);
+  }
+  .tier-card.featured {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+  }
+  .tier-badge {
+    position: absolute;
+    top: -13px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #6366f1;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .6px;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .tier-name {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: #6b7280;
+    margin-bottom: 10px;
+  }
+  .tier-card.featured .tier-name {
+    color: #6366f1;
+  }
+  .tier-price {
+    font-size: 40px;
+    font-weight: 800;
+    color: #111827;
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .tier-description {
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.55;
+    margin-bottom: 24px;
+    min-height: 40px;
+  }
+  .tier-divider {
+    border: none;
+    border-top: 1px solid #f3f4f6;
+    margin-bottom: 24px;
+  }
+  .tier-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 32px;
+    flex: 1;
+  }
+  .tier-features li {
+    font-size: 14px;
+    color: #374151;
+    padding: 6px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.45;
+  }
+  .tier-features li::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236366f1'%3E%3Cpath fill-rule='evenodd' d='M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E") center/contain no-repeat;
+    margin-top: 1px;
+  }
+  .tier-cta {
+    display: block;
+    text-align: center;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    border: 1.5px solid #e5e7eb;
+    color: #374151;
+    background: #fff;
+    transition: background .15s, color .15s, border-color .15s;
+    text-decoration: none;
+  }
+  .tier-cta:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+  }
+  .tier-card.featured .tier-cta {
+    background: #6366f1;
+    border-color: #6366f1;
+    color: #fff;
+  }
+  .tier-card.featured .tier-cta:hover {
+    background: #4f46e5;
+    border-color: #4f46e5;
+  }
+
+  /* ── FAQ ─────────────────────────────────────────────────── */
+  .faq-section {
+    padding: 24px 48px 96px;
+  }
+  .faq-inner {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  .faq-header {
+    text-align: center;
+    margin-bottom: 44px;
+  }
+  .faq-header h2 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+    color: #111827;
+    margin-bottom: 8px;
+  }
+  .faq-header p {
+    color: #6b7280;
+    font-size: 15px;
+  }
+  .accordion-item {
+    border: 1.5px solid #e5e7eb;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .accordion-button {
+    background: #fff;
+    color: #111827;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 18px 22px;
+    border: none;
+    width: 100%;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .accordion-button:not(.collapsed) {
+    background: #fafafa;
+    color: #6366f1;
+    box-shadow: none;
+  }
+  .accordion-button::after {
+    filter: none;
+  }
+  .accordion-button:not(.collapsed)::after {
+    filter: invert(40%) sepia(80%) saturate(600%) hue-rotate(210deg);
+  }
+  .accordion-body {
+    font-size: 15px;
+    color: #6b7280;
+    line-height: 1.7;
+    padding: 4px 22px 20px;
+  }
+
+  @media (max-width: 768px) {
+    .pricing-hero { padding: 56px 20px 48px; }
+    .pricing-hero h1 { font-size: 28px; }
+    .pricing-grid-wrap { padding: 0 20px 64px; }
+    .pricing-grid { grid-template-columns: 1fr; gap: 20px; }
+    .faq-section { padding: 16px 20px 72px; }
+    .tier-price { font-size: 34px; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Header -->
+<section class="pricing-hero">
+  <div class="section-label">Pricing</div>
+  <h1>{{ page.heading|default:"Simple, transparent pricing" }}</h1>
+  <p>{{ page.subtext|default:"Start free. Upgrade when you're ready." }}</p>
+</section>
+
+<!-- Pricing tiers -->
+<div class="pricing-grid-wrap">
+  <div class="pricing-grid">
+
+    {% if page.tiers %}
+      {% for block in page.tiers %}
+        {% with tier=block.value %}
+        <div class="tier-card{% if tier.is_featured %} featured{% endif %}">
+          {% if tier.is_featured %}<div class="tier-badge">Most popular</div>{% endif %}
+          <div class="tier-name">{{ tier.name }}</div>
+          <div class="tier-price">{{ tier.price }}</div>
+          <div class="tier-description">{{ tier.description }}</div>
+          <hr class="tier-divider">
+          <ul class="tier-features">
+            {% for feature in tier.features %}
+              <li>{{ feature }}</li>
+            {% endfor %}
+          </ul>
+          <a href="/register/" class="tier-cta">{{ tier.cta_label|default:"Get started" }}</a>
+        </div>
+        {% endwith %}
+      {% endfor %}
+
+    {% else %}
+      <!-- Hardcoded fallback tiers -->
+      <div class="tier-card">
+        <div class="tier-name">Free</div>
+        <div class="tier-price">$0</div>
+        <div class="tier-description">Everything you need to get started with a digital card.</div>
+        <hr class="tier-divider">
+        <ul class="tier-features">
+          <li>1 digital business card</li>
+          <li>NFC &amp; QR sharing</li>
+          <li>Basic contact info</li>
+          <li>VCard subdomain</li>
+          <li>100 profile views/mo</li>
+        </ul>
+        <a href="/register/" class="tier-cta">Get started free</a>
+      </div>
+
+      <div class="tier-card featured">
+        <div class="tier-badge">Most popular</div>
+        <div class="tier-name">Pro</div>
+        <div class="tier-price">$12<span style="font-size:18px;font-weight:600;color:#6b7280;">/mo</span></div>
+        <div class="tier-description">For professionals who want more reach and analytics.</div>
+        <hr class="tier-divider">
+        <ul class="tier-features">
+          <li>5 digital business cards</li>
+          <li>Custom domain support</li>
+          <li>Advanced analytics</li>
+          <li>Remove VCard branding</li>
+          <li>Priority support</li>
+          <li>Unlimited profile views</li>
+        </ul>
+        <a href="/register/" class="tier-cta">Start Pro trial</a>
+      </div>
+
+      <div class="tier-card">
+        <div class="tier-name">Business</div>
+        <div class="tier-price">$49<span style="font-size:18px;font-weight:600;color:#6b7280;">/mo</span></div>
+        <div class="tier-description">For teams and organisations managing multiple cards.</div>
+        <hr class="tier-divider">
+        <ul class="tier-features">
+          <li>Unlimited cards</li>
+          <li>Team management dashboard</li>
+          <li>Bulk NFC card ordering</li>
+          <li>SSO &amp; role-based access</li>
+          <li>API access</li>
+          <li>Dedicated account manager</li>
+        </ul>
+        <a href="/register/" class="tier-cta">Contact sales</a>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<!-- FAQ -->
+<section class="faq-section">
+  <div class="faq-inner">
+    <div class="faq-header">
+      <div class="section-label">FAQ</div>
+      <h2>Frequently asked questions</h2>
+      <p>Can't find the answer you're looking for? <a href="mailto:hello@hosammo.com" style="color:#6366f1;">Contact us</a>.</p>
+    </div>
+
+    <div class="accordion" id="faqAccordion">
+
+      {% if page.faq %}
+        {% for block in page.faq %}
+          {% with item=block.value %}
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="faq-heading-{{ forloop.counter }}">
+              <button
+                class="accordion-button{% if not forloop.first %} collapsed{% endif %}"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#faq-collapse-{{ forloop.counter }}"
+                aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}"
+                aria-controls="faq-collapse-{{ forloop.counter }}"
+              >
+                {{ item.question }}
+              </button>
+            </h2>
+            <div
+              id="faq-collapse-{{ forloop.counter }}"
+              class="accordion-collapse collapse{% if forloop.first %} show{% endif %}"
+              aria-labelledby="faq-heading-{{ forloop.counter }}"
+              data-bs-parent="#faqAccordion"
+            >
+              <div class="accordion-body">{{ item.answer }}</div>
+            </div>
+          </div>
+          {% endwith %}
+        {% endfor %}
+
+      {% else %}
+        <!-- Hardcoded fallback FAQs -->
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="faq-heading-1">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq-collapse-1" aria-expanded="true" aria-controls="faq-collapse-1">
+              Can I upgrade or downgrade my plan at any time?
+            </button>
+          </h2>
+          <div id="faq-collapse-1" class="accordion-collapse collapse show" aria-labelledby="faq-heading-1" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              Yes — you can upgrade or downgrade your plan at any time from your account settings. Changes take effect immediately and billing is prorated for the remainder of the billing cycle.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="faq-heading-2">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-collapse-2" aria-expanded="false" aria-controls="faq-collapse-2">
+              Do I need an NFC card to use VCard?
+            </button>
+          </h2>
+          <div id="faq-collapse-2" class="accordion-collapse collapse" aria-labelledby="faq-heading-2" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              No. Your digital card works perfectly via QR code and shareable link without any physical hardware. The NFC card is an optional add-on for a seamless tap-to-share experience.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="faq-heading-3">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-collapse-3" aria-expanded="false" aria-controls="faq-collapse-3">
+              Is there a free trial for the Pro plan?
+            </button>
+          </h2>
+          <div id="faq-collapse-3" class="accordion-collapse collapse" aria-labelledby="faq-heading-3" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              Yes, the Pro plan comes with a 14-day free trial — no credit card required. At the end of the trial you can choose to subscribe or drop back to the Free plan automatically.
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc4s9bIOgUxi8T/jzmSjxj/jLM8eRLYSbcHGhZGtl8Kl" crossorigin="anonymous"></script>
+{% endblock %}

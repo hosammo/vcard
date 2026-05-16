@@ -1,0 +1,107 @@
+{% extends "cms/base.html" %}
+{% load wagtailcore_tags %}
+
+{% block title %}{{ page.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .about-hero {
+    padding: 72px 0 48px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .about-hero h1 {
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: -0.75px;
+    line-height: 1.15;
+    color: #111827;
+    margin-bottom: 0;
+  }
+  .about-hero h1 span {
+    color: #6366f1;
+  }
+  .about-body {
+    padding: 56px 0 96px;
+  }
+  .prose {
+    color: #374151;
+    font-size: 17px;
+    line-height: 1.8;
+  }
+  .prose h1, .prose h2, .prose h3 {
+    color: #111827;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    margin-top: 2.5rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+  }
+  .prose h1 { font-size: 30px; }
+  .prose h2 { font-size: 24px; }
+  .prose h3 { font-size: 20px; }
+  .prose p {
+    margin-bottom: 1.25rem;
+  }
+  .prose ul, .prose ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .prose li {
+    margin-bottom: 0.4rem;
+  }
+  .prose a {
+    color: #6366f1;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .prose a:hover {
+    color: #4f46e5;
+  }
+  .prose blockquote {
+    border-left: 3px solid #6366f1;
+    padding-left: 1.25rem;
+    margin: 2rem 0;
+    color: #6b7280;
+    font-style: italic;
+  }
+  .prose img {
+    max-width: 100%;
+    border-radius: 12px;
+    margin: 2rem 0;
+  }
+  .prose hr {
+    border: none;
+    border-top: 1px solid #f3f4f6;
+    margin: 2.5rem 0;
+  }
+  .about-narrow {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 48px;
+  }
+  @media (max-width: 768px) {
+    .about-narrow { padding: 0 20px; }
+    .about-hero h1 { font-size: 30px; }
+    .about-hero { padding: 48px 0 32px; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="about-hero">
+  <div class="about-narrow">
+    <div class="section-label">Our story</div>
+    <h1>{{ page.title }}</h1>
+  </div>
+</section>
+
+<div class="about-body">
+  <div class="about-narrow">
+    <div class="prose">
+      {{ page.body }}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

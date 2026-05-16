@@ -1,0 +1,565 @@
+{% extends "cms/base.html" %}
+{% load wagtailcore_tags %}
+
+{% block title %}{{ page.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ── Hero ───────────────────────────────────────────── */
+  .hero {
+    padding: 96px 48px 80px;
+    text-align: center;
+    background: #fff;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: #eef2ff;
+    color: #6366f1;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-size: clamp(36px, 5vw, 56px);
+    font-weight: 900;
+    letter-spacing: -1px;
+    line-height: 1.1;
+    color: #111827;
+    max-width: 720px;
+    margin: 0 auto 20px;
+  }
+  .hero-sub {
+    font-size: 18px;
+    color: #6b7280;
+    line-height: 1.65;
+    max-width: 520px;
+    margin: 0 auto 36px;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+  .btn-hero-primary {
+    background: #6366f1;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px 28px;
+    border-radius: 10px;
+    display: inline-block;
+    transition: background .15s, transform .1s;
+    border: none;
+    cursor: pointer;
+  }
+  .btn-hero-primary:hover {
+    background: #4f46e5;
+    transform: translateY(-1px);
+    color: #fff;
+  }
+  .btn-hero-secondary {
+    background: transparent;
+    color: #374151;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 14px 28px;
+    border-radius: 10px;
+    border: 1.5px solid #e5e7eb;
+    display: inline-block;
+    transition: border-color .15s, color .15s;
+  }
+  .btn-hero-secondary:hover {
+    border-color: #6366f1;
+    color: #6366f1;
+  }
+  .hero-proof {
+    font-size: 13px;
+    color: #9ca3af;
+    font-weight: 500;
+  }
+  .hero-proof strong {
+    color: #6366f1;
+  }
+
+  /* ── Features ──────────────────────────────────────── */
+  .section-features {
+    padding: 80px 48px;
+    background: #f9fafb;
+  }
+  .section-header {
+    text-align: center;
+    margin-bottom: 52px;
+  }
+  .section-header .section-label { margin-bottom: 8px; }
+  .section-header .section-title { margin-bottom: 12px; }
+  .section-header .section-sub { margin: 0 auto; text-align: center; }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    max-width: 1040px;
+    margin: 0 auto;
+  }
+  .feature-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 32px 28px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    transition: box-shadow .2s, transform .2s;
+  }
+  .feature-card:hover {
+    box-shadow: 0 6px 20px rgba(99,102,241,.1);
+    transform: translateY(-2px);
+  }
+  .feature-icon {
+    font-size: 28px;
+    margin-bottom: 16px;
+    line-height: 1;
+  }
+  .feature-card h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 8px;
+  }
+  .feature-card p {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ── How it works ──────────────────────────────────── */
+  .section-steps {
+    padding: 80px 48px;
+    background: #fff;
+  }
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    max-width: 1040px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .steps-grid::before {
+    content: '';
+    position: absolute;
+    top: 28px;
+    left: calc(16.66% + 16px);
+    right: calc(16.66% + 16px);
+    height: 2px;
+    background: #e5e7eb;
+    z-index: 0;
+  }
+  .step-item {
+    text-align: center;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+  .step-number {
+    width: 56px;
+    height: 56px;
+    background: #6366f1;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 800;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    box-shadow: 0 0 0 6px #eef2ff;
+  }
+  .step-item h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 8px;
+  }
+  .step-item p {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ── Testimonials ──────────────────────────────────── */
+  .section-testimonials {
+    padding: 80px 48px;
+    background: #f9fafb;
+  }
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    max-width: 1040px;
+    margin: 0 auto;
+  }
+  .testimonial-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 28px 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .testimonial-stars {
+    color: #f59e0b;
+    font-size: 14px;
+    letter-spacing: 1px;
+  }
+  .testimonial-quote {
+    font-size: 14px;
+    color: #374151;
+    line-height: 1.65;
+    flex: 1;
+    margin: 0;
+  }
+  .testimonial-quote::before {
+    content: '\201C';
+    color: #6366f1;
+    font-size: 32px;
+    line-height: 0;
+    vertical-align: -10px;
+    margin-right: 4px;
+    font-weight: 800;
+  }
+  .testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-top: 1px solid #f3f4f6;
+    padding-top: 14px;
+  }
+  .author-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #eef2ff;
+    color: #6366f1;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .author-info strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: #111827;
+  }
+  .author-info span {
+    font-size: 12px;
+    color: #9ca3af;
+  }
+
+  /* ── CTA Banner ────────────────────────────────────── */
+  .section-cta {
+    padding: 96px 48px;
+    background: #6366f1;
+    color: #fff;
+    text-align: center;
+  }
+  .section-cta h2 {
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    line-height: 1.15;
+    margin-bottom: 14px;
+    color: #fff;
+  }
+  .section-cta p {
+    font-size: 16px;
+    color: rgba(255,255,255,.8);
+    max-width: 480px;
+    margin: 0 auto 36px;
+    line-height: 1.65;
+  }
+  .btn-cta {
+    background: #fff;
+    color: #6366f1;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px 28px;
+    border-radius: 10px;
+    display: inline-block;
+    transition: background .15s, transform .1s;
+  }
+  .btn-cta:hover {
+    background: #f5f3ff;
+    transform: translateY(-1px);
+    color: #4f46e5;
+  }
+
+  /* ── Responsive ────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .hero { padding: 64px 20px 56px; }
+    .section-features,
+    .section-steps,
+    .section-testimonials,
+    .section-cta { padding: 60px 20px; }
+
+    .features-grid,
+    .testimonials-grid { grid-template-columns: 1fr; }
+
+    .steps-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+    .steps-grid::before { display: none; }
+
+    .hero-actions { flex-direction: column; align-items: center; }
+    .btn-hero-primary,
+    .btn-hero-secondary { width: 100%; max-width: 320px; text-align: center; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════════════════
+     1. HERO
+════════════════════════════════════════════════════════ -->
+<section class="hero">
+
+  {% if page.hero_badge_text %}
+    <div class="hero-badge">{{ page.hero_badge_text }}</div>
+  {% else %}
+    <div class="hero-badge">✦ NFC-ready digital business cards</div>
+  {% endif %}
+
+  <h1>
+    {% if page.hero_heading %}{{ page.hero_heading }}{% else %}Your digital identity, one tap away{% endif %}
+  </h1>
+
+  <p class="hero-sub">
+    {% if page.hero_subtext %}
+      {{ page.hero_subtext }}
+    {% else %}
+      Share your contact details, social profiles and portfolio with a single tap or scan — no app required on the receiving end.
+    {% endif %}
+  </p>
+
+  <div class="hero-actions">
+    <a href="/register/" class="btn-hero-primary">
+      {% if page.hero_primary_cta_label %}{{ page.hero_primary_cta_label }}{% else %}Create your card — it's free{% endif %}
+    </a>
+    <a href="#how-it-works" class="btn-hero-secondary">
+      {% if page.hero_secondary_cta_label %}{{ page.hero_secondary_cta_label }}{% else %}See how it works →{% endif %}
+    </a>
+  </div>
+
+  <p class="hero-proof">
+    {% if page.hero_social_proof_text %}
+      <strong>{{ page.hero_social_proof_text }}</strong>
+    {% else %}
+      <strong>12,000+</strong> professionals already use VCard
+    {% endif %}
+  </p>
+
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════
+     2. FEATURES
+════════════════════════════════════════════════════════ -->
+<section class="section-features" id="features">
+  <div class="section-header">
+    <p class="section-label">Features</p>
+    <h2 class="section-title">Everything you need to share smarter</h2>
+    <p class="section-sub">One card. Every platform. Always up to date.</p>
+  </div>
+
+  <div class="features-grid">
+
+    {% if page.features %}
+      {% for block in page.features %}
+        {% with feature=block.value %}
+        <div class="feature-card">
+          {% if feature.icon %}
+            <div class="feature-icon">{{ feature.icon }}</div>
+          {% endif %}
+          <h3>{{ feature.heading }}</h3>
+          <p>{{ feature.body }}</p>
+        </div>
+        {% endwith %}
+      {% endfor %}
+    {% else %}
+      <div class="feature-card">
+        <div class="feature-icon">📲</div>
+        <h3>One-tap NFC sharing</h3>
+        <p>Tap your physical NFC card to any smartphone and your contact page opens instantly — no app, no friction.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Real-time analytics</h3>
+        <p>See who viewed your card, where they came from, and which links they clicked — all in a live dashboard.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✏️</div>
+        <h3>Always editable</h3>
+        <p>Update your phone number, title, or links at any time. People who already have your card see the latest version automatically.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔗</div>
+        <h3>Link all your profiles</h3>
+        <p>Add LinkedIn, Instagram, Calendly, WhatsApp, portfolio sites — anything you want discoverable in one place.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎨</div>
+        <h3>Branded themes</h3>
+        <p>Choose from sleek templates or build a custom design that matches your personal brand or company colours.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🏢</div>
+        <h3>Team management</h3>
+        <p>Manage cards for your entire team from one admin panel. Update branding globally with a single change.</p>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════
+     3. HOW IT WORKS
+════════════════════════════════════════════════════════ -->
+<section class="section-steps" id="how-it-works">
+  <div class="section-header">
+    <p class="section-label">How it works</p>
+    <h2 class="section-title">Up and running in minutes</h2>
+    <p class="section-sub">Three simple steps. No technical knowledge needed.</p>
+  </div>
+
+  <div class="steps-grid">
+
+    {% if page.steps %}
+      {% for block in page.steps %}
+        {% with step=block.value %}
+        <div class="step-item">
+          <div class="step-number">{{ step.number }}</div>
+          <h3>{{ step.heading }}</h3>
+          <p>{{ step.body }}</p>
+        </div>
+        {% endwith %}
+      {% endfor %}
+    {% else %}
+      <div class="step-item">
+        <div class="step-number">1</div>
+        <h3>Create your card</h3>
+        <p>Sign up free, fill in your details and pick a design. Your card is live within seconds.</p>
+      </div>
+      <div class="step-item">
+        <div class="step-number">2</div>
+        <h3>Share your link or tap</h3>
+        <p>Send your VCard link by message or email, display your QR code, or tap an NFC card to share instantly.</p>
+      </div>
+      <div class="step-item">
+        <div class="step-number">3</div>
+        <h3>Track every interaction</h3>
+        <p>Your dashboard shows real-time views, link clicks and contact saves so you never miss a connection.</p>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════
+     4. TESTIMONIALS
+════════════════════════════════════════════════════════ -->
+<section class="section-testimonials" id="testimonials">
+  <div class="section-header">
+    <p class="section-label">Testimonials</p>
+    <h2 class="section-title">Loved by professionals worldwide</h2>
+    <p class="section-sub">See what our customers say about making the switch to digital.</p>
+  </div>
+
+  <div class="testimonials-grid">
+
+    {% if page.testimonials %}
+      {% for block in page.testimonials %}
+        {% with t=block.value %}
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-quote">{{ t.quote }}</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">{{ t.name|slice:":1" }}</div>
+            <div class="author-info">
+              <strong>{{ t.name }}</strong>
+              <span>{{ t.role }}</span>
+            </div>
+          </div>
+        </div>
+        {% endwith %}
+      {% endfor %}
+    {% else %}
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-quote">I handed out 200 paper business cards at a conference last year. Half were thrown away. With VCard I just tap and they instantly have everything — and I can see who actually saved my contact.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">S</div>
+          <div class="author-info">
+            <strong>Sarah Mitchell</strong>
+            <span>Head of Sales, Techflow</span>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-quote">Setting up took five minutes and the analytics blew me away. I can see which link people click most — turned out my portfolio gets twice the clicks of my LinkedIn. Completely changed how I present myself.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">J</div>
+          <div class="author-info">
+            <strong>James Okonkwo</strong>
+            <span>Freelance Designer</span>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-quote">We rolled VCard out to our 40-person sales team in a day. Updating the company logo across every card took one click. Our brand looks consistent everywhere now — it's a no-brainer for any team.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">A</div>
+          <div class="author-info">
+            <strong>Aisha Rahman</strong>
+            <span>Marketing Director, NovaCorp</span>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════
+     5. CTA BANNER
+════════════════════════════════════════════════════════ -->
+<section class="section-cta">
+  <h2>
+    {% if page.cta_heading %}{{ page.cta_heading }}{% else %}Ready to make your mark?{% endif %}
+  </h2>
+  <p>
+    {% if page.cta_subtext %}
+      {{ page.cta_subtext }}
+    {% else %}
+      Join 12,000+ professionals who've gone digital. Free to start, no credit card required.
+    {% endif %}
+  </p>
+  <a href="/register/" class="btn-cta">
+    {% if page.cta_button_label %}{{ page.cta_button_label }}{% else %}Start your free card →{% endif %}
+  </a>
+</section>
+
+{% endblock %}
