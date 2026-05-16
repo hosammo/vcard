@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Settings - Virtual Business Card</title>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --accent-color: #764ba2;
+            --dark-color: #1f2937;
+            --light-color: #f9fafb;
+            --sidebar-width: 260px;
+        }
+        
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        body {
+            background: var(--light-color);
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            z-index: 1000;
+            transition: transform 0.3s;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .sidebar-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1.5rem;
+            color: #6b7280;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        .menu-item:hover {
+            background: var(--light-color);
+            color: var(--primary-color);
+        }
+        
+        .menu-item.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border-right: 3px solid var(--accent-color);
+        }
+        
+        .menu-item i {
+            font-size: 1.25rem;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+        
+        /* Top Bar */
+        .top-bar {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin: 0;
+        }
+        
+        .mobile-menu-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--light-color);
+            border: none;
+            color: var(--dark-color);
+            font-size: 1.25rem;
+        }
+        
+        /* Content Layout */
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Settings Navigation */
+        .settings-nav {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid #e5e7eb;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+        
+        .settings-nav-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #f3f4f6;
+        }
+        
+        .settings-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1rem;
+            color: #6b7280;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s;
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .settings-nav-item:hover {
+            background: var(--light-color);
+            color: var(--primary-color);
+        }
+        
+        .settings-nav-item.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+        }
+        
+        .settings-nav-item i {
+            font-size: 1.1rem;
+        }
+        
+        /* Settings Content */
+        .settings-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .settings-section {
+            display: none;
+        }
+        
+        .settings-section.active {
+            display: block;
+        }
+        
+        .section-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #f3f4f6;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .section-description {
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+        
+        /* Profile Header */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+        
+        .profile-avatar-wrapper {
+            position: relative;
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid white;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .avatar-edit-btn {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 36px;
+            height: 36px;
+            background: white;
+            border: 3px solid var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .avatar-edit-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .profile-info {
+            color: white;
+            flex: 1;
+        }
+        
+        .profile-name {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .profile-email {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+        
+        .profile-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+        
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-help {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-top: 0.375rem;
+        }
+        
+        /* Subscription Card */
+        .subscription-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-radius: 12px;
+            padding: 2rem;
+            color: white;
+            margin-bottom: 2rem;
+        }
+        
+        .plan-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .plan-price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+        
+        .plan-price span {
+            font-size: 1rem;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+        
+        .plan-features {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 1.5rem;
+        }
+        
+        .plan-features li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .plan-features i {
+            color: #d1fae5;
+        }
+        
+        /* Settings Grid */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .setting-item {
+            background: var(--light-color);
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+        
+        .setting-item:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+        
+        .setting-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+        
+        .setting-icon {
+            width: 48px;
+            height: 48px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+        
+        .setting-title {
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .setting-description {
+            color: #6b7280;
+            font-size: 0.85rem;
+        }
+        
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 28px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e5e7eb;
+            transition: .3s;
+            border-radius: 28px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(22px);
+        }
+        
+        /* Buttons */
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border: none;
+            color: white;
+            padding: 0.875rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary-custom {
+            background: white;
+            border: 2px solid #e5e7eb;
+            color: #6b7280;
+            padding: 0.875rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-secondary-custom:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: #f9fafb;
+        }
+        
+        .btn-danger {
+            background: #fee2e2;
+            border: 2px solid #fecaca;
+            color: #dc2626;
+            padding: 0.875rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-danger:hover {
+            background: #fecaca;
+            border-color: #dc2626;
+        }
+        
+        /* Danger Zone */
+        .danger-zone {
+            background: #fef2f2;
+            border: 2px solid #fecaca;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .danger-zone-title {
+            color: #dc2626;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .danger-zone-description {
+            color: #991b1b;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Activity Log */
+        .activity-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: var(--light-color);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            flex-shrink: 0;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-title {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.25rem;
+        }
+        
+        .activity-description {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .activity-time {
+            color: #9ca3af;
+            font-size: 0.85rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .content-wrapper {
+                grid-template-columns: 1fr;
+            }
+            
+            .settings-nav {
+                position: static;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-menu-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .content-wrapper {
+                padding: 1rem;
+            }
+            
+            .settings-content,
+            .settings-nav {
+                padding: 1.5rem;
+            }
+            
+            .top-bar {
+                padding: 1rem;
+            }
+            
+            .page-title {
+                font-size: 1.35rem;
+            }
+            
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        
+        .sidebar-overlay.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-logo">
+                <i class="bi bi-credit-card-2-front"></i>
+                VirtualCard
+            </a>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <a href="/dashboard/" class="menu-item">
+                <i class="bi bi-grid"></i>
+                Dashboard
+            </a>
+            <a href="/create-card/" class="menu-item">
+                <i class="bi bi-plus-circle"></i>
+                Create Card
+            </a>
+            <a href="/my-cards/" class="menu-item">
+                <i class="bi bi-credit-card"></i>
+                My Cards
+            </a>
+            <a href="/analytics/" class="menu-item">
+                <i class="bi bi-graph-up"></i>
+                Analytics
+            </a>
+            <a href="/settings/" class="menu-item active">
+                <i class="bi bi-gear"></i>
+                Settings
+            </a>
+            <a href="/help/" class="menu-item">
+                <i class="bi bi-question-circle"></i>
+                Help & Support
+            </a>
+        </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="d-flex align-items-center gap-3">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+                    <i class="bi bi-list"></i>
+                </button>
+                <h1 class="page-title">Settings</h1>
+            </div>
+        </div>
+        
+        <!-- Content -->
+        <div class="content-wrapper">
+            <!-- Settings Navigation -->
+            <div class="settings-nav">
+                <h3 class="settings-nav-title">Settings</h3>
+                <a href="#" class="settings-nav-item active" onclick="showSection('profile')">
+                    <i class="bi bi-person"></i>
+                    Profile
+                </a>
+                <a href="#" class="settings-nav-item" onclick="showSection('account')">
+                    <i class="bi bi-shield-lock"></i>
+                    Account
+                </a>
+                <a href="#" class="settings-nav-item" onclick="showSection('billing')">
+                    <i class="bi bi-credit-card"></i>
+                    Billing
+                </a>
+                <a href="#" class="settings-nav-item" onclick="showSection('notifications')">
+                    <i class="bi bi-bell"></i>
+                    Notifications
+                </a>
+                <a href="#" class="settings-nav-item" onclick="showSection('privacy')">
+                    <i class="bi bi-eye-slash"></i>
+                    Privacy
+                </a>
+                <a href="#" class="settings-nav-item" onclick="showSection('activity')">
+                    <i class="bi bi-clock-history"></i>
+                    Activity
+                </a>
+            </div>
+            
+            <!-- Settings Content -->
+            <div class="settings-content">
+                <!-- Profile Section -->
+                <div class="settings-section active" id="profileSection">
+                    <!-- Profile Header -->
+                    <div class="profile-header">
+                        <div class="profile-avatar-wrapper">
+                            <div class="profile-avatar">JD</div>
+                            <button class="avatar-edit-btn">
+                                <i class="bi bi-camera"></i>
+                            </button>
+                        </div>
+                        <div class="profile-info">
+                            <h2 class="profile-name">John Doe</h2>
+                            <p class="profile-email">john@example.com</p>
+                            <span class="profile-badge">
+                                <i class="bi bi-star-fill me-1"></i>
+                                Pro Member
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="section-header">
+                        <h2 class="section-title">Profile Information</h2>
+                        <p class="section-description">Update your personal information and manage your public profile</p>
+                    </div>
+                    
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">First Name</label>
+                                    <input type="text" class="form-control" value="John" placeholder="Enter your first name">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" value="Doe" placeholder="Enter your last name">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-control" value="john@example.com" placeholder="Enter your email">
+                            <div class="form-help">This is your primary contact email</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" value="+1 (555) 123-4567" placeholder="Enter your phone number">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Bio</label>
+                            <textarea class="form-control" rows="4" placeholder="Tell us about yourself...">Product designer and entrepreneur passionate about creating meaningful digital experiences.</textarea>
+                            <div class="form-help">Brief description for your profile</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Location</label>
+                            <input type="text" class="form-control" value="San Francisco, CA" placeholder="City, Country">
+                        </div>
+                        
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn-primary-custom">
+                                <i class="bi bi-check-lg"></i>
+                                Save Changes
+                            </button>
+                            <button type="button" class="btn-secondary-custom">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Account Section -->
+                <div class="settings-section" id="accountSection">
+                    <div class="section-header">
+                        <h2 class="section-title">Account Security</h2>
+                        <p class="section-description">Manage your password and security settings</p>
+                    </div>
+                    
+                    <form>
+                        <div class="form-group">
+                            <label class="form-label">Current Password</label>
+                            <input type="password" class="form-control" placeholder="Enter current password">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">New Password</label>
+                            <input type="password" class="form-control" placeholder="Enter new password">
+                            <div class="form-help">Minimum 8 characters with letters and numbers</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-control" placeholder="Confirm new password">
+                        </div>
+                        
+                        <button type="submit" class="btn-primary-custom">
+                            <i class="bi bi-shield-check"></i>
+                            Update Password
+                        </button>
+                    </form>
+                    
+                    <hr class="my-4">
+                    
+                    <h3 class="mb-3">Two-Factor Authentication</h3>
+                    <div class="setting-item">
+                        <div class="setting-header">
+                            <div>
+                                <div class="setting-title">Enable 2FA</div>
+                                <div class="setting-description">Add an extra layer of security to your account</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="danger-zone">
+                        <h3 class="danger-zone-title">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            Danger Zone
+                        </h3>
+                        <p class="danger-zone-description">
+                            Once you delete your account, there is no going back. Please be certain.
+                        </p>
+                        <button class="btn-danger">
+                            <i class="bi bi-trash"></i>
+                            Delete Account
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Billing Section -->
+                <div class="settings-section" id="billingSection">
+                    <div class="section-header">
+                        <h2 class="section-title">Billing & Subscription</h2>
+                        <p class="section-description">Manage your subscription and payment methods</p>
+                    </div>
+                    
+                    <div class="subscription-card">
+                        <div class="plan-name">Pro Plan</div>
+                        <div class="plan-price">$9.99 <span>/month</span></div>
+                        <ul class="plan-features">
+                            <li>
+                                <i class="bi bi-check-circle-fill"></i>
+                                5 Active Business Cards
+                            </li>
+                            <li>
+                                <i class="bi bi-check-circle-fill"></i>
+                                Advanced Analytics (90 days)
+                            </li>
+                            <li>
+                                <i class="bi bi-check-circle-fill"></i>
+                                Custom QR Codes
+                            </li>
+                            <li>
+                                <i class="bi bi-check-circle-fill"></i>
+                                Priority Support
+                            </li>
+                        </ul>
+                        <div class="d-flex gap-2">
+                            <button class="btn-secondary-custom" style="background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.3); color: white;">
+                                <i class="bi bi-arrow-up-circle"></i>
+                                Upgrade Plan
+                            </button>
+                            <button class="btn-secondary-custom" style="background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.3); color: white;">
+                                Cancel Subscription
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <h3 class="mb-3">Payment Method</h3>
+                    <div class="setting-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="setting-icon">
+                                    <i class="bi bi-credit-card"></i>
+                                </div>
+                                <div>
+                                    <div class="setting-title">Visa ending in 4242</div>
+                                    <div class="setting-description">Expires 12/2025</div>
+                                </div>
+                            </div>
+                            <button class="btn-secondary-custom">
+                                Update
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <h3 class="mb-3 mt-4">Billing History</h3>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Invoice</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Jan 1, 2026</td>
+                                    <td>Pro Plan - Monthly</td>
+                                    <td>$9.99</td>
+                                    <td><span class="badge bg-success">Paid</span></td>
+                                    <td><a href="#">Download</a></td>
+                                </tr>
+                                <tr>
+                                    <td>Dec 1, 2025</td>
+                                    <td>Pro Plan - Monthly</td>
+                                    <td>$9.99</td>
+                                    <td><span class="badge bg-success">Paid</span></td>
+                                    <td><a href="#">Download</a></td>
+                                </tr>
+                                <tr>
+                                    <td>Nov 1, 2025</td>
+                                    <td>Pro Plan - Monthly</td>
+                                    <td>$9.99</td>
+                                    <td><span class="badge bg-success">Paid</span></td>
+                                    <td><a href="#">Download</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Notifications Section -->
+                <div class="settings-section" id="notificationsSection">
+                    <div class="section-header">
+                        <h2 class="section-title">Notifications</h2>
+                        <p class="section-description">Choose what notifications you want to receive</p>
+                    </div>
+                    
+                    <div class="settings-grid">
+                        <div class="setting-item">
+                            <div class="setting-header">
+                                <div class="setting-icon">
+                                    <i class="bi bi-envelope"></i>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-title">Email Notifications</div>
+                            <div class="setting-description">Receive email updates about your cards</div>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <div class="setting-header">
+                                <div class="setting-icon">
+                                    <i class="bi bi-eye"></i>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-title">Card Views</div>
+                            <div class="setting-description">Get notified when someone views your card</div>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <div class="setting-header">
+                                <div class="setting-icon">
+                                    <i class="bi bi-download"></i>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-title">Contact Downloads</div>
+                            <div class="setting-description">Notify me when someone saves my contact</div>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <div class="setting-header">
+                                <div class="setting-icon">
+                                    <i class="bi bi-bell"></i>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-title">Marketing Emails</div>
+                            <div class="setting-description">Receive tips and product updates</div>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <div class="setting-header">
+                                <div class="setting-icon">
+                                    <i class="bi bi-graph-up"></i>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-title">Weekly Reports</div>
+                            <div class="setting-description">Get weekly analytics summary</div>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <div class="setting-header">
+                                <div class="setting-icon">
+                                    <i class="bi bi-credit-card"></i>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-title">Billing Updates</div>
+                            <div class="setting-description">Notifications about payments and invoices</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Privacy Section -->
+                <div class="settings-section" id="privacySection">
+                    <div class="section-header">
+                        <h2 class="section-title">Privacy Settings</h2>
+                        <p class="section-description">Control your privacy and data sharing preferences</p>
+                    </div>
+                    
+                    <div class="settings-grid">
+                        <div class="setting-item">
+                            <div class="setting-header">
+                                <div class="setting-icon">
+                                    <i class="bi bi-globe"></i>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-title">Public Profile</div>
+                            <div class="setting-description">Make your profile discoverable</div>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <div class="setting-header">
+                                <div class="setting-icon">
+                                    <i class="bi bi-search"></i>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-title">Search Engine Indexing</div>
+                            <div class="setting-description">Allow search engines to find your cards</div>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <div class="setting-header">
+                                <div class="setting-icon">
+                                    <i class="bi bi-graph-up-arrow"></i>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-title">Analytics Tracking</div>
+                            <div class="setting-description">Collect detailed visitor analytics</div>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <div class="setting-header">
+                                <div class="setting-icon">
+                                    <i class="bi bi-share"></i>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-title">Data Sharing</div>
+                            <div class="setting-description">Share anonymized data for improvements</div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="mb-3 mt-4">Download Your Data</h3>
+                    <p class="text-muted mb-3">Request a copy of all your data including cards, analytics, and account information.</p>
+                    <button class="btn-secondary-custom">
+                        <i class="bi bi-download"></i>
+                        Request Data Export
+                    </button>
+                </div>
+                
+                <!-- Activity Section -->
+                <div class="settings-section" id="activitySection">
+                    <div class="section-header">
+                        <h2 class="section-title">Recent Activity</h2>
+                        <p class="section-description">Review your recent account activity and login history</p>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Login from Chrome on Mac</div>
+                            <div class="activity-description">San Francisco, California, United States</div>
+                            <div class="activity-time">2 hours ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="bi bi-pencil"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Updated business card</div>
+                            <div class="activity-description">Modified "Senior Product Manager" card</div>
+                            <div class="activity-time">Yesterday at 3:45 PM</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="bi bi-plus-circle"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Created new card</div>
+                            <div class="activity-description">Added "Freelance Designer" profile</div>
+                            <div class="activity-time">2 days ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Password changed</div>
+                            <div class="activity-description">Account security updated</div>
+                            <div class="activity-time">5 days ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Login from Safari on iPhone</div>
+                            <div class="activity-description">New York, New York, United States</div>
+                            <div class="activity-time">1 week ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Toggle Sidebar (Mobile)
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+        
+        // Show Settings Section
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.settings-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active from all nav items
+            document.querySelectorAll('.settings-nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected section
+            const sections = {
+                'profile': 'profileSection',
+                'account': 'accountSection',
+                'billing': 'billingSection',
+                'notifications': 'notificationsSection',
+                'privacy': 'privacySection',
+                'activity': 'activitySection'
+            };
+            
+            document.getElementById(sections[sectionName]).classList.add('active');
+            event.currentTarget.classList.add('active');
+            
+            // Prevent default link behavior
+            event.preventDefault();
+        }
+    </script>
+</body>
+</html>

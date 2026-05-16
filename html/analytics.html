@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - Virtual Business Card</title>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --accent-color: #764ba2;
+            --dark-color: #1f2937;
+            --light-color: #f9fafb;
+            --sidebar-width: 260px;
+        }
+        
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        body {
+            background: var(--light-color);
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            z-index: 1000;
+            transition: transform 0.3s;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .sidebar-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1.5rem;
+            color: #6b7280;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        .menu-item:hover {
+            background: var(--light-color);
+            color: var(--primary-color);
+        }
+        
+        .menu-item.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border-right: 3px solid var(--accent-color);
+        }
+        
+        .menu-item i {
+            font-size: 1.25rem;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+        
+        /* Top Bar */
+        .top-bar {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin: 0;
+        }
+        
+        .top-bar-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .date-range-selector {
+            display: flex;
+            gap: 0.5rem;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 0.25rem;
+        }
+        
+        .date-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #6b7280;
+        }
+        
+        .date-btn.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+        }
+        
+        .export-btn {
+            padding: 0.625rem 1.5rem;
+            border-radius: 10px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            color: #6b7280;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .export-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .mobile-menu-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--light-color);
+            border: none;
+            color: var(--dark-color);
+            font-size: 1.25rem;
+        }
+        
+        /* Content Area */
+        .content-area {
+            padding: 2rem;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .stat-icon.purple {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        }
+        
+        .stat-icon.green {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        
+        .stat-icon.blue {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+        
+        .stat-icon.orange {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+        
+        .stat-icon.red {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+        
+        .stat-trend {
+            font-size: 0.85rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .stat-trend.up {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .stat-trend.down {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        
+        .stat-change {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+        
+        /* Chart Container */
+        .chart-container {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin: 0;
+        }
+        
+        .chart-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .chart-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            color: #6b7280;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .chart-btn.active {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: #f0f4ff;
+        }
+        
+        canvas {
+            max-height: 350px;
+        }
+        
+        /* Tables */
+        .data-table {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 2rem;
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .table-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin: 0;
+        }
+        
+        .table {
+            width: 100%;
+            margin: 0;
+        }
+        
+        .table thead th {
+            border-bottom: 2px solid #f3f4f6;
+            padding: 1rem;
+            font-weight: 600;
+            color: #6b7280;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .table tbody td {
+            padding: 1rem;
+            border-bottom: 1px solid #f3f4f6;
+            color: var(--dark-color);
+        }
+        
+        .table tbody tr:hover {
+            background: var(--light-color);
+        }
+        
+        .country-flag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .country-flag img {
+            width: 24px;
+            height: 16px;
+            border-radius: 2px;
+        }
+        
+        .device-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .device-badge.desktop {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+        
+        .device-badge.mobile {
+            background: #dbeafe;
+            color: #1e3a8a;
+        }
+        
+        .device-badge.tablet {
+            background: #fce7f3;
+            color: #831843;
+        }
+        
+        /* Progress Bars */
+        .progress-item {
+            margin-bottom: 1.5rem;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-label {
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+        }
+        
+        .progress-value {
+            font-weight: 600;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        
+        .progress-bar-custom {
+            height: 8px;
+            background: #f3f4f6;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+        
+        /* Card Selector */
+        .card-selector {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 2rem;
+        }
+        
+        .card-selector-label {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .card-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .card-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-menu-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .chart-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .content-area {
+                padding: 1rem;
+            }
+            
+            .top-bar {
+                padding: 1rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .page-title {
+                font-size: 1.35rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .date-range-selector {
+                width: 100%;
+            }
+            
+            .date-btn {
+                flex: 1;
+                text-align: center;
+            }
+            
+            .chart-container,
+            .data-table {
+                padding: 1.5rem;
+            }
+            
+            .table {
+                font-size: 0.85rem;
+            }
+        }
+        
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        
+        .sidebar-overlay.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-logo">
+                <i class="bi bi-credit-card-2-front"></i>
+                VirtualCard
+            </a>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <a href="/dashboard/" class="menu-item">
+                <i class="bi bi-grid"></i>
+                Dashboard
+            </a>
+            <a href="/create-card/" class="menu-item">
+                <i class="bi bi-plus-circle"></i>
+                Create Card
+            </a>
+            <a href="/my-cards/" class="menu-item">
+                <i class="bi bi-credit-card"></i>
+                My Cards
+            </a>
+            <a href="/analytics/" class="menu-item active">
+                <i class="bi bi-graph-up"></i>
+                Analytics
+            </a>
+            <a href="/settings/" class="menu-item">
+                <i class="bi bi-gear"></i>
+                Settings
+            </a>
+            <a href="/help/" class="menu-item">
+                <i class="bi bi-question-circle"></i>
+                Help & Support
+            </a>
+        </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="d-flex align-items-center gap-3">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+                    <i class="bi bi-list"></i>
+                </button>
+                <h1 class="page-title">Analytics</h1>
+            </div>
+            
+            <div class="top-bar-actions">
+                <div class="date-range-selector">
+                    <button class="date-btn" onclick="setDateRange('7d')">7D</button>
+                    <button class="date-btn active" onclick="setDateRange('30d')">30D</button>
+                    <button class="date-btn" onclick="setDateRange('90d')">90D</button>
+                    <button class="date-btn" onclick="setDateRange('1y')">1Y</button>
+                    <button class="date-btn" onclick="setDateRange('all')">All</button>
+                </div>
+                <button class="export-btn">
+                    <i class="bi bi-download"></i>
+                    Export
+                </button>
+            </div>
+        </div>
+        
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Card Selector -->
+            <div class="card-selector">
+                <label class="card-selector-label">Viewing Analytics For:</label>
+                <select class="card-select" id="cardSelect" onchange="changeCard()">
+                    <option value="all">All Cards Combined</option>
+                    <option value="1">John Doe - Senior Product Manager</option>
+                    <option value="2">John Doe - Freelance Designer</option>
+                    <option value="3">John Doe - CEO at StartupCo</option>
+                </select>
+            </div>
+            
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon blue">
+                            <i class="bi bi-eye"></i>
+                        </div>
+                        <span class="stat-trend up">
+                            <i class="bi bi-arrow-up"></i> 28%
+                        </span>
+                    </div>
+                    <div class="stat-value">1,247</div>
+                    <div class="stat-label">Total Views</div>
+                    <div class="stat-change">+312 from last period</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon green">
+                            <i class="bi bi-download"></i>
+                        </div>
+                        <span class="stat-trend up">
+                            <i class="bi bi-arrow-up"></i> 15%
+                        </span>
+                    </div>
+                    <div class="stat-value">342</div>
+                    <div class="stat-label">Contact Downloads</div>
+                    <div class="stat-change">+45 from last period</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon orange">
+                            <i class="bi bi-percent"></i>
+                        </div>
+                        <span class="stat-trend down">
+                            <i class="bi bi-arrow-down"></i> 3%
+                        </span>
+                    </div>
+                    <div class="stat-value">27.4%</div>
+                    <div class="stat-label">Conversion Rate</div>
+                    <div class="stat-change">-1.2% from last period</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon purple">
+                            <i class="bi bi-clock"></i>
+                        </div>
+                        <span class="stat-trend up">
+                            <i class="bi bi-arrow-up"></i> 8%
+                        </span>
+                    </div>
+                    <div class="stat-value">1m 34s</div>
+                    <div class="stat-label">Avg. Time on Card</div>
+                    <div class="stat-change">+7s from last period</div>
+                </div>
+            </div>
+            
+            <!-- Views Over Time Chart -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Views Over Time</h3>
+                    <div class="chart-actions">
+                        <button class="chart-btn active" onclick="changeChartType('views', 'line')">Line</button>
+                        <button class="chart-btn" onclick="changeChartType('views', 'bar')">Bar</button>
+                    </div>
+                </div>
+                <canvas id="viewsChart"></canvas>
+            </div>
+            
+            <!-- Two Column Charts -->
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Traffic Sources</h3>
+                        </div>
+                        <canvas id="sourcesChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Device Breakdown</h3>
+                        </div>
+                        <canvas id="devicesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Geographic Data -->
+            <div class="data-table">
+                <div class="table-header">
+                    <h3 class="table-title">Top Locations</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Country</th>
+                                <th>City</th>
+                                <th>Views</th>
+                                <th>Downloads</th>
+                                <th>% of Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <span class="country-flag">
+                                        🇺🇸 United States
+                                    </span>
+                                </td>
+                                <td>New York</td>
+                                <td>456</td>
+                                <td>123</td>
+                                <td>
+                                    <div class="progress-item">
+                                        <div class="progress-bar-custom">
+                                            <div class="progress-fill" style="width: 36.6%;"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="country-flag">
+                                        🇬🇧 United Kingdom
+                                    </span>
+                                </td>
+                                <td>London</td>
+                                <td>289</td>
+                                <td>87</td>
+                                <td>
+                                    <div class="progress-item">
+                                        <div class="progress-bar-custom">
+                                            <div class="progress-fill" style="width: 23.2%;"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="country-flag">
+                                        🇨🇦 Canada
+                                    </span>
+                                </td>
+                                <td>Toronto</td>
+                                <td>178</td>
+                                <td>54</td>
+                                <td>
+                                    <div class="progress-item">
+                                        <div class="progress-bar-custom">
+                                            <div class="progress-fill" style="width: 14.3%;"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="country-flag">
+                                        🇦🇺 Australia
+                                    </span>
+                                </td>
+                                <td>Sydney</td>
+                                <td>145</td>
+                                <td>39</td>
+                                <td>
+                                    <div class="progress-item">
+                                        <div class="progress-bar-custom">
+                                            <div class="progress-fill" style="width: 11.6%;"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="country-flag">
+                                        🇩🇪 Germany
+                                    </span>
+                                </td>
+                                <td>Berlin</td>
+                                <td>123</td>
+                                <td>32</td>
+                                <td>
+                                    <div class="progress-item">
+                                        <div class="progress-bar-custom">
+                                            <div class="progress-fill" style="width: 9.9%;"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="data-table">
+                <div class="table-header">
+                    <h3 class="table-title">Recent Activity</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Action</th>
+                                <th>Location</th>
+                                <th>Device</th>
+                                <th>Referrer</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Jan 3, 2026 14:32</td>
+                                <td><span class="badge bg-success">Download</span></td>
+                                <td>New York, US</td>
+                                <td><span class="device-badge mobile"><i class="bi bi-phone"></i> Mobile</span></td>
+                                <td>LinkedIn</td>
+                            </tr>
+                            <tr>
+                                <td>Jan 3, 2026 14:15</td>
+                                <td><span class="badge bg-info">View</span></td>
+                                <td>London, UK</td>
+                                <td><span class="device-badge desktop"><i class="bi bi-display"></i> Desktop</span></td>
+                                <td>Direct</td>
+                            </tr>
+                            <tr>
+                                <td>Jan 3, 2026 13:58</td>
+                                <td><span class="badge bg-success">Download</span></td>
+                                <td>Toronto, CA</td>
+                                <td><span class="device-badge tablet"><i class="bi bi-tablet"></i> Tablet</span></td>
+                                <td>Twitter</td>
+                            </tr>
+                            <tr>
+                                <td>Jan 3, 2026 13:42</td>
+                                <td><span class="badge bg-info">View</span></td>
+                                <td>Sydney, AU</td>
+                                <td><span class="device-badge mobile"><i class="bi bi-phone"></i> Mobile</span></td>
+                                <td>QR Code</td>
+                            </tr>
+                            <tr>
+                                <td>Jan 3, 2026 13:25</td>
+                                <td><span class="badge bg-info">View</span></td>
+                                <td>Berlin, DE</td>
+                                <td><span class="device-badge desktop"><i class="bi bi-display"></i> Desktop</span></td>
+                                <td>Google</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Top Referrers -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Top Referrers</h3>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span class="progress-label">
+                            <i class="bi bi-qr-code me-2"></i>QR Code Scans
+                        </span>
+                        <span class="progress-value">487 (39.0%)</span>
+                    </div>
+                    <div class="progress-bar-custom">
+                        <div class="progress-fill" style="width: 39%;"></div>
+                    </div>
+                </div>
+                
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span class="progress-label">
+                            <i class="bi bi-linkedin me-2"></i>LinkedIn
+                        </span>
+                        <span class="progress-value">324 (26.0%)</span>
+                    </div>
+                    <div class="progress-bar-custom">
+                        <div class="progress-fill" style="width: 26%;"></div>
+                    </div>
+                </div>
+                
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span class="progress-label">
+                            <i class="bi bi-link-45deg me-2"></i>Direct Link
+                        </span>
+                        <span class="progress-value">213 (17.1%)</span>
+                    </div>
+                    <div class="progress-bar-custom">
+                        <div class="progress-fill" style="width: 17.1%;"></div>
+                    </div>
+                </div>
+                
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span class="progress-label">
+                            <i class="bi bi-envelope me-2"></i>Email
+                        </span>
+                        <span class="progress-value">135 (10.8%)</span>
+                    </div>
+                    <div class="progress-bar-custom">
+                        <div class="progress-fill" style="width: 10.8%;"></div>
+                    </div>
+                </div>
+                
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span class="progress-label">
+                            <i class="bi bi-twitter me-2"></i>Twitter
+                        </span>
+                        <span class="progress-value">88 (7.1%)</span>
+                    </div>
+                    <div class="progress-bar-custom">
+                        <div class="progress-fill" style="width: 7.1%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Toggle Sidebar (Mobile)
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+        
+        // Set Date Range
+        function setDateRange(range) {
+            const buttons = document.querySelectorAll('.date-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            console.log('Date range changed to:', range);
+            // Reload data with new date range
+        }
+        
+        // Change Card
+        function changeCard() {
+            const select = document.getElementById('cardSelect');
+            console.log('Card changed to:', select.value);
+            // Reload analytics for selected card
+        }
+        
+        // Change Chart Type
+        function changeChartType(chartName, type) {
+            const buttons = event.target.parentElement.querySelectorAll('.chart-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            console.log('Chart type changed:', chartName, type);
+            // Update chart
+        }
+        
+        // Initialize Charts
+        const ctx1 = document.getElementById('viewsChart').getContext('2d');
+        const viewsChart = new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: ['Jan 1', 'Jan 2', 'Jan 3', 'Jan 4', 'Jan 5', 'Jan 6', 'Jan 7', 
+                         'Jan 8', 'Jan 9', 'Jan 10', 'Jan 11', 'Jan 12', 'Jan 13', 'Jan 14'],
+                datasets: [{
+                    label: 'Views',
+                    data: [45, 52, 48, 65, 72, 68, 85, 92, 78, 95, 88, 102, 115, 108],
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#667eea',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#f3f4f6'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+        
+        const ctx2 = document.getElementById('sourcesChart').getContext('2d');
+        const sourcesChart = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: ['QR Code', 'LinkedIn', 'Direct', 'Email', 'Twitter', 'Other'],
+                datasets: [{
+                    data: [487, 324, 213, 135, 88, 100],
+                    backgroundColor: [
+                        '#667eea',
+                        '#0077b5',
+                        '#10b981',
+                        '#f59e0b',
+                        '#1da1f2',
+                        '#9ca3af'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            usePointStyle: true
+                        }
+                    }
+                }
+            }
+        });
+        
+        const ctx3 = document.getElementById('devicesChart').getContext('2d');
+        const devicesChart = new Chart(ctx3, {
+            type: 'pie',
+            data: {
+                labels: ['Mobile', 'Desktop', 'Tablet'],
+                datasets: [{
+                    data: [625, 478, 144],
+                    backgroundColor: [
+                        '#667eea',
+                        '#764ba2',
+                        '#10b981'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            usePointStyle: true
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

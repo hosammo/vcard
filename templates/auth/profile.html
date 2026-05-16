@@ -1,0 +1,750 @@
+{% extends 'auth/base.html' %}
+
+{% block title %}Account Settings — VCard Manager{% endblock %}
+{% block nav_profile %}active{% endblock %}
+
+{% block breadcrumbs %}
+<div class="app-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'user_dashboard' %}"><i class="bi bi-house-door"></i> VCard Manager</a>
+        </li>
+        <li class="breadcrumb-item active">Account Settings</li>
+    </ol>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ── Settings sidebar ── */
+    .settings-sidebar {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 0.5rem;
+        position: sticky;
+        top: 80px;
+    }
+    .settings-nav .nav-link {
+        color: #4b5563;
+        padding: 0.65rem 1rem;
+        border-radius: 9px;
+        font-weight: 500;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        transition: background 0.15s, color 0.15s;
+        border: none;
+        text-align: left;
+        width: 100%;
+        background: none;
+    }
+    .settings-nav .nav-link:hover { background: #f5f3ff; color: #4f46e5; }
+    .settings-nav .nav-link.active {
+        background: linear-gradient(135deg, #ede9fe, #f5f3ff);
+        color: #4f46e5;
+        font-weight: 600;
+    }
+    .settings-nav .nav-link i { font-size: 1rem; width: 18px; text-align: center; }
+
+    /* ── Settings cards ── */
+    .settings-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 1.75rem;
+        margin-bottom: 1.25rem;
+    }
+    .settings-card-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .settings-card-title > i { color: #4f46e5; }
+
+    /* ── Form controls ── */
+    .form-label { font-weight: 600; font-size: 0.825rem; color: #374151; margin-bottom: 0.35rem; }
+    .form-control {
+        border: 1.5px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        padding: 0.55rem 0.875rem;
+        transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .form-control:focus { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,.1); outline: none; }
+    .input-group-text {
+        background: #f9fafb; border: 1.5px solid #e5e7eb; border-right: none;
+        border-radius: 8px 0 0 8px; color: #9ca3af; font-size: .875rem;
+    }
+    .input-group .form-control { border-left: none; border-radius: 0 8px 8px 0; }
+    .input-group .form-control:focus { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,.1); }
+
+    .btn-primary-purple {
+        background: linear-gradient(135deg,#4f46e5,#7c3aed);
+        color: #fff; border: none; border-radius: 8px;
+        padding: 0.55rem 1.5rem; font-weight: 600; font-size: 0.875rem;
+        transition: opacity 0.15s;
+    }
+    .btn-primary-purple:hover { opacity: 0.9; color: #fff; }
+
+    /* ── Profile header ── */
+    .profile-avatar-lg {
+        width: 72px; height: 72px; border-radius: 50%;
+        background: linear-gradient(135deg,#4f46e5,#7c3aed);
+        display: flex; align-items: center; justify-content: center;
+        color: #fff; font-weight: 700; font-size: 1.75rem; flex-shrink: 0;
+    }
+
+    /* ── Toggle switches ── */
+    .toggle-row {
+        display: flex; align-items: flex-start; justify-content: space-between;
+        padding: 0.875rem 0; border-bottom: 1px solid #f8fafc; gap: 1rem;
+    }
+    .toggle-row:last-child { border-bottom: none; }
+    .toggle-label { font-weight: 600; font-size: 0.875rem; color: #111827; margin-bottom: 0.2rem; }
+    .toggle-desc  { font-size: 0.775rem; color: #6b7280; }
+    .form-check-input[type="checkbox"] {
+        width: 2.5rem; height: 1.375rem; border-radius: 99px; cursor: pointer;
+        background-color: #d1d5db; border: none; transition: background-color 0.2s;
+        flex-shrink: 0; margin-top: 0.15rem;
+    }
+    .form-check-input[type="checkbox"]:checked { background-color: #4f46e5; }
+    .form-check-input[type="checkbox"]:focus   { box-shadow: 0 0 0 3px rgba(79,70,229,.15); }
+
+    /* ── Danger zone ── */
+    .danger-zone {
+        background: #fff5f5; border: 1px solid #fecaca;
+        border-radius: 12px; padding: 1.25rem 1.5rem;
+    }
+    .danger-zone-title { font-weight: 700; color: #dc2626; font-size: 0.9rem; margin-bottom: 0.25rem; }
+    .danger-zone-desc  { font-size: 0.8rem; color: #6b7280; margin-bottom: 0; }
+
+    /* ── Activity timeline ── */
+    .activity-item {
+        display: flex; align-items: flex-start; gap: 0.875rem;
+        padding: 0.875rem 0; border-bottom: 1px solid #f8fafc;
+    }
+    .activity-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .activity-icon {
+        width: 36px; height: 36px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.875rem; flex-shrink: 0;
+    }
+    .activity-title { font-weight: 600; font-size: 0.875rem; color: #111827; margin-bottom: 0.1rem; }
+    .activity-meta  { font-size: 0.75rem; color: #9ca3af; }
+    .activity-time  { font-size: 0.75rem; color: #9ca3af; white-space: nowrap; margin-left: auto; flex-shrink: 0; }
+
+    .strength-bar { height: 4px; border-radius: 2px; transition: width .3s, background .3s; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Page header -->
+<div class="page-header d-flex align-items-center gap-3 mb-4">
+    <div class="profile-avatar-lg">
+        {% if profile_user.first_name %}{{ profile_user.first_name.0|upper }}{% else %}{{ profile_user.username.0|upper }}{% endif %}
+    </div>
+    <div>
+        <h4 class="fw-bold mb-0">{{ profile_user.get_full_name|default:profile_user.username }}</h4>
+        <div class="text-muted small">{{ profile_user.email }}</div>
+        <div class="mt-1 d-flex align-items-center gap-2">
+            {% if current_plan == 'business' %}
+                <span class="badge" style="background:#d1fae5;color:#065f46;">BUSINESS</span>
+            {% elif current_plan == 'pro' %}
+                <span class="badge" style="background:#fef3c7;color:#92400e;">PRO</span>
+            {% else %}
+                <span class="badge" style="background:#e0e7ff;color:#3730a3;">FREE</span>
+            {% endif %}
+            {% if current_org %}<span class="text-muted small">· {{ current_org.name }}</span>{% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 align-items-start">
+
+    <!-- ────────── Left: Settings Nav ────────── -->
+    <div class="col-lg-3 col-md-12">
+        <div class="settings-sidebar">
+            <nav class="nav flex-column settings-nav" id="settingsTabNav" role="tablist">
+                <button class="nav-link" id="pill-profile" data-bs-toggle="pill"
+                        data-bs-target="#tab-profile" type="button" role="tab">
+                    <i class="bi bi-person-fill"></i> Profile
+                </button>
+                <button class="nav-link" id="pill-security" data-bs-toggle="pill"
+                        data-bs-target="#tab-security" type="button" role="tab">
+                    <i class="bi bi-shield-lock-fill"></i> Security
+                </button>
+                <button class="nav-link" id="pill-notifications" data-bs-toggle="pill"
+                        data-bs-target="#tab-notifications" type="button" role="tab">
+                    <i class="bi bi-bell-fill"></i> Notifications
+                </button>
+                <button class="nav-link" id="pill-privacy" data-bs-toggle="pill"
+                        data-bs-target="#tab-privacy" type="button" role="tab">
+                    <i class="bi bi-eye-slash-fill"></i> Privacy
+                </button>
+                <button class="nav-link" id="pill-activity" data-bs-toggle="pill"
+                        data-bs-target="#tab-activity" type="button" role="tab">
+                    <i class="bi bi-clock-history"></i> Activity
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- ────────── Right: Tab Content ────────── -->
+    <div class="col-lg-9 col-md-12">
+        <div class="tab-content" id="settingsTabContent">
+
+            <!-- ══ PROFILE TAB ══ -->
+            <div class="tab-pane fade" id="tab-profile" role="tabpanel">
+                <div class="settings-card">
+                    <div class="settings-card-title">
+                        <i class="bi bi-person-fill"></i> Personal Information
+                    </div>
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="profile">
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-6">
+                                <label class="form-label">First Name</label>
+                                <input type="text" name="first_name" class="form-control"
+                                       value="{{ profile_user.first_name }}" required>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" name="last_name" class="form-control"
+                                       value="{{ profile_user.last_name }}" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                <input type="email" name="email" class="form-control"
+                                       value="{{ profile_user.email }}" required>
+                            </div>
+                            <div class="form-text" style="font-size:.75rem;">This is also your login email.</div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">
+                                Username <span class="fw-normal text-muted">(auto-generated, read-only)</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-at"></i></span>
+                                <input type="text" class="form-control" value="{{ profile_user.username }}"
+                                       readonly style="background:#f9fafb;color:#6b7280;">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary-purple">
+                            <i class="bi bi-check2 me-1"></i>Save Changes
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Account Info -->
+                <div class="settings-card">
+                    <div class="settings-card-title">
+                        <i class="bi bi-info-circle-fill"></i> Account Info
+                    </div>
+                    <div class="d-flex flex-column gap-0" style="font-size:.875rem;">
+                        <div class="d-flex justify-content-between py-2 border-bottom">
+                            <span class="text-muted">Member since</span>
+                            <span class="fw-semibold">{{ profile_user.date_joined|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-2 border-bottom">
+                            <span class="text-muted">Last login</span>
+                            <span class="fw-semibold">{{ profile_user.last_login|date:"M d, Y · H:i"|default:"—" }}</span>
+                        </div>
+                        {% if current_org %}
+                        <div class="d-flex justify-content-between py-2 border-bottom">
+                            <span class="text-muted">Workspace</span>
+                            <span class="fw-semibold">{{ current_org.name }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-2">
+                            <span class="text-muted">Role</span>
+                            <span class="fw-semibold">{{ current_member.get_role_display }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ SECURITY TAB ══ -->
+            <div class="tab-pane fade" id="tab-security" role="tabpanel">
+                <div class="settings-card">
+                    <div class="settings-card-title">
+                        <i class="bi bi-key-fill"></i> Change Password
+                    </div>
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="password">
+                        <div class="mb-3">
+                            <label class="form-label">Current Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                <input type="password" name="current_password" class="form-control"
+                                       placeholder="Enter current password" autocomplete="current-password">
+                                <button class="btn btn-outline-secondary" type="button"
+                                        onclick="togglePw(this,'current_password')"
+                                        style="border:1.5px solid #e5e7eb;border-left:none;border-radius:0 8px 8px 0;">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">New Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                                <input type="password" name="new_password" id="newPw" class="form-control"
+                                       placeholder="Min. 8 characters" autocomplete="new-password"
+                                       oninput="checkStrength(this.value)">
+                                <button class="btn btn-outline-secondary" type="button"
+                                        onclick="togglePw(this,'new_password')"
+                                        style="border:1.5px solid #e5e7eb;border-left:none;border-radius:0 8px 8px 0;">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            <div class="mt-2" style="background:#f1f5f9;border-radius:2px;height:4px;">
+                                <div id="strengthBar" class="strength-bar" style="width:0%;"></div>
+                            </div>
+                            <div id="strengthLabel" class="form-text" style="font-size:.72rem;"></div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Confirm New Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                                <input type="password" name="confirm_password" id="confirmPw" class="form-control"
+                                       placeholder="Repeat new password" autocomplete="new-password"
+                                       oninput="checkMatch()">
+                            </div>
+                            <div id="matchMsg" class="form-text" style="font-size:.72rem;"></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary-purple">
+                            <i class="bi bi-shield-check me-1"></i>Update Password
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="settings-card">
+                    <div class="settings-card-title" style="color:#dc2626;border-bottom-color:#fee2e2;">
+                        <i class="bi bi-exclamation-triangle-fill" style="color:#dc2626;"></i> Danger Zone
+                    </div>
+                    <div class="danger-zone d-flex align-items-start justify-content-between gap-3 flex-wrap">
+                        <div>
+                            <div class="danger-zone-title">Delete Account</div>
+                            <p class="danger-zone-desc">
+                                Permanently delete your account and all associated data — cards,
+                                analytics, and team memberships. <strong>This cannot be undone.</strong>
+                            </p>
+                        </div>
+                        <button type="button" class="btn btn-sm flex-shrink-0"
+                                style="background:#fee2e2;color:#dc2626;border:1px solid #fecaca;font-weight:600;"
+                                data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                            <i class="bi bi-trash me-1"></i>Delete Account
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ NOTIFICATIONS TAB ══ -->
+            <div class="tab-pane fade" id="tab-notifications" role="tabpanel">
+                <div class="settings-card">
+                    <div class="settings-card-title">
+                        <i class="bi bi-bell-fill"></i> Notification Preferences
+                        <span class="ms-auto fw-normal text-muted" style="font-size:.75rem;">Saves automatically</span>
+                    </div>
+                    <form method="POST" id="notifForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="notifications">
+
+                        <div class="toggle-row">
+                            <div>
+                                <div class="toggle-label">Email Notifications</div>
+                                <div class="toggle-desc">Receive important emails about your account and cards</div>
+                            </div>
+                            <div class="form-check form-switch ps-0">
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                       name="email_notifications"
+                                       {% if user_settings.email_notifications %}checked{% endif %}
+                                       onchange="autoSave('notifForm','notifSaveMsg')">
+                            </div>
+                        </div>
+                        <div class="toggle-row">
+                            <div>
+                                <div class="toggle-label">Card View Alerts</div>
+                                <div class="toggle-desc">Get notified when someone views your business card</div>
+                            </div>
+                            <div class="form-check form-switch ps-0">
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                       name="card_view_alerts"
+                                       {% if user_settings.card_view_alerts %}checked{% endif %}
+                                       onchange="autoSave('notifForm','notifSaveMsg')">
+                            </div>
+                        </div>
+                        <div class="toggle-row">
+                            <div>
+                                <div class="toggle-label">Contact Download Notifications</div>
+                                <div class="toggle-desc">Get notified when someone downloads your contact / vCard</div>
+                            </div>
+                            <div class="form-check form-switch ps-0">
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                       name="contact_download_notifications"
+                                       {% if user_settings.contact_download_notifications %}checked{% endif %}
+                                       onchange="autoSave('notifForm','notifSaveMsg')">
+                            </div>
+                        </div>
+                        <div class="toggle-row">
+                            <div>
+                                <div class="toggle-label">Marketing Emails</div>
+                                <div class="toggle-desc">Tips, new feature announcements, and special offers</div>
+                            </div>
+                            <div class="form-check form-switch ps-0">
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                       name="marketing_emails"
+                                       {% if user_settings.marketing_emails %}checked{% endif %}
+                                       onchange="autoSave('notifForm','notifSaveMsg')">
+                            </div>
+                        </div>
+                        <div class="toggle-row">
+                            <div>
+                                <div class="toggle-label">Weekly Reports</div>
+                                <div class="toggle-desc">A summary of your card views and engagement each week</div>
+                            </div>
+                            <div class="form-check form-switch ps-0">
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                       name="weekly_reports"
+                                       {% if user_settings.weekly_reports %}checked{% endif %}
+                                       onchange="autoSave('notifForm','notifSaveMsg')">
+                            </div>
+                        </div>
+                        <div class="toggle-row">
+                            <div>
+                                <div class="toggle-label">Billing Updates</div>
+                                <div class="toggle-desc">Invoices, payment confirmations, and subscription changes</div>
+                            </div>
+                            <div class="form-check form-switch ps-0">
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                       name="billing_updates"
+                                       {% if user_settings.billing_updates %}checked{% endif %}
+                                       onchange="autoSave('notifForm','notifSaveMsg')">
+                            </div>
+                        </div>
+                    </form>
+                    <div id="notifSaveMsg" class="mt-2" style="font-size:.8rem;display:none;color:#16a34a;">
+                        <i class="bi bi-check-circle me-1"></i>Preferences saved
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ PRIVACY TAB ══ -->
+            <div class="tab-pane fade" id="tab-privacy" role="tabpanel">
+                <div class="settings-card">
+                    <div class="settings-card-title">
+                        <i class="bi bi-eye-slash-fill"></i> Privacy Settings
+                        <span class="ms-auto fw-normal text-muted" style="font-size:.75rem;">Saves automatically</span>
+                    </div>
+                    <form method="POST" id="privacyForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="privacy">
+
+                        <div class="toggle-row">
+                            <div>
+                                <div class="toggle-label">Public Profile</div>
+                                <div class="toggle-desc">Allow anyone with your card link to view your profile</div>
+                            </div>
+                            <div class="form-check form-switch ps-0">
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                       name="public_profile"
+                                       {% if user_settings.public_profile %}checked{% endif %}
+                                       onchange="autoSave('privacyForm','privacySaveMsg')">
+                            </div>
+                        </div>
+                        <div class="toggle-row">
+                            <div>
+                                <div class="toggle-label">Search Engine Indexing</div>
+                                <div class="toggle-desc">Allow Google and other search engines to index your cards</div>
+                            </div>
+                            <div class="form-check form-switch ps-0">
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                       name="search_engine_indexing"
+                                       {% if user_settings.search_engine_indexing %}checked{% endif %}
+                                       onchange="autoSave('privacyForm','privacySaveMsg')">
+                            </div>
+                        </div>
+                        <div class="toggle-row">
+                            <div>
+                                <div class="toggle-label">Analytics Tracking</div>
+                                <div class="toggle-desc">Track views, downloads, and visitor details on your cards</div>
+                            </div>
+                            <div class="form-check form-switch ps-0">
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                       name="analytics_tracking"
+                                       {% if user_settings.analytics_tracking %}checked{% endif %}
+                                       onchange="autoSave('privacyForm','privacySaveMsg')">
+                            </div>
+                        </div>
+                        <div class="toggle-row">
+                            <div>
+                                <div class="toggle-label">Data Sharing</div>
+                                <div class="toggle-desc">Share anonymised usage data to help improve the platform</div>
+                            </div>
+                            <div class="form-check form-switch ps-0">
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                       name="data_sharing"
+                                       {% if user_settings.data_sharing %}checked{% endif %}
+                                       onchange="autoSave('privacyForm','privacySaveMsg')">
+                            </div>
+                        </div>
+                    </form>
+                    <div id="privacySaveMsg" class="mt-2" style="font-size:.8rem;display:none;color:#16a34a;">
+                        <i class="bi bi-check-circle me-1"></i>Privacy settings saved
+                    </div>
+                </div>
+
+                <!-- Data Export -->
+                <div class="settings-card">
+                    <div class="settings-card-title">
+                        <i class="bi bi-cloud-download-fill"></i> Your Data
+                    </div>
+                    <p style="font-size:.875rem;color:#4b5563;">
+                        Request a copy of all your personal data stored on VCard Manager.
+                        We'll email it to <strong>{{ profile_user.email }}</strong> within 48 hours.
+                    </p>
+                    <button class="btn btn-primary-purple" disabled>
+                        <i class="bi bi-download me-1"></i>Request Data Export
+                    </button>
+                    <span class="ms-2 text-muted" style="font-size:.75rem;">Coming soon</span>
+                </div>
+            </div>
+
+            <!-- ══ ACTIVITY TAB ══ -->
+            <div class="tab-pane fade" id="tab-activity" role="tabpanel">
+                <div class="settings-card">
+                    <div class="settings-card-title">
+                        <i class="bi bi-clock-history"></i> Recent Activity
+                        <span class="ms-auto fw-normal text-muted" style="font-size:.75rem;">Last 20 events</span>
+                    </div>
+
+                    {% if activity_logs %}
+                        {% for log in activity_logs %}
+                        <div class="activity-item">
+                            {% if log.action == 'login' %}
+                                <div class="activity-icon" style="background:#d1fae5;color:#059669;">
+                                    <i class="bi bi-box-arrow-in-right"></i>
+                                </div>
+                            {% elif log.action == 'logout' %}
+                                <div class="activity-icon" style="background:#f1f5f9;color:#6b7280;">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                </div>
+                            {% elif log.action == 'password_changed' %}
+                                <div class="activity-icon" style="background:#fef9c3;color:#ca8a04;">
+                                    <i class="bi bi-key-fill"></i>
+                                </div>
+                            {% elif log.action == 'profile_updated' %}
+                                <div class="activity-icon" style="background:#dbeafe;color:#2563eb;">
+                                    <i class="bi bi-person-fill"></i>
+                                </div>
+                            {% elif log.action == 'card_created' %}
+                                <div class="activity-icon" style="background:#d1fae5;color:#059669;">
+                                    <i class="bi bi-plus-circle-fill"></i>
+                                </div>
+                            {% elif log.action == 'card_updated' %}
+                                <div class="activity-icon" style="background:#dbeafe;color:#2563eb;">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </div>
+                            {% elif log.action == 'card_deleted' %}
+                                <div class="activity-icon" style="background:#fee2e2;color:#dc2626;">
+                                    <i class="bi bi-trash-fill"></i>
+                                </div>
+                            {% else %}
+                                <div class="activity-icon" style="background:#f3f4f6;color:#6b7280;">
+                                    <i class="bi bi-gear-fill"></i>
+                                </div>
+                            {% endif %}
+
+                            <div style="flex:1;min-width:0;">
+                                <div class="activity-title">{{ log.get_action_display }}</div>
+                                {% if log.description %}
+                                    <div class="activity-meta">{{ log.description }}</div>
+                                {% endif %}
+                                {% if log.ip_address and log.action == 'login' %}
+                                    <div class="activity-meta">
+                                        <i class="bi bi-geo-alt me-1"></i>{{ log.ip_address }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="activity-time" title="{{ log.timestamp|date:'Y-m-d H:i' }}">
+                                {{ log.timestamp|timesince }} ago
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-5 text-muted">
+                            <i class="bi bi-clock-history" style="font-size:2.5rem;opacity:.25;"></i>
+                            <div class="mt-2" style="font-size:.875rem;">No activity recorded yet</div>
+                            <div style="font-size:.775rem;">Your recent logins and changes will appear here</div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div><!-- /tab-content -->
+    </div><!-- /col-lg-9 -->
+</div><!-- /row -->
+
+<!-- ══ DELETE ACCOUNT MODAL ══ -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:16px;border:none;box-shadow:0 20px 60px rgba(0,0,0,.15);">
+            <div class="modal-header" style="background:#fff5f5;border-bottom:1px solid #fecaca;border-radius:16px 16px 0 0;">
+                <h5 class="modal-title fw-bold text-danger">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Delete Account
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p style="font-size:.9rem;color:#374151;">
+                    This will <strong>permanently</strong> delete your account and all associated data:
+                </p>
+                <ul style="font-size:.875rem;color:#6b7280;line-height:1.8;">
+                    <li>All business cards you've created</li>
+                    <li>Analytics and view history</li>
+                    <li>Team memberships and invites</li>
+                    <li>Your profile, settings, and activity log</li>
+                </ul>
+                <div class="alert alert-warning py-2 px-3" style="font-size:.825rem;border-radius:8px;">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+                    <strong>This action cannot be undone.</strong>
+                </div>
+                <form method="POST" id="deleteAccountForm" action="{% url 'edit_profile' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="delete_account">
+                    <label class="form-label mt-1" style="font-size:.875rem;font-weight:600;">
+                        Type <code style="background:#fee2e2;color:#dc2626;padding:1px 5px;border-radius:4px;">DELETE</code> to confirm:
+                    </label>
+                    <input type="text" id="deleteConfirmInput" name="confirm_text"
+                           class="form-control" placeholder="DELETE" autocomplete="off"
+                           style="font-family:monospace;letter-spacing:.08em;font-size:1rem;"
+                           oninput="checkDeleteInput(this.value)">
+                </form>
+            </div>
+            <div class="modal-footer" style="border-top:1px solid #fecaca;">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="deleteAccountForm" id="deleteConfirmBtn"
+                        class="btn btn-danger btn-sm" disabled>
+                    <i class="bi bi-trash me-1"></i>Delete My Account Forever
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// ── Activate correct tab from URL ?tab= param ────────────────────────────────
+document.addEventListener('DOMContentLoaded', function () {
+    const params  = new URLSearchParams(window.location.search);
+    const tabName = params.get('tab') || 'profile';
+    const btn     = document.getElementById('pill-' + tabName) ||
+                    document.getElementById('pill-profile');
+    if (btn) new bootstrap.Tab(btn).show();
+});
+
+// Update URL bar when tab changes (no page reload)
+document.querySelectorAll('#settingsTabNav button').forEach(function (btn) {
+    btn.addEventListener('shown.bs.tab', function (e) {
+        const id  = e.target.getAttribute('data-bs-target').replace('#tab-', '');
+        const url = new URL(window.location);
+        url.searchParams.set('tab', id);
+        window.history.replaceState({}, '', url);
+    });
+});
+
+// ── Auto-save toggle forms via fetch ────────────────────────────────────────
+function autoSave(formId, msgId) {
+    const form = document.getElementById(formId);
+    const data = new FormData(form);
+    fetch(window.location.pathname, {
+        method: 'POST',
+        body: data,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        redirect: 'manual',
+    }).then(function () {
+        const msg = document.getElementById(msgId);
+        if (!msg) return;
+        msg.style.display = 'block';
+        setTimeout(function () { msg.style.display = 'none'; }, 2500);
+    }).catch(function () {
+        form.submit();   // fallback: regular POST
+    });
+}
+
+// ── Password show/hide ───────────────────────────────────────────────────────
+function togglePw(btn, fieldName) {
+    const input = btn.closest('.input-group').querySelector('input');
+    if (!input) return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerHTML = '<i class="bi bi-eye-slash"></i>';
+    } else {
+        input.type = 'password';
+        btn.innerHTML = '<i class="bi bi-eye"></i>';
+    }
+}
+
+// ── Password strength bar ────────────────────────────────────────────────────
+function checkStrength(pw) {
+    const bar   = document.getElementById('strengthBar');
+    const label = document.getElementById('strengthLabel');
+    if (!pw) { bar.style.width = '0%'; label.textContent = ''; return; }
+    let score = 0;
+    if (pw.length >= 8)           score++;
+    if (pw.length >= 12)          score++;
+    if (/[A-Z]/.test(pw))        score++;
+    if (/[0-9]/.test(pw))        score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    const levels = [
+        {w:'20%', bg:'#ef4444', text:'Very weak',   cls:'text-danger'},
+        {w:'40%', bg:'#f97316', text:'Weak',         cls:'text-warning'},
+        {w:'60%', bg:'#eab308', text:'Fair',         cls:'text-warning'},
+        {w:'80%', bg:'#22c55e', text:'Strong',       cls:'text-success'},
+        {w:'100%',bg:'#16a34a', text:'Very strong',  cls:'text-success'},
+    ];
+    const lvl = levels[Math.max(0, Math.min(score - 1, 4))];
+    bar.style.width      = lvl.w;
+    bar.style.background = lvl.bg;
+    label.textContent    = lvl.text;
+    label.className      = 'form-text ' + lvl.cls;
+    checkMatch();
+}
+
+function checkMatch() {
+    const pw  = document.getElementById('newPw');
+    const cp  = document.getElementById('confirmPw');
+    const msg = document.getElementById('matchMsg');
+    if (!pw || !cp || !cp.value) { if (msg) msg.textContent = ''; return; }
+    if (pw.value === cp.value) {
+        msg.textContent = '✓ Passwords match';
+        msg.className   = 'form-text text-success';
+    } else {
+        msg.textContent = '✗ Passwords do not match';
+        msg.className   = 'form-text text-danger';
+    }
+}
+
+// ── Delete account confirmation ──────────────────────────────────────────────
+function checkDeleteInput(val) {
+    const btn = document.getElementById('deleteConfirmBtn');
+    if (btn) btn.disabled = (val.trim() !== 'DELETE');
+}
+</script>
+{% endblock %}

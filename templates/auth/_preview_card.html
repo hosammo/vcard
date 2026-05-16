@@ -1,0 +1,107 @@
+{# Reusable live-preview card — included in both desktop pane and mobile offcanvas #}
+
+<div class="preview-label">
+    <span class="preview-label-badge">
+        <span class="preview-live-dot"></span>
+        Live Preview
+    </span>
+    <small class="text-muted" style="font-size:.7rem;">Updates as you type</small>
+</div>
+
+<div class="preview-card">
+
+    <!-- Banner (shown only when a banner image is set) -->
+    <div class="prev-banner" style="display:none;">
+        <div class="prev-banner-overlay">
+            <div class="prev-banner-text"></div>
+        </div>
+    </div>
+
+    <!-- Hero ─ gradient bg, profile photo, name, title -->
+    <div class="prev-hero">
+        <div class="prev-photo-wrap">
+            <img class="prev-photo" src="" alt="Profile photo" style="display:none; margin:0 auto;">
+            <div class="prev-avatar">?</div>
+        </div>
+        <div class="prev-name">Your Name</div>
+        <div class="prev-title">Job Title · Company</div>
+        <img class="prev-logo" src="" alt="Company logo" style="display:none; margin-top:6px;">
+    </div>
+
+    <!-- Contact items — mirrors .contact-item layout from card_detail.html -->
+    <div class="prev-body">
+
+        <div class="prev-contact prev-email" style="display:none;">
+            <i class="bi bi-envelope-fill prev-icon"></i>
+            <div class="prev-info">
+                <div class="prev-label">Email</div>
+                <div class="prev-val prev-email-val"></div>
+            </div>
+        </div>
+
+        <!-- Phone numbers — built dynamically by JS from the phone formset -->
+        <div class="prev-phones-list"></div>
+
+        <div class="prev-contact prev-website" style="display:none;">
+            <i class="bi bi-globe2 prev-icon"></i>
+            <div class="prev-info">
+                <div class="prev-label">Website</div>
+                <div class="prev-val prev-website-val"></div>
+            </div>
+        </div>
+
+        <div class="prev-contact prev-address" style="display:none;">
+            <i class="bi bi-geo-alt-fill prev-icon"></i>
+            <div class="prev-info">
+                <div class="prev-label">Address</div>
+                <div class="prev-val prev-address-val"></div>
+            </div>
+        </div>
+
+        <!-- Empty-state placeholder -->
+        <div class="preview-empty" id="prevEmptyHint" style="display:none;">
+            <i class="bi bi-pencil-square d-block mb-2" style="font-size:2rem;"></i>
+            <div class="small">Fill in the form<br>to see your card here</div>
+        </div>
+
+    </div><!-- /prev-body -->
+
+    <!-- Bio -->
+    <div class="prev-section prev-bio" style="display:none;">
+        <div class="prev-section-label">About</div>
+        <div class="prev-section-text prev-bio-text"></div>
+    </div>
+
+    <!-- Skills -->
+    <div class="prev-section prev-skills" style="display:none;">
+        <div class="prev-section-label">Skills &amp; Services</div>
+        <div class="prev-section-text prev-skills-text"></div>
+    </div>
+
+    <!-- Social links -->
+    <div class="prev-social" style="display:none;">
+        <div class="prev-social-row"></div>
+    </div>
+
+    <!-- Custom links -->
+    <div class="prev-section prev-custom-sect" style="display:none;">
+        <div class="prev-section-label">Links</div>
+        <div class="prev-custom-links d-flex flex-wrap gap-1"></div>
+    </div>
+
+    <!-- Mock action bar — mirrors .action-buttons from card_detail.html -->
+    <div class="prev-actions">
+        <span class="prev-act-save">
+            <i class="bi bi-person-plus-fill"></i> Save Contact
+        </span>
+        <span class="prev-act-call">
+            <i class="bi bi-telephone-fill"></i> Call
+        </span>
+    </div>
+
+</div><!-- /preview-card -->
+
+<p class="text-muted text-center mt-2" style="font-size:.7rem;">
+    <i class="bi bi-info-circle me-1"></i>
+    This is a preview — the final card may look slightly different
+</p>

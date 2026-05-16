@@ -1,52 +1,260 @@
 {% extends 'cards/base.html' %}
 
-{% block title %}Virtual Business Cards - hosammo.com{% endblock %}
+{% block title %}VCard Manager - Professional Digital Business Cards{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .home-container {
+        max-width: 520px;
+        width: 100%;
+    }
+
+    .home-card {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.18);
+        overflow: hidden;
+    }
+
+    .home-hero {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        color: white;
+        padding: 3rem 2rem 2rem;
+        text-align: center;
+        position: relative;
+    }
+
+    .home-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="200" height="200" fill="url(%23dots)"/></svg>');
+    }
+
+    .hero-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.25rem;
+        position: relative;
+        z-index: 1;
+        backdrop-filter: blur(4px);
+    }
+
+    .home-hero h1 {
+        position: relative;
+        z-index: 1;
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+    }
+
+    .home-hero p {
+        position: relative;
+        z-index: 1;
+        opacity: 0.85;
+        margin-bottom: 0;
+    }
+
+    .home-body {
+        padding: 2rem;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem 0;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .feature-item:last-child { border-bottom: none; }
+
+    .feature-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 1.15rem;
+    }
+
+    .feature-icon.indigo  { background: #ede9fe; color: #4f46e5; }
+    .feature-icon.green   { background: #dcfce7; color: #16a34a; }
+    .feature-icon.amber   { background: #fef9c3; color: #d97706; }
+    .feature-icon.sky     { background: #e0f2fe; color: #0284c7; }
+
+    .feature-title {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: #1f2937;
+        margin-bottom: 2px;
+    }
+
+    .feature-desc {
+        font-size: 0.82rem;
+        color: #6b7280;
+        line-height: 1.4;
+    }
+
+    .home-footer {
+        background: #f9fafb;
+        padding: 1.25rem 2rem;
+        display: flex;
+        gap: 0.75rem;
+        border-top: 1px solid #f3f4f6;
+    }
+
+    .btn-home-primary {
+        flex: 1;
+        padding: 0.7rem 1rem;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-decoration: none;
+        text-align: center;
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        color: white;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .btn-home-primary:hover {
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 5px 15px rgba(79, 70, 229, 0.35);
+    }
+
+    .btn-home-secondary {
+        padding: 0.7rem 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-decoration: none;
+        text-align: center;
+        background: white;
+        color: #4b5563;
+        transition: border-color 0.15s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .btn-home-secondary:hover {
+        border-color: #c4b5fd;
+        color: #4f46e5;
+    }
+
+    @media (max-width: 480px) {
+        body { padding: 12px; align-items: flex-start; padding-top: 20px; }
+        .home-hero { padding: 2rem 1.5rem 1.5rem; }
+        .home-hero h1 { font-size: 1.6rem; }
+        .home-body { padding: 1.5rem; }
+        .home-footer { padding: 1rem 1.5rem; flex-direction: column; }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="card">
-        <div class="hero-section">
-            <div style="font-size: 48px; margin-bottom: 20px;">💼</div>
-            <h1 class="name">Virtual Business Cards</h1>
-            <p class="title">Professional Digital Networking</p>
-        </div>
-        
-        <div class="content">
-            <div class="bio-section">
-                <h3 class="bio-title">Welcome</h3>
-                <p class="bio-text">
-                    Discover modern networking with our digital business cards. 
-                    Simply scan an NFC tag or QR code to instantly access professional contact information 
-                    and save it directly to your phone.
-                </p>
+<div class="home-container">
+    <div class="home-card">
+
+        <!-- Hero -->
+        <div class="home-hero">
+            <div class="hero-icon">
+                <i class="bi bi-credit-card-2-front-fill fs-3"></i>
             </div>
-            
-            <div class="bio-section">
-                <h3 class="bio-title">Features</h3>
-                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <span>📱</span>
-                        <span>Instant contact sharing</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <span>🔗</span>
-                        <span>Social media integration</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <span>📊</span>
-                        <span>Analytics tracking</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <span>🌱</span>
-                        <span>Eco-friendly solution</span>
+            <h1>VCard Manager</h1>
+            <p class="fs-6">Professional digital business cards for modern networking</p>
+        </div>
+
+        <!-- Features -->
+        <div class="home-body">
+
+            <p class="text-muted small mb-3 fw-semibold text-uppercase"
+               style="letter-spacing:0.05em;">Why go digital?</p>
+
+            <div class="feature-item">
+                <div class="feature-icon indigo">
+                    <i class="bi bi-share-fill"></i>
+                </div>
+                <div>
+                    <div class="feature-title">Instant Contact Sharing</div>
+                    <div class="feature-desc">
+                        Share your profile via QR code, NFC, or a simple link — no app required
                     </div>
                 </div>
             </div>
+
+            <div class="feature-item">
+                <div class="feature-icon green">
+                    <i class="bi bi-link-45deg"></i>
+                </div>
+                <div>
+                    <div class="feature-title">Social Media Integration</div>
+                    <div class="feature-desc">
+                        LinkedIn, Instagram, Twitter, Facebook and custom links in one place
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon amber">
+                    <i class="bi bi-bar-chart-line-fill"></i>
+                </div>
+                <div>
+                    <div class="feature-title">Analytics &amp; Insights</div>
+                    <div class="feature-desc">
+                        Track who viewed your card, where they're from, and what they clicked
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon sky">
+                    <i class="bi bi-leaf-fill"></i>
+                </div>
+                <div>
+                    <div class="feature-title">Eco-Friendly Networking</div>
+                    <div class="feature-desc">
+                        No paper waste — update your details anytime without reprinting
+                    </div>
+                </div>
+            </div>
+
         </div>
-        
-        <div class="action-buttons">
-            <a href="/admin/" class="btn btn-primary">Admin Panel</a>
+
+        <!-- Footer actions -->
+        <div class="home-footer">
+            <a href="{% url 'user_login' %}" class="btn-home-primary">
+                <i class="bi bi-box-arrow-in-right"></i> Sign In
+            </a>
+            <a href="{% url 'user_register' %}" class="btn-home-secondary">
+                <i class="bi bi-person-plus"></i> Create Account
+            </a>
         </div>
+
     </div>
 </div>
 {% endblock %}

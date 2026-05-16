@@ -12,6 +12,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,hosammo.com
 
 # Application definition
 INSTALLED_APPS = [
+     # Django apps   
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -19,11 +20,36 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'cards',
+
+    # Wagtail apps - ADD THESE
+    'wagtail.contrib.forms',
+    'wagtail.contrib.redirects',
+    'wagtail.embeds',
+    'wagtail.sites',
+    'wagtail.users',
+    'wagtail.snippets',
+    'wagtail.documents',
+    'wagtail.images',
+    'wagtail.search',
+    'wagtail.admin',
+    'wagtail',
+    
+    'modelcluster',
+    'taggit',
+
+    # Third party apps
+    'crispy_forms',
+    'crispy_bootstrap5',
+
+'cards',
+
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+
+    'wagtail.contrib.redirects.middleware.RedirectMiddleware', 
+
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -45,6 +71,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'cards.context_processors.org_context',
             ],
         },
     },
@@ -187,3 +214,20 @@ LOGGING = {
         },
     },
 }
+
+# Wagtail settings
+WAGTAIL_SITE_NAME = 'Virtual Business Card'
+
+# Base URL to use when referring to full URLs within the Wagtail admin backend
+# e.g. in notification emails. Don't include '/admin' or a trailing slash
+WAGTAILADMIN_BASE_URL = 'http://localhost:8000'
+
+# Wagtail email notifications from address
+WAGTAILADMIN_NOTIFICATION_FROM_EMAIL = 'noreply@hosammo.com'
+
+# Reverse the default case-sensitive handling of tags
+TAGGIT_CASE_INSENSITIVE = True
+
+# Crispy Forms - Bootstrap 5
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"

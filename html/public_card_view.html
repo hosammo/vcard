@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>John Doe - Senior Product Manager</title>
+    
+    <!-- Meta tags for SEO and social sharing -->
+    <meta name="description" content="Connect with John Doe - Senior Product Manager at TechCorp. View contact information and save to your phone.">
+    <meta property="og:title" content="John Doe - Senior Product Manager">
+    <meta property="og:description" content="Connect with John Doe - Senior Product Manager at TechCorp">
+    <meta property="og:image" content="https://yoursite.com/path-to-image.jpg">
+    <meta property="og:url" content="https://yoursite.com/john-doe">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --accent-color: #764ba2;
+            --dark-color: #1f2937;
+            --light-color: #f9fafb;
+        }
+        
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: var(--light-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Card Container */
+        .card-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            flex: 1;
+        }
+        
+        /* Main Card */
+        .business-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Banner Section */
+        .card-banner {
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .banner-text {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+            padding: 0 2rem;
+        }
+        
+        .company-logo {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 12px;
+            padding: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .company-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        /* Profile Section */
+        .profile-section {
+            padding: 0 2rem 2rem 2rem;
+            text-align: center;
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 6px solid white;
+            margin: -60px auto 1.5rem;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .profile-name {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .profile-title {
+            font-size: 1.1rem;
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+        }
+        
+        .profile-company {
+            font-size: 1rem;
+            color: #9ca3af;
+            margin-bottom: 1.5rem;
+        }
+        
+        .profile-bio {
+            color: #6b7280;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+        
+        /* Skills Tags */
+        .skills-section {
+            margin-bottom: 2rem;
+        }
+        
+        .skills-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+        
+        .skills-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: flex-start;
+        }
+        
+        .skill-tag {
+            padding: 0.5rem 1rem;
+            background: var(--light-color);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--dark-color);
+            font-weight: 500;
+        }
+        
+        /* Contact Information */
+        .contact-section {
+            background: var(--light-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.875rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .contact-item:last-child {
+            border-bottom: none;
+        }
+        
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        
+        .contact-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .contact-label {
+            font-size: 0.8rem;
+            color: #9ca3af;
+            margin-bottom: 0.25rem;
+        }
+        
+        .contact-value {
+            color: var(--dark-color);
+            font-weight: 500;
+            word-break: break-word;
+        }
+        
+        .contact-value a {
+            color: var(--dark-color);
+            text-decoration: none;
+        }
+        
+        .contact-value a:hover {
+            color: var(--primary-color);
+        }
+        
+        .whatsapp-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            background: #dcfce7;
+            color: #16a34a;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        
+        /* Social Links */
+        .social-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .social-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .social-link {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+            text-decoration: none;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .social-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        
+        .social-link.linkedin {
+            background: #0077b5;
+        }
+        
+        .social-link.twitter {
+            background: #1da1f2;
+        }
+        
+        .social-link.instagram {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        }
+        
+        .social-link.facebook {
+            background: #1877f2;
+        }
+        
+        .social-link.portfolio {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        }
+        
+        .social-link.website {
+            background: #6b7280;
+        }
+        
+        /* Action Buttons */
+        .actions-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .action-btn {
+            padding: 1rem;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+        
+        .action-btn.primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+        }
+        
+        .action-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .action-btn.secondary {
+            background: white;
+            color: var(--dark-color);
+            border: 2px solid #e5e7eb;
+        }
+        
+        .action-btn.secondary:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        /* Share Button */
+        .share-btn {
+            width: 100%;
+            padding: 1rem;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            color: var(--dark-color);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .share-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        /* QR Code Section */
+        .qr-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .qr-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+        }
+        
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 1rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .qr-code img {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .qr-description {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .qr-download-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--light-color);
+            border: none;
+            border-radius: 10px;
+            color: var(--dark-color);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .qr-download-btn:hover {
+            background: #e5e7eb;
+        }
+        
+        /* Footer */
+        .card-footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #9ca3af;
+            font-size: 0.85rem;
+        }
+        
+        .card-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .card-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Share Modal */
+        .share-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        .share-modal.active {
+            display: flex;
+        }
+        
+        .share-modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 100%;
+            position: relative;
+        }
+        
+        .share-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #6b7280;
+            cursor: pointer;
+        }
+        
+        .share-modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 1.5rem;
+        }
+        
+        .share-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .share-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            border-radius: 12px;
+            background: var(--light-color);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--dark-color);
+        }
+        
+        .share-option:hover {
+            background: #e5e7eb;
+            transform: translateY(-2px);
+        }
+        
+        .share-option i {
+            font-size: 1.5rem;
+        }
+        
+        .share-option span {
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .share-link-container {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .share-link-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .copy-link-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .copy-link-btn:hover {
+            background: var(--accent-color);
+        }
+        
+        .copy-link-btn.copied {
+            background: #10b981;
+        }
+        
+        /* Responsive */
+        @media (max-width: 576px) {
+            .card-container {
+                margin: 1rem auto;
+            }
+            
+            .profile-section {
+                padding: 0 1.5rem 1.5rem 1.5rem;
+            }
+            
+            .profile-name {
+                font-size: 1.75rem;
+            }
+            
+            .profile-title {
+                font-size: 1rem;
+            }
+            
+            .actions-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .contact-section {
+                padding: 1rem;
+            }
+            
+            .share-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .business-card {
+            animation: fadeInUp 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="card-container">
+        <!-- Main Business Card -->
+        <div class="business-card">
+            <!-- Banner -->
+            <div class="card-banner" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                <div class="banner-text">Welcome to my profile</div>
+                <!-- Company Logo (optional) -->
+                <!-- <div class="company-logo">
+                    <img src="company-logo.png" alt="Company Logo">
+                </div> -->
+            </div>
+            
+            <!-- Profile Section -->
+            <div class="profile-section">
+                <!-- Avatar -->
+                <div class="profile-avatar">
+                    <img src="https://via.placeholder.com/120/667eea/ffffff?text=JD" alt="John Doe">
+                </div>
+                
+                <!-- Name & Title -->
+                <h1 class="profile-name">John Doe</h1>
+                <p class="profile-title">Senior Product Manager</p>
+                <p class="profile-company">TechCorp Inc.</p>
+                
+                <!-- Bio -->
+                <p class="profile-bio">
+                    Passionate product manager with 10+ years of experience building innovative digital products. 
+                    Specialized in SaaS platforms, user experience design, and agile methodologies. 
+                    Always excited to connect with fellow tech enthusiasts and industry professionals.
+                </p>
+                
+                <!-- Skills (optional) -->
+                <div class="skills-section">
+                    <div class="skills-title">Skills & Expertise</div>
+                    <div class="skills-tags">
+                        <span class="skill-tag">Product Management</span>
+                        <span class="skill-tag">UX Design</span>
+                        <span class="skill-tag">Agile</span>
+                        <span class="skill-tag">SaaS</span>
+                        <span class="skill-tag">Analytics</span>
+                        <span class="skill-tag">Leadership</span>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="actions-container">
+                    <button class="action-btn primary" onclick="downloadVCard()">
+                        <i class="bi bi-download"></i>
+                        Save Contact
+                    </button>
+                    <button class="action-btn secondary" onclick="openShareModal()">
+                        <i class="bi bi-share"></i>
+                        Share Card
+                    </button>
+                </div>
+                
+                <!-- Contact Information -->
+                <div class="contact-section">
+                    <!-- Email -->
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="bi bi-envelope"></i>
+                        </div>
+                        <div class="contact-content">
+                            <div class="contact-label">Email</div>
+                            <div class="contact-value">
+                                <a href="mailto:john@techcorp.com">john@techcorp.com</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Phone - Mobile -->
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="bi bi-phone"></i>
+                        </div>
+                        <div class="contact-content">
+                            <div class="contact-label">Mobile</div>
+                            <div class="contact-value">
+                                <a href="tel:+15551234567">+1 (555) 123-4567</a>
+                                <span class="whatsapp-badge">
+                                    <i class="bi bi-whatsapp"></i> WhatsApp
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Phone - Work -->
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="bi bi-telephone"></i>
+                        </div>
+                        <div class="contact-content">
+                            <div class="contact-label">Work</div>
+                            <div class="contact-value">
+                                <a href="tel:+15559876543">+1 (555) 987-6543</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Website -->
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="bi bi-globe"></i>
+                        </div>
+                        <div class="contact-content">
+                            <div class="contact-label">Website</div>
+                            <div class="contact-value">
+                                <a href="https://johndoe.com" target="_blank">johndoe.com</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Address -->
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+                        <div class="contact-content">
+                            <div class="contact-label">Location</div>
+                            <div class="contact-value">
+                                San Francisco, CA, USA
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Social Media Links -->
+                <div class="social-section">
+                    <div class="social-title">Connect with me</div>
+                    <div class="social-links">
+                        <a href="https://linkedin.com/in/johndoe" class="social-link linkedin" target="_blank" title="LinkedIn">
+                            <i class="bi bi-linkedin"></i>
+                        </a>
+                        <a href="https://twitter.com/johndoe" class="social-link twitter" target="_blank" title="Twitter">
+                            <i class="bi bi-twitter"></i>
+                        </a>
+                        <a href="https://instagram.com/johndoe" class="social-link instagram" target="_blank" title="Instagram">
+                            <i class="bi bi-instagram"></i>
+                        </a>
+                        <a href="https://facebook.com/johndoe" class="social-link facebook" target="_blank" title="Facebook">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="https://portfolio.johndoe.com" class="social-link portfolio" target="_blank" title="Portfolio">
+                            <i class="bi bi-briefcase"></i>
+                        </a>
+                        <a href="https://blog.johndoe.com" class="social-link website" target="_blank" title="Blog">
+                            <i class="bi bi-link-45deg"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- QR Code Section -->
+        <div class="qr-section">
+            <h3 class="qr-title">Share via QR Code</h3>
+            <div class="qr-code">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://hosammo.com/john-doe" alt="QR Code">
+            </div>
+            <p class="qr-description">
+                Scan this code to share this card with others
+            </p>
+            <button class="qr-download-btn" onclick="downloadQRCode()">
+                <i class="bi bi-download"></i>
+                Download QR Code
+            </button>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="card-footer">
+        <p>
+            Create your own digital business card at 
+            <a href="https://hosammo.com">hosammo.com</a>
+        </p>
+    </div>
+    
+    <!-- Share Modal -->
+    <div class="share-modal" id="shareModal">
+        <div class="share-modal-content">
+            <button class="share-modal-close" onclick="closeShareModal()">
+                <i class="bi bi-x"></i>
+            </button>
+            
+            <h2 class="share-modal-title">Share This Card</h2>
+            
+            <div class="share-options">
+                <a href="#" class="share-option" onclick="shareViaWhatsApp(); return false;">
+                    <i class="bi bi-whatsapp" style="color: #25D366;"></i>
+                    <span>WhatsApp</span>
+                </a>
+                <a href="#" class="share-option" onclick="shareViaEmail(); return false;">
+                    <i class="bi bi-envelope" style="color: #EA4335;"></i>
+                    <span>Email</span>
+                </a>
+                <a href="#" class="share-option" onclick="shareViaLinkedIn(); return false;">
+                    <i class="bi bi-linkedin" style="color: #0077B5;"></i>
+                    <span>LinkedIn</span>
+                </a>
+                <a href="#" class="share-option" onclick="shareViaTwitter(); return false;">
+                    <i class="bi bi-twitter" style="color: #1DA1F2;"></i>
+                    <span>Twitter</span>
+                </a>
+            </div>
+            
+            <div class="share-link-container">
+                <input type="text" class="share-link-input" id="shareLinkInput" value="https://hosammo.com/john-doe" readonly>
+                <button class="copy-link-btn" id="copyLinkBtn" onclick="copyLink()">
+                    Copy
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Track page view (send to backend)
+        function trackView() {
+            // Send analytics data to backend
+            fetch('/api/track-view/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    card_id: 'john-doe', // Replace with actual card ID
+                    timestamp: new Date().toISOString(),
+                    referrer: document.referrer,
+                    user_agent: navigator.userAgent
+                })
+            }).catch(err => console.log('Analytics tracking failed'));
+        }
+        
+        // Track on page load
+        trackView();
+        
+        // Download vCard
+        function downloadVCard() {
+            // Track download event
+            fetch('/api/track-download/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    card_id: 'john-doe',
+                    timestamp: new Date().toISOString()
+                })
+            }).catch(err => console.log('Download tracking failed'));
+            
+            // Download vCard file
+            window.location.href = '/download-vcard/john-doe/';
+        }
+        
+        // Download QR Code
+        function downloadQRCode() {
+            const link = document.createElement('a');
+            link.href = '/download-qr/john-doe/';
+            link.download = 'john-doe-qrcode.png';
+            link.click();
+        }
+        
+        // Open Share Modal
+        function openShareModal() {
+            document.getElementById('shareModal').classList.add('active');
+        }
+        
+        // Close Share Modal
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.remove('active');
+        }
+        
+        // Close modal on outside click
+        document.getElementById('shareModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeShareModal();
+            }
+        });
+        
+        // Copy Link
+        function copyLink() {
+            const input = document.getElementById('shareLinkInput');
+            const btn = document.getElementById('copyLinkBtn');
+            
+            input.select();
+            document.execCommand('copy');
+            
+            btn.textContent = 'Copied!';
+            btn.classList.add('copied');
+            
+            setTimeout(() => {
+                btn.textContent = 'Copy';
+                btn.classList.remove('copied');
+            }, 2000);
+        }
+        
+        // Share via WhatsApp
+        function shareViaWhatsApp() {
+            const url = encodeURIComponent(window.location.href);
+            const text = encodeURIComponent('Check out my digital business card!');
+            window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
+        }
+        
+        // Share via Email
+        function shareViaEmail() {
+            const subject = encodeURIComponent('Digital Business Card - John Doe');
+            const body = encodeURIComponent(`Check out my digital business card: ${window.location.href}`);
+            window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        }
+        
+        // Share via LinkedIn
+        function shareViaLinkedIn() {
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+        }
+        
+        // Share via Twitter
+        function shareViaTwitter() {
+            const url = encodeURIComponent(window.location.href);
+            const text = encodeURIComponent('Check out my digital business card!');
+            window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+        }
+        
+        // Web Share API (if supported)
+        if (navigator.share) {
+            // Add native share option
+            const shareBtn = document.querySelector('.action-btn.secondary');
+            shareBtn.addEventListener('click', async () => {
+                try {
+                    await navigator.share({
+                        title: 'John Doe - Digital Business Card',
+                        text: 'Check out my digital business card!',
+                        url: window.location.href
+                    });
+                } catch (err) {
+                    // Fallback to modal
+                    openShareModal();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

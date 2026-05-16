@@ -1,0 +1,301 @@
+{% extends 'auth/base.html' %}
+
+{% block title %}Team Management — VCard Manager{% endblock %}
+{% block nav_team %}active{% endblock %}
+
+{% block breadcrumbs %}
+<nav class="app-breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'user_dashboard' %}"><i class="bi bi-credit-card-2-front-fill"></i> VCard Manager</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            <i class="bi bi-people-fill"></i> Team
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .member-row {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        margin-bottom: .6rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        transition: box-shadow .15s;
+    }
+    .member-row:hover { box-shadow: 0 3px 10px rgba(0,0,0,.07); }
+    .member-avatar {
+        width: 42px; height: 42px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: .9rem; flex-shrink: 0;
+        background: linear-gradient(135deg,#4f46e5,#7c3aed); color: #fff;
+    }
+    .member-avatar.pending { background: #f3f4f6; color: #9ca3af; }
+    .role-badge {
+        font-size: .68rem; font-weight: 700; padding: 3px 10px;
+        border-radius: 20px; letter-spacing: .04em;
+    }
+    .role-owner   { background: #fef3c7; color: #92400e; }
+    .role-admin   { background: #dbeafe; color: #1e40af; }
+    .role-editor  { background: #d1fae5; color: #065f46; }
+    .role-viewer  { background: #f3f4f6; color: #374151; }
+    .role-pending { background: #fef9c3; color: #713f12; }
+    .seat-bar {
+        height: 6px; border-radius: 999px;
+        background: #e5e7eb; overflow: hidden;
+    }
+    .seat-bar-fill {
+        height: 100%; border-radius: 999px;
+        background: linear-gradient(90deg, #4f46e5, #7c3aed);
+    }
+    .seat-bar-fill.danger { background: linear-gradient(90deg,#ef4444,#dc2626); }
+    .invite-link-box {
+        background: #f8faff; border: 1px dashed #c7d2fe;
+        border-radius: 8px; padding: .5rem .75rem;
+        font-family: monospace; font-size: .72rem;
+        color: #4338ca; word-break: break-all;
+        cursor: pointer;
+    }
+    .section-title {
+        font-size: .7rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: .07em; color: #6b7280; margin-bottom: .75rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Page header -->
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div>
+        <h1 class="h3 fw-bold mb-1 text-dark">Team Management</h1>
+        <p class="text-muted mb-0">{{ org.name }} &middot; Business plan</p>
+    </div>
+    <!-- Seat usage pill -->
+    <div class="d-flex align-items-center gap-3">
+        <div style="min-width:160px;">
+            <div class="d-flex justify-content-between small mb-1">
+                <span class="text-muted">Seats used</span>
+                <span class="fw-semibold {% if seat_count >= seat_limit %}text-danger{% else %}text-dark{% endif %}">
+                    {{ seat_count }} / {{ seat_limit }}
+                </span>
+            </div>
+            <div class="seat-bar">
+                <div class="seat-bar-fill {% if seat_count >= seat_limit %}danger{% endif %}"
+                     style="width:{% widthratio seat_count seat_limit 100 %}%;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+
+    <!-- ── Left: Members + Pending ── -->
+    <div class="col-lg-8">
+
+        <!-- Active members -->
+        <p class="section-title"><i class="bi bi-check-circle-fill text-success me-1"></i>Active Members</p>
+
+        {% for m in accepted_members %}
+        <div class="member-row">
+
+            <!-- Avatar + info -->
+            <div class="member-avatar">
+                {% if m.user %}{{ m.user.first_name.0|upper|default:m.user.username.0|upper }}
+                {% else %}?{% endif %}
+            </div>
+            <div class="flex-grow-1" style="min-width:0;">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <span class="fw-semibold text-dark text-truncate" style="max-width:200px;">
+                        {% if m.user %}{{ m.user.get_full_name|default:m.user.username }}
+                        {% else %}{{ m.invited_email }}{% endif %}
+                    </span>
+                    <span class="role-badge role-{{ m.role }}">{{ m.get_role_display }}</span>
+                    {% if m.user == request.user %}
+                    <span class="role-badge" style="background:#f0fdf4;color:#166534;">You</span>
+                    {% endif %}
+                </div>
+                <div class="text-muted small mt-1">
+                    {% if m.user %}{{ m.user.email }}{% else %}{{ m.invited_email }}{% endif %}
+                    &middot; Joined {{ m.joined_at|date:"M d, Y" }}
+                </div>
+            </div>
+
+            <!-- Role change (non-owners, not self) -->
+            {% if member.can_manage_members and m.role != 'owner' and m.user != request.user %}
+            <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                <form method="POST" action="{% url 'change_member_role' m.id %}" class="d-flex align-items-center gap-1">
+                    {% csrf_token %}
+                    <select name="role" class="form-select form-select-sm" style="width:auto;font-size:.78rem;"
+                            onchange="this.form.submit()">
+                        {% for val, label in roles %}
+                        {% if val != 'owner' %}
+                        <option value="{{ val }}" {% if m.role == val %}selected{% endif %}>{{ label }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </form>
+                <form method="POST" action="{% url 'remove_member' m.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                            title="Remove member"
+                            onclick="return confirm('Remove {{ m.user.get_full_name|default:m.user.username|default:m.invited_email }} from the workspace?')">
+                        <i class="bi bi-person-dash-fill"></i>
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+
+        </div>
+        {% empty %}
+        <div class="text-center text-muted py-3 small">No active members found.</div>
+        {% endfor %}
+
+        <!-- Pending invites -->
+        {% if pending_invites %}
+        <p class="section-title mt-4"><i class="bi bi-clock-history text-warning me-1"></i>Pending Invites</p>
+
+        {% for item in pending_invites %}
+        <div class="member-row" style="border-style:dashed;opacity:.85;">
+            <div class="member-avatar pending"><i class="bi bi-envelope-fill" style="font-size:.9rem;"></i></div>
+            <div class="flex-grow-1" style="min-width:0;">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <span class="fw-semibold text-dark">{{ item.member.invited_email }}</span>
+                    <span class="role-badge role-pending">Pending · {{ item.member.get_role_display }}</span>
+                </div>
+                <div class="mt-1">
+                    <div class="invite-link-box" onclick="copyLink(this, '{{ item.link }}')"
+                         title="Click to copy invite link">
+                        <i class="bi bi-link-45deg me-1"></i>{{ item.link }}
+                    </div>
+                    <div class="text-muted" style="font-size:.68rem;margin-top:3px;">
+                        <i class="bi bi-info-circle me-1"></i>Share this link with {{ item.member.invited_email }} — no email sent (simulator mode)
+                    </div>
+                </div>
+            </div>
+            {% if member.can_manage_members %}
+            <form method="POST" action="{% url 'remove_member' item.member.id %}" class="flex-shrink-0">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-secondary" title="Revoke invite">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </form>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+    </div>
+
+    <!-- ── Right: Invite form ── -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-3 p-4">
+
+            <h6 class="fw-bold text-dark mb-1">
+                <i class="bi bi-person-plus-fill me-2" style="color:#4f46e5;"></i>Invite a Member
+            </h6>
+            <p class="text-muted small mb-3">
+                They'll receive a link to join your workspace.
+            </p>
+
+            {% if can_add_member %}
+            <form method="POST" action="{% url 'invite_member' %}">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small text-dark">Email Address</label>
+                    <input type="email" name="email" required class="form-control"
+                           placeholder="colleague@company.com">
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold small text-dark">Role</label>
+                    <select name="role" class="form-select">
+                        {% for val, label in roles %}
+                        {% if val != 'owner' %}
+                        <option value="{{ val }}" {% if val == 'editor' %}selected{% endif %}>{{ label }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                    <div class="mt-2" style="font-size:.72rem;color:#6b7280;">
+                        <strong>Editor</strong> — can edit cards &nbsp;|&nbsp;
+                        <strong>Viewer</strong> — read-only &nbsp;|&nbsp;
+                        <strong>Admin</strong> — can invite others
+                    </div>
+                </div>
+
+                <button type="submit" class="btn w-100 fw-semibold text-white"
+                        style="background:linear-gradient(135deg,#4f46e5,#7c3aed);">
+                    <i class="bi bi-send-fill me-2"></i>Send Invite
+                </button>
+            </form>
+
+            {% else %}
+            <!-- Seat limit reached -->
+            <div class="alert alert-warning border-0 rounded-3 d-flex gap-2 align-items-start p-3" style="font-size:.85rem;">
+                <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
+                <div>
+                    <strong>Seat limit reached</strong> ({{ seat_limit }} / {{ seat_limit }}).<br>
+                    Remove a member to free a seat, or contact us to expand your plan.
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Role reference card -->
+            <div class="mt-4 pt-3 border-top">
+                <p class="section-title mb-2">Role Permissions</p>
+                <table class="table table-sm mb-0" style="font-size:.75rem;">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Action</th>
+                            <th class="text-center">Viewer</th>
+                            <th class="text-center">Editor</th>
+                            <th class="text-center">Admin</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>View cards</td>
+                            <td class="text-center text-success">✓</td>
+                            <td class="text-center text-success">✓</td>
+                            <td class="text-center text-success">✓</td></tr>
+                        <tr><td>Edit cards</td>
+                            <td class="text-center text-muted">—</td>
+                            <td class="text-center text-success">✓</td>
+                            <td class="text-center text-success">✓</td></tr>
+                        <tr><td>Invite members</td>
+                            <td class="text-center text-muted">—</td>
+                            <td class="text-center text-muted">—</td>
+                            <td class="text-center text-success">✓</td></tr>
+                        <tr><td>Billing</td>
+                            <td class="text-center text-muted">—</td>
+                            <td class="text-center text-muted">—</td>
+                            <td class="text-center text-muted">—</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function copyLink(el, url) {
+    navigator.clipboard.writeText(url).then(function () {
+        var orig = el.innerHTML;
+        el.innerHTML = '<i class="bi bi-check2-all me-1 text-success"></i>Copied!';
+        setTimeout(function () { el.innerHTML = orig; }, 2000);
+    });
+}
+</script>
+{% endblock %}

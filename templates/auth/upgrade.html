@@ -1,0 +1,294 @@
+{% extends 'auth/base.html' %}
+
+{% block title %}Upgrade Plan — VCard Manager{% endblock %}
+{% block nav_upgrade %}active{% endblock %}
+
+{% block breadcrumbs %}
+<nav class="app-breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'user_dashboard' %}"><i class="bi bi-credit-card-2-front-fill"></i> VCard Manager</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            <i class="bi bi-lightning-fill"></i> Upgrade Plan
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .plan-card {
+        border-radius: 16px;
+        border: 2px solid #e5e7eb;
+        transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+        height: 100%;
+    }
+    .plan-card:hover {
+        border-color: #4f46e5;
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(79, 70, 229, 0.15);
+    }
+    .plan-card.highlighted {
+        border-color: #4f46e5;
+        box-shadow: 0 8px 24px rgba(79, 70, 229, 0.18);
+    }
+    .plan-price {
+        font-size: 2.6rem;
+        font-weight: 800;
+        line-height: 1;
+    }
+    .plan-price sup {
+        font-size: 1.2rem;
+        font-weight: 600;
+        vertical-align: top;
+        margin-top: 0.5rem;
+    }
+    .plan-price sub {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #6b7280;
+    }
+    .feature-list li {
+        padding: 0.45rem 0;
+        border-bottom: 1px solid #f3f4f6;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .feature-list li:last-child { border-bottom: none; }
+    .feature-list .bi-check-circle-fill { color: #10b981; }
+    .feature-list .bi-x-circle-fill     { color: #d1d5db; }
+    .popular-badge {
+        position: absolute;
+        top: -14px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        color: #fff;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        padding: 4px 16px;
+        border-radius: 20px;
+        white-space: nowrap;
+    }
+    .plan-label-badge {
+        font-size: 0.7rem;
+        letter-spacing: 0.05em;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-weight: 700;
+    }
+    .dev-banner {
+        background: repeating-linear-gradient(
+            45deg,
+            #fef3c7,
+            #fef3c7 10px,
+            #fde68a 10px,
+            #fde68a 20px
+        );
+        border: 1px solid #f59e0b;
+        border-radius: 10px;
+        font-size: 0.82rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header text-center mb-4">
+    <h1 class="h2 fw-bold mb-2 text-dark">Choose Your Plan</h1>
+    <p class="text-muted mb-0" style="max-width:480px;margin:auto;">
+        Start free, upgrade when you're ready. All plans include a digital business card that works everywhere.
+    </p>
+</div>
+
+<!-- Dev simulator banner -->
+<div class="dev-banner d-flex align-items-center gap-3 p-3 mb-4" style="max-width:780px;margin:auto;">
+    <i class="bi bi-cone-striped fs-5 text-warning flex-shrink-0"></i>
+    <div>
+        <strong>Payment Simulator Active</strong> — No real money is charged.
+        Clicking a plan button will instantly apply it to your account so you can test the full upgrade flow.
+        Swap in your real payment provider when ready.
+    </div>
+    {% if has_paid_plan %}
+    <form method="POST" action="{% url 'simulate_downgrade' %}" class="ms-auto flex-shrink-0">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-sm btn-outline-danger">
+            <i class="bi bi-arrow-down-circle me-1"></i>Downgrade to Free
+        </button>
+    </form>
+    {% endif %}
+</div>
+
+<!-- Pricing Cards -->
+<div class="row g-4 justify-content-center mb-5" style="max-width:960px;margin:auto;">
+
+    <!-- FREE -->
+    <div class="col-12 col-md-4">
+        <div class="plan-card card border-0 shadow-sm p-4 {% if org and org.plan == 'free' %}highlighted{% endif %}">
+            <div class="text-center mb-4">
+                <div class="mb-2">
+                    <span class="plan-label-badge badge" style="background:#e0e7ff;color:#3730a3;">FREE</span>
+                    {% if org and org.plan == 'free' %}
+                    <span class="plan-label-badge badge ms-1" style="background:#d1fae5;color:#065f46;">Current Plan</span>
+                    {% endif %}
+                </div>
+                <div class="plan-price text-dark mt-3">
+                    <sup>$</sup>0<sub>/mo</sub>
+                </div>
+                <p class="text-muted small mt-2 mb-0">Forever free</p>
+            </div>
+
+            <ul class="feature-list list-unstyled mb-4">
+                <li><i class="bi bi-check-circle-fill"></i> <strong>1</strong> business card</li>
+                <li><i class="bi bi-check-circle-fill"></i> Public card page</li>
+                <li><i class="bi bi-check-circle-fill"></i> vCard / contact download</li>
+                <li><i class="bi bi-check-circle-fill"></i> Social media links</li>
+                <li><i class="bi bi-x-circle-fill"></i> <span class="text-muted">Analytics dashboard</span></li>
+                <li><i class="bi bi-x-circle-fill"></i> <span class="text-muted">CSV export</span></li>
+                <li><i class="bi bi-x-circle-fill"></i> <span class="text-muted">Team members</span></li>
+            </ul>
+
+            <button class="btn btn-outline-secondary w-100" disabled>
+                {% if org and org.plan == 'free' %}Current Plan{% else %}Free{% endif %}
+            </button>
+        </div>
+    </div>
+
+    <!-- PRO -->
+    <div class="col-12 col-md-4">
+        <div class="plan-card card border-0 shadow-sm p-4 highlighted" style="position:relative;">
+            <div class="popular-badge"><i class="bi bi-lightning-fill me-1"></i>MOST POPULAR</div>
+
+            <div class="text-center mb-4 mt-2">
+                <div class="mb-2">
+                    <span class="plan-label-badge badge" style="background:#fef3c7;color:#92400e;">PRO</span>
+                    {% if org and org.plan == 'pro' %}
+                    <span class="plan-label-badge badge ms-1" style="background:#d1fae5;color:#065f46;">Current Plan</span>
+                    {% endif %}
+                </div>
+                <div class="plan-price mt-3" style="color:#4f46e5;">
+                    <sup>$</sup>9<sub>/mo</sub>
+                </div>
+                <p class="text-muted small mt-2 mb-0">Billed monthly · cancel anytime</p>
+            </div>
+
+            <ul class="feature-list list-unstyled mb-4">
+                <li><i class="bi bi-check-circle-fill"></i> <strong>5</strong> business cards</li>
+                <li><i class="bi bi-check-circle-fill"></i> Public card pages</li>
+                <li><i class="bi bi-check-circle-fill"></i> vCard / contact download</li>
+                <li><i class="bi bi-check-circle-fill"></i> Social media links</li>
+                <li><i class="bi bi-check-circle-fill"></i> <strong>Full analytics</strong> dashboard</li>
+                <li><i class="bi bi-check-circle-fill"></i> <strong>CSV export</strong></li>
+                <li><i class="bi bi-x-circle-fill"></i> <span class="text-muted">Team members</span></li>
+            </ul>
+
+            {% if org and org.plan == 'pro' %}
+            <button class="btn w-100 fw-semibold" style="background:#4f46e5;color:#fff;" disabled>Current Plan</button>
+            {% else %}
+            <a href="{% url 'simulate_payment' 'pro' %}"
+               class="btn w-100 fw-semibold text-white"
+               style="background:linear-gradient(135deg,#4f46e5,#7c3aed);">
+                <i class="bi bi-lightning-fill me-1"></i>Get Pro — $9/mo
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- BUSINESS -->
+    <div class="col-12 col-md-4">
+        <div class="plan-card card border-0 shadow-sm p-4 {% if org and org.plan == 'business' %}highlighted{% endif %}">
+            <div class="text-center mb-4">
+                <div class="mb-2">
+                    <span class="plan-label-badge badge" style="background:#d1fae5;color:#065f46;">BUSINESS</span>
+                    {% if org and org.plan == 'business' %}
+                    <span class="plan-label-badge badge ms-1" style="background:#d1fae5;color:#065f46;">Current Plan</span>
+                    {% endif %}
+                </div>
+                <div class="plan-price text-dark mt-3">
+                    <sup>$</sup>29<sub>/mo</sub>
+                </div>
+                <p class="text-muted small mt-2 mb-0">Billed monthly · cancel anytime</p>
+            </div>
+
+            <ul class="feature-list list-unstyled mb-4">
+                <li><i class="bi bi-check-circle-fill"></i> <strong>Unlimited</strong> cards</li>
+                <li><i class="bi bi-check-circle-fill"></i> Public card pages</li>
+                <li><i class="bi bi-check-circle-fill"></i> vCard / contact download</li>
+                <li><i class="bi bi-check-circle-fill"></i> Social media links</li>
+                <li><i class="bi bi-check-circle-fill"></i> <strong>Full analytics</strong> dashboard</li>
+                <li><i class="bi bi-check-circle-fill"></i> <strong>CSV export</strong></li>
+                <li><i class="bi bi-check-circle-fill"></i> <strong>Up to 10 team members</strong></li>
+            </ul>
+
+            {% if org and org.plan == 'business' %}
+            <button class="btn btn-outline-success w-100 fw-semibold" disabled>Current Plan</button>
+            {% else %}
+            <a href="{% url 'simulate_payment' 'business' %}"
+               class="btn btn-outline-dark w-100 fw-semibold">
+                <i class="bi bi-building me-1"></i>Get Business — $29/mo
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+<!-- FAQ -->
+<div style="max-width:600px;margin:0 auto 3rem;">
+    <h5 class="fw-bold text-dark mb-3 text-center">Common Questions</h5>
+    <div class="accordion accordion-flush" id="faqAccordion">
+
+        <div class="accordion-item border rounded-3 mb-2">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed rounded-3 fw-semibold" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#faq1">
+                    Can I cancel anytime?
+                </button>
+            </h2>
+            <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body text-muted">
+                    Yes — cancel at any time with no questions asked.
+                    Your card stays active until the end of your billing period.
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item border rounded-3 mb-2">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed rounded-3 fw-semibold" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#faq2">
+                    What happens if I downgrade to Free?
+                </button>
+            </h2>
+            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body text-muted">
+                    Your cards stay public, but analytics and CSV export are locked.
+                    If you have more than 1 card, existing cards remain — you just can't add new ones.
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item border rounded-3">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed rounded-3 fw-semibold" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#faq3">
+                    Have a question not answered here?
+                </button>
+            </h2>
+            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body text-muted">
+                    Email us at <a href="mailto:hello@hosammo.com">hello@hosammo.com</a> and we'll
+                    get back to you within 24 hours.
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

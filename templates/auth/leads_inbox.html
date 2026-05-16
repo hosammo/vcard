@@ -1,0 +1,179 @@
+{% extends 'auth/base.html' %}
+
+{% block title %}Leads Inbox — VCard Manager{% endblock %}
+{% block nav_leads %}active{% endblock %}
+
+{% block breadcrumbs %}
+<nav class="app-breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'user_dashboard' %}"><i class="bi bi-credit-card-2-front-fill"></i> VCard Manager</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            <i class="bi bi-inbox-fill"></i> Leads Inbox
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .lead-card {
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        padding: 1.1rem 1.25rem;
+        margin-bottom: .75rem;
+        transition: box-shadow .15s, border-color .15s;
+    }
+    .lead-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,.07); border-color: #c7d2fe; }
+    .lead-card.unread { border-left: 3px solid #4f46e5; }
+    .lead-meta { font-size: .75rem; color: #9ca3af; }
+    .lead-message {
+        font-size: .875rem; color: #374151;
+        background: #f9fafb; border-radius: 8px;
+        padding: .6rem .9rem; margin-top: .6rem;
+        border-left: 3px solid #e5e7eb;
+        white-space: pre-wrap; word-break: break-word;
+    }
+    .filter-bar {
+        background: #fff; border-radius: 12px;
+        border: 1px solid #e5e7eb; padding: .75rem 1rem;
+        margin-bottom: 1.25rem;
+        display: flex; flex-wrap: wrap; gap: .5rem; align-items: center;
+    }
+    .empty-leads {
+        text-align: center; padding: 4rem 2rem;
+        color: #9ca3af;
+    }
+    .empty-leads i { font-size: 3.5rem; display: block; margin-bottom: 1rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div>
+        <h1 class="h3 fw-bold mb-1 text-dark">
+            Leads Inbox
+            {% if unread_count %}
+            <span class="badge rounded-pill ms-2"
+                  style="background:#4f46e5;font-size:.65rem;vertical-align:middle;">
+                {{ unread_count }} new
+            </span>
+            {% endif %}
+        </h1>
+        <p class="text-muted mb-0">Contact messages submitted through your public card pages.</p>
+    </div>
+</div>
+
+<!-- Filter bar -->
+<div class="filter-bar">
+    <span class="text-muted small fw-semibold me-1">Filter:</span>
+
+    <!-- By card -->
+    <select class="form-select form-select-sm" style="width:auto;"
+            onchange="applyFilter('card', this.value)">
+        <option value="">All Cards</option>
+        {% for c in user_cards %}
+        <option value="{{ c.id }}" {% if card_filter == c.id|stringformat:"s" %}selected{% endif %}>
+            {{ c.full_name }}
+        </option>
+        {% endfor %}
+    </select>
+
+    <!-- By read status -->
+    <select class="form-select form-select-sm" style="width:auto;"
+            onchange="applyFilter('read', this.value)">
+        <option value="">All Messages</option>
+        <option value="unread" {% if read_filter == 'unread' %}selected{% endif %}>Unread Only</option>
+        <option value="read"   {% if read_filter == 'read'   %}selected{% endif %}>Read Only</option>
+    </select>
+
+    <span class="text-muted small ms-auto">{{ leads|length }} result{{ leads|length|pluralize }}</span>
+</div>
+
+<!-- Leads list -->
+{% if leads %}
+<div>
+    {% for lead in leads %}
+    <div class="lead-card {% if not lead.is_read %}unread{% endif %}">
+        <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
+
+            <div class="d-flex align-items-center gap-3">
+                <!-- Avatar -->
+                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold"
+                     style="width:42px;height:42px;background:#ede9fe;color:#4f46e5;font-size:.95rem;">
+                    {{ lead.name.0|upper }}
+                </div>
+                <div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <span class="fw-semibold text-dark">{{ lead.name }}</span>
+                        {% if not lead.is_read %}
+                        <span class="badge rounded-pill"
+                              style="background:#e0e7ff;color:#3730a3;font-size:.65rem;">New</span>
+                        {% endif %}
+                    </div>
+                    <div class="lead-meta d-flex flex-wrap gap-2 mt-1">
+                        <span><i class="bi bi-envelope me-1"></i>
+                            <a href="mailto:{{ lead.email }}" class="text-muted text-decoration-none">{{ lead.email }}</a>
+                        </span>
+                        {% if lead.phone %}
+                        <span><i class="bi bi-telephone me-1"></i>{{ lead.phone }}</span>
+                        {% endif %}
+                        <span><i class="bi bi-credit-card me-1"></i>{{ lead.card.full_name }}</span>
+                        <span><i class="bi bi-clock me-1"></i>{{ lead.submitted_at|date:"M d, Y · H:i" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="d-flex gap-2 flex-shrink-0">
+                <a href="mailto:{{ lead.email }}?subject=Re: Your message&body=Hi {{ lead.name }},"
+                   class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-reply-fill me-1"></i>Reply
+                </a>
+                {% if not lead.is_read %}
+                <a href="?mark_read={{ lead.id }}{% if card_filter %}&card={{ card_filter }}{% endif %}{% if read_filter %}&read={{ read_filter }}{% endif %}"
+                   class="btn btn-sm btn-outline-secondary" title="Mark as read">
+                    <i class="bi bi-check2-all"></i>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Message body -->
+        <div class="lead-message">{{ lead.message }}</div>
+    </div>
+    {% endfor %}
+</div>
+
+{% else %}
+<div class="card border-0 shadow-sm">
+    <div class="empty-leads">
+        <i class="bi bi-inbox"></i>
+        <h6 class="fw-semibold text-dark mb-1">No messages yet</h6>
+        <p class="text-muted small mb-0">
+            When visitors fill in the contact form on your card pages,<br>
+            their messages will appear here.
+        </p>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function applyFilter(key, value) {
+    var url = new URL(window.location.href);
+    if (value) {
+        url.searchParams.set(key, value);
+    } else {
+        url.searchParams.delete(key);
+    }
+    window.location.href = url.toString();
+}
+</script>
+{% endblock %}

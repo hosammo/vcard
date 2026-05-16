@@ -1,635 +1,1311 @@
-<!-- COMPLETE FIXED templates/auth/edit_card.html -->
-{% extends 'cards/base.html' %}
+{% extends 'auth/base.html' %}
 
-{% block title %}Edit {{ card.full_name }}{% endblock %}
+{% block title %}Edit {{ card.full_name }} - VCard Manager{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
 
 {% block extra_css %}
 <style>
-    .form-control {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        font-size: 16px;
-        box-sizing: border-box;
-        transition: border-color 0.2s ease;
-    }
-    .form-control:focus {
-        outline: none;
-        border-color: #0066cc;
-        box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
-    }
-    .color-picker {
-        height: 50px;
-        padding: 5px;
-        cursor: pointer;
-    }
-    .file-input {
-        padding: 8px;
-        background: #f8f9fa;
-    }
-    .section-card {
-        background: white;
-        padding: 25px;
-        border-radius: 12px;
-        margin-bottom: 25px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        border-left: 4px solid;
-    }
-    .section-card.basic { border-left-color: #3b82f6; }
-    .section-card.contact { border-left-color: #10b981; }
-    .section-card.about { border-left-color: #f59e0b; }
-    .section-card.images { border-left-color: #8b5cf6; }
-    .section-card.colors { border-left-color: #ef4444; }
-    .section-card.social { border-left-color: #06b6d4; }
-    
-    .section-title {
-        margin: 0 0 20px 0;
-        font-size: 1.4em;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    .form-grid {
-        display: grid;
-        gap: 20px;
-    }
-    .form-grid.two-col { grid-template-columns: 1fr 1fr; }
-    .form-grid.three-col { grid-template-columns: 1fr 1fr 1fr; }
-    .form-field {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-    .form-label {
-        font-weight: 600;
-        color: #374151;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-    .form-help {
-        font-size: 12px;
-        color: #6b7280;
-        margin-top: 4px;
-    }
-    .required {
-        color: #ef4444;
-    }
-    .current-image {
-        max-width: 100px;
-        max-height: 100px;
-        border-radius: 8px;
-        margin-top: 10px;
-        border: 2px solid #e5e7eb;
-    }
-    .preview-section {
-        background: #f8fafc;
-        border: 2px dashed #cbd5e1;
-        border-radius: 8px;
-        padding: 20px;
-        text-align: center;
-        color: #64748b;
-        margin-top: 10px;
-    }
-    
-    /* Phone Numbers Styling */
-    .phone-form-row {
-        background: white;
-        border: 2px solid #e5e7eb;
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 20px;
-        transition: all 0.2s ease;
-    }
-    .phone-form-row:hover {
-        border-color: #cbd5e1;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    }
-    .phone-grid {
-        display: grid;
-        grid-template-columns: 1fr 1.5fr 2fr auto;
-        gap: 20px;
-        align-items: end;
-    }
-    .phone-field {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-    .phone-label {
-        font-weight: 600;
-        color: #374151;
-        font-size: 14px;
-        margin-bottom: 5px;
-    }
-    .phone-checkboxes {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        padding-top: 8px;
-    }
-    .checkbox-group {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .checkbox-label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-        font-size: 13px;
-        font-weight: 500;
-        color: #4b5563;
-    }
-    .form-check-input {
-        width: 18px;
-        height: 18px;
-        border: 2px solid #d1d5db;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    .add-phone-btn {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        color: white;
-        border: none;
-        padding: 14px 28px;
-        border-radius: 10px;
-        font-size: 15px;
-        font-weight: 600;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-    }
-    .phone-tips {
-        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-        border: 2px solid #bfdbfe;
-        border-radius: 12px;
-        padding: 20px;
-        margin-top: 20px;
-    }
-    
-    @media (max-width: 768px) {
-        .form-grid.two-col,
-        .form-grid.three-col {
-            grid-template-columns: 1fr;
-        }
-        .section-card {
-            padding: 20px;
-        }
-        .phone-grid {
-            grid-template-columns: 1fr;
-        }
-    }
+/* ── Section cards (form) ── */
+.section-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 6px rgba(0,0,0,.07);
+    margin-bottom: 1.1rem;
+    overflow: hidden;
+}
+.section-header {
+    padding: .9rem 1.1rem;
+    display: flex; align-items: center; gap: .55rem;
+    font-weight: 600; font-size: .88rem;
+    border-bottom: 1px solid #f3f4f6;
+    cursor: pointer; user-select: none;
+}
+.section-header .section-icon {
+    width: 30px; height: 30px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: .85rem;
+}
+.section-header.basic   .section-icon { background:#dbeafe; color:#2563eb; }
+.section-header.contact .section-icon { background:#dcfce7; color:#16a34a; }
+.section-header.phones  .section-icon { background:#f0fdf4; color:#059669; }
+.section-header.about   .section-icon { background:#fef9c3; color:#d97706; }
+.section-header.images  .section-icon { background:#f3e8ff; color:#7c3aed; }
+.section-header.colors  .section-icon { background:#fee2e2; color:#dc2626; }
+.section-header.social  .section-icon { background:#e0f2fe; color:#0284c7; }
+
+.section-body { padding: 1.1rem; }
+
+.section-toggle-icon {
+    margin-left: auto; transition: transform .2s ease; color: #9ca3af;
+}
+.collapsed .section-toggle-icon { transform: rotate(-90deg); }
+
+/* ── Form fields ── */
+.form-label { font-weight:600; font-size:.8rem; color:#374151; margin-bottom:.3rem; }
+.form-control, .form-select {
+    border: 1.5px solid #e5e7eb; border-radius: 8px; font-size:.88rem;
+    transition: border-color .2s, box-shadow .2s;
+}
+.form-control:focus, .form-select:focus {
+    border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,.1);
+}
+textarea.form-control { resize:vertical; min-height:82px; }
+input[type="color"].form-control { height:44px; padding:4px 6px; cursor:pointer; }
+.form-help { font-size:.73rem; color:#6b7280; margin-top:3px; }
+.required-star { color:#ef4444; }
+
+/* ── Current image thumbnails ── */
+.current-thumb {
+    max-width:80px; max-height:80px;
+    border-radius:8px; border:2px solid #e5e7eb;
+    object-fit:cover; display:block; margin-top:6px;
+}
+.current-banner-thumb {
+    max-width:200px; max-height:80px;
+    border-radius:8px; border:2px solid #e5e7eb;
+    object-fit:cover; display:block; margin-top:6px;
+}
+
+/* ── Phone rows ── */
+.phone-row {
+    background:#fafafa; border:1.5px solid #e5e7eb;
+    border-radius:10px; padding:.9rem; margin-bottom:.75rem;
+    transition: border-color .2s;
+}
+.phone-row:hover { border-color:#c4b5fd; }
+.checkbox-label {
+    display:flex; align-items:center; gap:6px;
+    font-size:.8rem; font-weight:500; color:#4b5563; cursor:pointer;
+}
+.checkbox-label.delete-label { color:#dc2626; }
+.form-check-input { width:16px; height:16px; cursor:pointer; margin:0; flex-shrink:0; }
+
+/* ── Color preview box ── */
+.color-preview-box {
+    height:52px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:.9rem; color:white;
+    transition: background .3s ease;
+}
+
+/* ─────────────────────────────────────────
+   SEARCHABLE COUNTRY SELECT
+───────────────────────────────────────── */
+.cs-wrapper { position: relative; }
+
+.cs-trigger {
+    width: 100%; border: 1.5px solid #e5e7eb; border-radius: 8px;
+    padding: .5rem .75rem; font-size: .88rem; background: white;
+    cursor: pointer; text-align: left;
+    display: flex; align-items: center; gap: .45rem;
+    color: #374151; transition: border-color .2s, box-shadow .2s;
+    min-height: 38px; outline: none;
+}
+.cs-trigger:hover              { border-color: #c4b5fd; }
+.cs-trigger:focus,
+.cs-trigger.open               { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,.1); }
+.cs-trigger-flag               { font-size: 1.05rem; flex-shrink: 0; line-height: 1; }
+.cs-trigger-label              { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cs-trigger-code               {
+    font-family: monospace; font-size: .75rem; font-weight: 700;
+    color: #6d28d9; background: #f5f3ff; padding: 1px 5px;
+    border-radius: 4px; flex-shrink: 0;
+}
+.cs-trigger-placeholder        { color: #9ca3af; }
+.cs-trigger-chevron            { margin-left: auto; flex-shrink: 0; color: #9ca3af; font-size: .72rem; transition: transform .2s; }
+.cs-trigger.open .cs-trigger-chevron { transform: rotate(180deg); }
+
+.cs-dropdown {
+    display: none; position: absolute;
+    top: calc(100% + 4px); left: 0; right: 0;
+    background: white; border: 1.5px solid #e5e7eb;
+    border-radius: 10px; box-shadow: 0 8px 28px rgba(0,0,0,.14);
+    z-index: 9999; overflow: hidden;
+}
+.cs-dropdown.show { display: block; }
+
+.cs-search-box {
+    position: sticky; top: 0; padding: .45rem .45rem .4rem;
+    background: white; border-bottom: 1px solid #f3f4f6;
+}
+.cs-search-input {
+    width: 100%; border: 1.5px solid #e5e7eb; border-radius: 7px;
+    padding: .38rem .65rem .38rem 1.85rem; font-size: .8rem;
+    outline: none; transition: border-color .15s;
+    background: #fafafa url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath fill='%239ca3af' d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242 1.656a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E") no-repeat .52rem center;
+    background-size: 12px;
+}
+.cs-search-input:focus { border-color: #7c3aed; background-color: white; }
+
+.cs-list {
+    max-height: 210px; overflow-y: auto; overflow-x: hidden;
+    scrollbar-width: thin; scrollbar-color: #e5e7eb transparent;
+}
+.cs-option {
+    padding: .44rem .75rem; display: flex; align-items: center; gap: .55rem;
+    cursor: pointer; font-size: .81rem; transition: background .08s;
+}
+.cs-option:hover,
+.cs-option.cs-hl       { background: #f5f3ff; }
+.cs-option.cs-selected { background: #ede9fe; font-weight: 600; }
+.cs-option-flag        { font-size: .98rem; flex-shrink: 0; line-height: 1; }
+.cs-option-name        { flex: 1; color: #1f2937; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cs-option-code        {
+    font-family: monospace; font-size: .73rem; font-weight: 700;
+    color: #6d28d9; background: #f5f3ff; padding: 1px 5px; border-radius: 4px; flex-shrink: 0;
+}
+.cs-no-results { padding: .9rem; text-align: center; color: #9ca3af; font-size: .8rem; font-style: italic; }
+
+/* ── Tips box ── */
+.tips-box {
+    background:#eff6ff; border:1px solid #bfdbfe;
+    border-radius:10px; padding:.9rem; margin-top:.9rem;
+}
+
+/* ── Sticky submit bar ── */
+.submit-bar {
+    position:sticky; bottom:0;
+    background:white; border-top:1px solid #e5e7eb;
+    padding:.9rem 1.1rem;
+    margin: 0 -1.75rem -1.75rem;
+    z-index:15;
+    display:flex; gap:.65rem; flex-wrap:wrap;
+    justify-content:flex-end;
+    box-shadow:0 -4px 12px rgba(0,0,0,.06);
+}
+@media(max-width:575.98px){
+    .submit-bar { margin:0 -1rem -1rem; }
+    .submit-bar .btn { flex:1; }
+}
+
+/* ─────────────────────────────────────────
+   LIVE PREVIEW PANE  –  floating / sticky
+───────────────────────────────────────── */
+.preview-col { align-self: stretch; }
+
+.preview-sticky {
+    position: sticky;
+    top: calc(58px + 1.25rem);
+    max-height: calc(100vh - 58px - 2.5rem);
+    overflow-y: auto; overflow-x: hidden;
+    scrollbar-width: thin; scrollbar-color: #c4b5fd transparent;
+    border-radius: 20px;
+    transition: filter .25s ease, transform .25s ease;
+    will-change: filter, transform;
+}
+.preview-sticky.is-floating {
+    filter: drop-shadow(0 12px 28px rgba(79,70,229,.18));
+    transform: translateY(2px);
+}
+
+.preview-label {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: .65rem;
+}
+.preview-label-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: #f0fdf4; border: 1px solid #bbf7d0;
+    color: #16a34a; font-size: .7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .06em;
+    padding: 3px 8px; border-radius: 20px;
+}
+.preview-live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #16a34a; animation: liveBlink 1.4s ease-in-out infinite;
+}
+@keyframes liveBlink { 0%,100% { opacity:1; } 50% { opacity:.3; } }
+
+.preview-card {
+    border-radius: 18px; overflow: hidden;
+    box-shadow: 0 12px 36px rgba(0,0,0,.14);
+    background: white; font-size: .82rem;
+    transition: box-shadow .3s ease;
+}
+.preview-card:hover { box-shadow: 0 16px 48px rgba(0,0,0,.18); }
+
+.prev-banner {
+    height: 80px; background-size: cover; background-position: center;
+    position: relative; display: none;
+}
+.prev-banner-overlay {
+    position: absolute; inset: 0; background: rgba(0,0,0,.45);
+    display: flex; align-items: center; justify-content: center;
+}
+.prev-banner-text { color: white; font-weight: 700; font-size: .8rem; padding: 4px 12px; text-align: center; }
+
+.prev-hero {
+    background: linear-gradient(135deg,#4f46e5,#7c3aed);
+    padding: 1.4rem 1rem 1rem; text-align: center; position: relative;
+}
+.prev-hero::before {
+    content:''; position:absolute; inset:0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="g" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="white" opacity="0.08"/></pattern></defs><rect width="100" height="100" fill="url(%23g)"/></svg>');
+}
+.prev-photo-wrap { position: relative; z-index:1; margin-bottom: .6rem; }
+.prev-photo {
+    width: 70px; height: 70px; border-radius: 50%; object-fit: cover;
+    border: 3px solid rgba(255,255,255,.9); display: none;
+}
+.prev-avatar {
+    width: 70px; height: 70px; border-radius: 50%;
+    background: rgba(255,255,255,.25); border: 3px solid rgba(255,255,255,.5);
+    display: flex; align-items: center; justify-content: center; margin: 0 auto;
+    font-size: 1.4rem; font-weight: 800; color: white;
+    backdrop-filter: blur(4px); transition: background .3s;
+}
+.prev-name { position:relative; z-index:1; font-size: 1rem; font-weight: 800; color: white; margin-bottom: 2px; line-height: 1.2; text-shadow: 0 1px 4px rgba(0,0,0,.15); }
+.prev-title { position:relative; z-index:1; font-size: .75rem; opacity: .88; color: white; margin-bottom: .5rem; }
+.prev-logo { max-width: 48px; max-height: 22px; object-fit: contain; position: relative; z-index:1; display: none; margin: 0 auto; filter: drop-shadow(0 1px 2px rgba(0,0,0,.2)); }
+
+/* ── Contact items — mirror .contact-item from card_detail.html ── */
+.prev-body { padding: .5rem .85rem; }
+.prev-contact {
+    display: flex; align-items: center; gap: .55rem;
+    padding: .5rem 0; border-bottom: 1px solid #f3f4f6; display: none;
+}
+.prev-contact:last-of-type { border-bottom: none; }
+.prev-icon { font-size: 1rem; flex-shrink: 0; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; opacity: 0.55; color: #4b5563; }
+.prev-info { flex: 1; min-width: 0; }
+.prev-label { font-size: .6rem; color: #9ca3af; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 1px; }
+.prev-val { font-size: .78rem; color: #1f2937; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.prev-phone-actions { display: flex; gap: 3px; flex-shrink: 0; }
+.prev-phone-btn { padding: 2px 6px; border-radius: 4px; font-size: .6rem; font-weight: 600; display: inline-flex; align-items: center; gap: 2px; pointer-events: none; user-select: none; }
+.prev-phone-btn.prev-call { background: #10b981; color: white; }
+.prev-phone-btn.prev-wa   { background: #25d366; color: white; }
+.prev-primary-badge { background: #3b82f6; color: white; font-size: .55rem; font-weight: 700; padding: 1px 5px; border-radius: 8px; margin-left: 4px; text-transform: uppercase; letter-spacing: .03em; vertical-align: middle; }
+
+.prev-section { padding: .6rem .75rem; border-top: 1px solid #f3f4f6; display:none; }
+.prev-section-label { font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #9ca3af; margin-bottom: .3rem; }
+.prev-section-text  { font-size: .76rem; color: #4b5563; line-height: 1.5; }
+
+.prev-social { padding: .7rem .75rem; border-top: 1px solid #f3f4f6; display:none; }
+.prev-social-row { display:flex; gap: 7px; flex-wrap: wrap; justify-content: center; }
+.prev-social-btn { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .82rem; text-decoration: none; transition: transform .2s; }
+.prev-social-btn:hover { transform: scale(1.12); }
+.prev-soc-linkedin  { background:#0077b5; color:white; }
+.prev-soc-twitter   { background:#1da1f2; color:white; }
+.prev-soc-instagram { background: linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); color:white; }
+.prev-soc-facebook  { background:#1877f2; color:white; }
+.prev-soc-portfolio { background:#7c3aed; color:white; }
+
+.prev-custom-link {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: #f3f4f6; color: #374151;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: .72rem; font-weight: 600; text-decoration: none; margin: 3px;
+}
+
+.preview-empty { text-align: center; padding: 2rem 1rem; color: #9ca3af; }
+
+/* ── Mock action buttons bar ── */
+.prev-actions { padding: .7rem .85rem; background: #f9fafb; border-top: 1px solid #f3f4f6; display: flex; gap: .5rem; }
+.prev-act-save, .prev-act-call { flex: 1; padding: .42rem .6rem; border-radius: 8px; font-size: .72rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 4px; pointer-events: none; user-select: none; }
+.prev-act-save { background: #10b981; color: white; }
+.prev-act-call { background: white; color: #4b5563; border: 1.5px solid #e5e7eb; }
+
+/* ── Mobile preview FAB ── */
+.preview-fab {
+    position: fixed; bottom: 5rem; right: 1.25rem;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: linear-gradient(135deg,#4f46e5,#7c3aed);
+    color: white; border: none; box-shadow: 0 6px 20px rgba(79,70,229,.4);
+    display: none; align-items: center; justify-content: center;
+    font-size: 1.25rem; z-index: 100; transition: transform .2s;
+}
+.preview-fab:hover { transform: scale(1.08); }
+@media(max-width:1199.98px){ .preview-fab { display:flex; } }
+
+.preview-offcanvas .offcanvas-header {
+    background: linear-gradient(135deg,#4f46e5,#7c3aed);
+    color: white; padding: .9rem 1.1rem;
+}
+.preview-offcanvas .offcanvas-header .btn-close { filter: invert(1) brightness(2); }
+.preview-offcanvas .offcanvas-body { padding: 1rem; background: #f1f5f9; }
 </style>
 {% endblock %}
 
-{% block content %}
-<div class="container">
-    <div class="card" style="max-width: 900px;">
-        <div class="hero-section">
-            <div style="font-size: 48px; margin-bottom: 20px;">✏️</div>
-            <h1 class="name">Edit Business Card</h1>
-            <p class="title">Update "{{ card.full_name }}"</p>
-        </div>
-        
-        <div class="content">
-            {% if messages %}
-                {% for message in messages %}
-                    <div style="background: {% if message.tags == 'error' %}#fee{% else %}#dcfce7{% endif %}; padding: 15px; border-radius: 8px; margin-bottom: 20px; color: {% if message.tags == 'error' %}#dc2626{% else %}#166534{% endif %}; border: 1px solid {% if message.tags == 'error' %}#fecaca{% else %}#bbf7d0{% endif %};">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
+{% block breadcrumbs %}
+<nav class="app-breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'user_dashboard' %}"><i class="bi bi-credit-card-2-front-fill"></i> VCard Manager</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{% url 'user_dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{{ card.get_absolute_url }}" target="_blank">
+                <i class="bi bi-credit-card"></i> {{ card.full_name }}
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            <i class="bi bi-pencil"></i> Edit
+        </li>
+    </ol>
+</nav>
+{% endblock %}
 
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                
-                <!-- Basic Information -->
-                <div class="section-card basic">
-                    <h3 class="section-title">
-                        <span>📝</span> Basic Information
-                    </h3>
-                    <div class="form-grid three-col">
-                        <div class="form-field">
-                            <label class="form-label">
-                                Profile Type <span class="required">*</span>
-                            </label>
-                            {{ form.profile_type }}
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label">
-                                First Name <span class="required">*</span>
-                            </label>
-                            {{ form.first_name }}
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label">
-                                Last Name <span class="required">*</span>
-                            </label>
-                            {{ form.last_name }}
-                        </div>
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div>
+        <h1 class="h3 fw-bold mb-1 text-dark">Edit Business Card</h1>
+        <p class="text-muted mb-0">Updating <strong>{{ card.full_name }}</strong></p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ card.get_absolute_url }}" target="_blank"
+           class="btn btn-outline-success btn-sm">
+            <i class="bi bi-eye me-1"></i>Live Card
+        </a>
+        <a href="{% url 'user_dashboard' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Dashboard
+        </a>
+    </div>
+</div>
+
+
+<!-- ═══════════════════ TWO-COLUMN LAYOUT ═══════════════════ -->
+<div class="row g-4 align-items-start">
+
+<!-- ───────── LEFT: FORM ───────── -->
+<div class="col-12 col-xl-7">
+<form method="post" enctype="multipart/form-data" id="cardForm">
+{% csrf_token %}
+
+    <!-- ── 1. Basic Information ── -->
+    <div class="section-card">
+        <div class="section-header basic" data-bs-toggle="collapse" data-bs-target="#sec-basic">
+            <div class="section-icon"><i class="bi bi-person-vcard"></i></div>
+            Basic Information
+            <i class="bi bi-chevron-down section-toggle-icon"></i>
+        </div>
+        <div class="collapse show" id="sec-basic">
+            <div class="section-body">
+                <div class="row g-3">
+                    <div class="col-12 col-md-4">
+                        <label class="form-label">Profile Type <span class="required-star">*</span></label>
+                        {{ form.profile_type }}
                     </div>
-                    
-                    <div class="form-grid two-col" style="margin-top: 20px;">
-                        <div class="form-field">
-                            <label class="form-label">Job Title</label>
-                            {{ form.job_title }}
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label">Company</label>
-                            {{ form.company }}
-                        </div>
+                    <div class="col-12 col-sm-6 col-md-4">
+                        <label class="form-label">First Name <span class="required-star">*</span></label>
+                        {{ form.first_name }}
                     </div>
-                    
-                    <div class="form-field" style="margin-top: 20px;">
-                        <label class="form-label">
-                            Custom URL <span style="color: #6b7280;">(Optional)</span>
-                        </label>
+                    <div class="col-12 col-sm-6 col-md-4">
+                        <label class="form-label">Last Name <span class="required-star">*</span></label>
+                        {{ form.last_name }}
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <label class="form-label">Job Title</label>
+                        {{ form.job_title }}
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <label class="form-label">Company</label>
+                        {{ form.company }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Custom URL <span class="text-muted fw-normal">(optional)</span></label>
                         {{ form.custom_url }}
                         <div class="form-help">{{ form.custom_url.help_text }}</div>
-                        <div class="form-help">Current URL: <strong>{{ card.get_absolute_url }}</strong></div>
+                        <div class="form-help">
+                            Current URL:
+                            <a href="{{ card.get_absolute_url }}" target="_blank"
+                               class="text-decoration-none" style="color:#4f46e5;">
+                                {{ card.get_absolute_url }}
+                            </a>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <!-- Contact Information -->
-                <div class="section-card contact">
-                    <h3 class="section-title">
-                        <span>📞</span> Contact Information
-                    </h3>
-                    <div class="form-grid two-col">
-                        <div class="form-field">
-                            <label class="form-label">Email Address</label>
-                            {{ form.email }}
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label">Phone Number (Legacy)</label>
-                            {{ form.phone }}
-                            <div class="form-help">{{ form.phone.help_text }}</div>
-                        </div>
+    <!-- ── 2. Contact Information ── -->
+    <div class="section-card">
+        <div class="section-header contact" data-bs-toggle="collapse" data-bs-target="#sec-contact">
+            <div class="section-icon"><i class="bi bi-envelope"></i></div>
+            Contact Information
+            <i class="bi bi-chevron-down section-toggle-icon"></i>
+        </div>
+        <div class="collapse show" id="sec-contact">
+            <div class="section-body">
+                <div class="row g-3">
+                    <div class="col-12 col-sm-6">
+                        <label class="form-label">Email Address</label>
+                        {{ form.email }}
                     </div>
-                    
-                    <div class="form-field" style="margin-top: 20px;">
+                    <div class="col-12 col-sm-6">
+                        <label class="form-label">Phone Number</label>
+                        {{ form.phone }}
+                        <div class="form-help">{{ form.phone.help_text }}</div>
+                    </div>
+                    <div class="col-12">
                         <label class="form-label">Website</label>
                         {{ form.website }}
                     </div>
-                    
-                    <div class="form-field" style="margin-top: 20px;">
+                    <div class="col-12">
                         <label class="form-label">Address</label>
                         {{ form.address }}
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <!-- Phone Numbers Management -->
-                <div class="section-card contact">
-                    <h3 class="section-title">
-                        <span>📱</span> Phone Numbers
-                    </h3>
-                    
-                    {{ phone_formset.management_form }}
-                    
-                    <div id="phone-formset">
-                        {% for phone_form in phone_formset %}
-                            <div class="phone-form-row">
-                                {{ phone_form.non_field_errors }}
-                                
-                                <div class="phone-grid">
-                                    <div class="phone-field">
-                                        <label class="phone-label">Type</label>
-                                        {{ phone_form.label }}
-                                    </div>
-                                    
-                                    <div class="phone-field">
-                                        <label class="phone-label">Country</label>
-                                        {{ phone_form.country_code }}
-                                    </div>
-                                    
-                                    <div class="phone-field">
-                                        <label class="phone-label">Number</label>
-                                        {{ phone_form.number }}
-                                    </div>
-                                    
-                                    <div class="phone-checkboxes">
-                                        <div class="checkbox-group">
-                                            <label class="checkbox-label">
-                                                {{ phone_form.is_primary }}
-                                                <span>Primary</span>
-                                            </label>
-                                        </div>
-                                        
-                                        <div class="checkbox-group">
-                                            <label class="checkbox-label">
-                                                {{ phone_form.is_whatsapp }}
-                                                <span>WhatsApp</span>
-                                            </label>
-                                        </div>
-                                        
-                                        {% if phone_form.instance.pk %}
-                                            <div class="checkbox-group">
-                                                <label class="checkbox-label" style="color: #dc2626;">
-                                                    {{ phone_form.DELETE }}
-                                                    <span>Delete</span>
-                                                </label>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                
-                                {% for hidden in phone_form.hidden_fields %}
-                                    {{ hidden }}
-                                {% endfor %}
+    <!-- ── 3. Phone Numbers ── -->
+    <div class="section-card">
+        <div class="section-header phones" data-bs-toggle="collapse" data-bs-target="#sec-phones">
+            <div class="section-icon"><i class="bi bi-phone"></i></div>
+            Phone Numbers
+            <i class="bi bi-chevron-down section-toggle-icon"></i>
+        </div>
+        <div class="collapse show" id="sec-phones">
+            <div class="section-body">
+
+                {{ phone_formset.management_form }}
+
+                <div id="phone-formset">
+                    {% for phone_form in phone_formset %}
+                    <div class="phone-row">
+                        {{ phone_form.non_field_errors }}
+                        <div class="row g-2 align-items-end">
+                            <div class="col-12 col-sm-3">
+                                <label class="form-label">Type</label>
+                                {{ phone_form.label }}
                             </div>
-                        {% endfor %}
-                    </div>
-                    
-                    <div style="text-align: center; margin: 25px 0;">
-                        <button type="button" id="add-phone" class="add-phone-btn">
-                            <span>➕</span>
-                            Add Another Phone Number
-                        </button>
-                    </div>
-                    
-                    <div class="phone-tips">
-                        <div style="display: flex; align-items: center; gap: 10px; color: #1e40af; font-size: 15px; margin-bottom: 12px;">
-                            <span style="font-size: 18px;">💡</span>
-                            <strong>Phone Number Tips:</strong>
+                            <div class="col-12 col-sm-4">
+                                <label class="form-label">Country</label>
+                                {{ phone_form.country_code }}
+                            </div>
+                            <div class="col-12 col-sm-5">
+                                <label class="form-label">Number</label>
+                                {{ phone_form.number }}
+                            </div>
+                            <div class="col-12">
+                                <div class="d-flex flex-wrap gap-3 pt-1">
+                                    <label class="checkbox-label">{{ phone_form.is_primary }}<span>Primary</span></label>
+                                    <label class="checkbox-label">{{ phone_form.is_whatsapp }}<span>WhatsApp</span></label>
+                                    {% if phone_form.instance.pk %}
+                                    <label class="checkbox-label delete-label">{{ phone_form.DELETE }}<span>Delete</span></label>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
-                        <ul style="margin: 0; padding-left: 20px; color: #1e40af;">
-                            <li>Mark one number as <strong>"Primary"</strong> - this will be the main contact number</li>
-                            <li>Check <strong>"WhatsApp"</strong> for numbers that have WhatsApp enabled</li>
-                            <li>Enter only the number without the country code (e.g., 12345678)</li>
-                            <li>You can add multiple numbers for different purposes (work, mobile, etc.)</li>
-                        </ul>
+                        {% for hidden in phone_form.hidden_fields %}{{ hidden }}{% endfor %}
                     </div>
+                    {% endfor %}
                 </div>
 
-                <!-- About Section -->
-                <div class="section-card about">
-                    <h3 class="section-title">
-                        <span>📖</span> About You
-                    </h3>
-                    <div class="form-field">
-                        <label class="form-label">Bio / Description</label>
-                        {{ form.bio }}
-                        <div class="form-help">Tell people about yourself, your expertise, and what makes you unique</div>
+                <button type="button" id="add-phone"
+                        class="btn btn-outline-success btn-sm d-inline-flex align-items-center gap-2 mt-1">
+                    <i class="bi bi-plus-circle"></i> Add Phone Number
+                </button>
+
+                <div class="tips-box">
+                    <div class="d-flex align-items-center gap-2 mb-2 text-primary">
+                        <i class="bi bi-lightbulb-fill"></i>
+                        <strong class="small">Tips</strong>
                     </div>
-                    
-                    <div class="form-field" style="margin-top: 20px;">
-                        <label class="form-label">Skills & Services</label>
-                        {{ form.skills }}
-                        <div class="form-help">List your skills, services, or areas of expertise</div>
-                    </div>
+                    <ul class="mb-0 ps-3 small" style="color:#1e40af;">
+                        <li>Mark one number as <strong>Primary</strong> — it will be the main contact number</li>
+                        <li>Check <strong>WhatsApp</strong> for numbers that have WhatsApp enabled</li>
+                        <li>Enter number without country code (e.g. 12345678)</li>
+                    </ul>
                 </div>
 
-                <!-- Images Section -->
-                <div class="section-card images">
-                    <h3 class="section-title">
-                        <span>🖼️</span> Images & Banner
-                    </h3>
-                    <div class="form-grid two-col">
-                        <div class="form-field">
-                            <label class="form-label">Profile Photo</label>
-                            {{ form.profile_photo }}
-                            {% if card.profile_photo %}
-                                <div style="margin-top: 10px;">
-                                    <small style="color: #6b7280;">Current image:</small><br>
-                                    <img src="{{ card.profile_photo.url }}" alt="Current profile photo" class="current-image">
-                                </div>
-                            {% endif %}
-                            <div class="form-help">Upload your profile picture (recommended: square image, max 2MB)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 4. About You ── -->
+    <div class="section-card">
+        <div class="section-header about" data-bs-toggle="collapse" data-bs-target="#sec-about">
+            <div class="section-icon"><i class="bi bi-file-person"></i></div>
+            About You
+            <i class="bi bi-chevron-down section-toggle-icon"></i>
+        </div>
+        <div class="collapse show" id="sec-about">
+            <div class="section-body">
+                <div class="mb-3">
+                    <label class="form-label">Bio / Description</label>
+                    {{ form.bio }}
+                    <div class="form-help">Tell people about yourself, your expertise, and what makes you unique</div>
+                </div>
+                <div>
+                    <label class="form-label">Skills &amp; Services</label>
+                    {{ form.skills }}
+                    <div class="form-help">List your skills, services, or areas of expertise</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 5. Images & Banner ── -->
+    <div class="section-card">
+        <div class="section-header images" data-bs-toggle="collapse" data-bs-target="#sec-images">
+            <div class="section-icon"><i class="bi bi-image"></i></div>
+            Images &amp; Banner
+            <i class="bi bi-chevron-down section-toggle-icon"></i>
+        </div>
+        <div class="collapse show" id="sec-images">
+            <div class="section-body">
+                <div class="row g-3">
+                    <div class="col-12 col-sm-6">
+                        <label class="form-label">Profile Photo</label>
+                        {{ form.profile_photo }}
+                        {% if card.profile_photo %}
+                        <div>
+                            <small class="text-muted">Current:</small>
+                            <img src="{{ card.profile_photo.url }}" alt="Profile photo" class="current-thumb">
                         </div>
-                        <div class="form-field">
-                            <label class="form-label">Company Logo</label>
-                            {{ form.company_logo }}
-                            {% if card.company_logo %}
-                                <div style="margin-top: 10px;">
-                                    <small style="color: #6b7280;">Current logo:</small><br>
-                                    <img src="{{ card.company_logo.url }}" alt="Current company logo" class="current-image">
-                                </div>
-                            {% endif %}
-                            <div class="form-help">Upload your company logo (recommended: rectangular, max 2MB)</div>
-                        </div>
+                        {% endif %}
+                        <div class="form-help">{{ form.profile_photo.help_text }}</div>
                     </div>
-                    
-                    <div class="form-field" style="margin-top: 20px;">
+                    <div class="col-12 col-sm-6">
+                        <label class="form-label">Company Logo</label>
+                        {{ form.company_logo }}
+                        {% if card.company_logo %}
+                        <div>
+                            <small class="text-muted">Current:</small>
+                            <img src="{{ card.company_logo.url }}" alt="Company logo" class="current-thumb">
+                        </div>
+                        {% endif %}
+                        <div class="form-help">{{ form.company_logo.help_text }}</div>
+                    </div>
+                    <div class="col-12">
                         <label class="form-label">Banner Image</label>
                         {{ form.banner_image }}
                         {% if card.banner_image %}
-                            <div style="margin-top: 10px;">
-                                <small style="color: #6b7280;">Current banner:</small><br>
-                                <img src="{{ card.banner_image.url }}" alt="Current banner" style="max-width: 200px; max-height: 100px; border-radius: 8px; border: 2px solid #e5e7eb;">
-                            </div>
+                        <div>
+                            <small class="text-muted">Current:</small>
+                            <img src="{{ card.banner_image.url }}" alt="Banner" class="current-banner-thumb">
+                        </div>
                         {% endif %}
-                        <div class="form-help">Upload a banner image for the top of your card (recommended: 800x200px, max 2MB)</div>
+                        <div class="form-help">Recommended: 800×200px, max 2MB</div>
                     </div>
-                    
-                    <div class="form-field" style="margin-top: 20px;">
+                    <div class="col-12">
                         <label class="form-label">Banner Text</label>
                         {{ form.banner_text }}
                         <div class="form-help">Optional text to display over your banner image</div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <!-- Color Customization -->
-                <div class="section-card colors">
-                    <h3 class="section-title">
-                        <span>🎨</span> Card Colors
-                    </h3>
-                    <div class="form-grid three-col">
-                        <div class="form-field">
-                            <label class="form-label">Background Color</label>
-                            {{ form.background_color }}
-                            <div class="form-help">Primary gradient color</div>
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label">Accent Color</label>
-                            {{ form.accent_color }}
-                            <div class="form-help">Secondary gradient color</div>
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label">Text Color</label>
-                            {{ form.text_color }}
-                            <div class="form-help">Text color for the hero section</div>
-                        </div>
+    <!-- ── 6. Card Colors ── -->
+    <div class="section-card">
+        <div class="section-header colors" data-bs-toggle="collapse" data-bs-target="#sec-colors">
+            <div class="section-icon"><i class="bi bi-palette"></i></div>
+            Card Colors
+            <i class="bi bi-chevron-down section-toggle-icon"></i>
+        </div>
+        <div class="collapse show" id="sec-colors">
+            <div class="section-body">
+                <div class="row g-3 mb-3">
+                    <div class="col-12 col-sm-4">
+                        <label class="form-label">Background Color</label>
+                        {{ form.background_color }}
+                        <div class="form-help">Primary gradient color</div>
                     </div>
-                    
-                    <div class="preview-section">
-                        <div style="margin-bottom: 10px;">🎨 Color Preview</div>
-                        <div id="color-preview" style="height: 60px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; background: {{ card.gradient_style }};">
-                            {{ card.full_name }}
-                        </div>
+                    <div class="col-12 col-sm-4">
+                        <label class="form-label">Accent Color</label>
+                        {{ form.accent_color }}
+                        <div class="form-help">Secondary gradient color</div>
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <label class="form-label">Text Color</label>
+                        {{ form.text_color }}
+                        <div class="form-help">Hero section text color</div>
                     </div>
                 </div>
+                <div class="color-preview-box" id="color-preview"
+                     style="background: {{ card.gradient_style }}; color: {{ card.text_color }};">
+                    {{ card.full_name }}
+                </div>
+            </div>
+        </div>
+    </div>
 
-                <!-- Social Media -->
-                <div class="section-card social">
-                    <h3 class="section-title">
-                        <span>🔗</span> Social Media & Links
-                    </h3>
-                    <div class="form-grid two-col">
-                        <div class="form-field">
-                            <label class="form-label">🔗 LinkedIn</label>
-                            {{ form.linkedin_url }}
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label">🐦 Twitter</label>
-                            {{ form.twitter_url }}
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label">📸 Instagram</label>
-                            {{ form.instagram_url }}
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label">📘 Facebook</label>
-                            {{ form.facebook_url }}
-                        </div>
+    <!-- ── 7. Social Media & Links ── -->
+    <div class="section-card">
+        <div class="section-header social" data-bs-toggle="collapse" data-bs-target="#sec-social">
+            <div class="section-icon"><i class="bi bi-share"></i></div>
+            Social Media &amp; Links
+            <i class="bi bi-chevron-down section-toggle-icon"></i>
+        </div>
+        <div class="collapse show" id="sec-social">
+            <div class="section-body">
+                <div class="row g-3 mb-3">
+                    <div class="col-12 col-sm-6">
+                        <label class="form-label"><i class="bi bi-linkedin text-primary me-1"></i>LinkedIn</label>
+                        {{ form.linkedin_url }}
                     </div>
-                    
-                    <div class="form-field" style="margin-top: 20px;">
-                        <label class="form-label">💼 Portfolio Website</label>
+                    <div class="col-12 col-sm-6">
+                        <label class="form-label"><i class="bi bi-twitter-x me-1"></i>Twitter / X</label>
+                        {{ form.twitter_url }}
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <label class="form-label"><i class="bi bi-instagram text-danger me-1"></i>Instagram</label>
+                        {{ form.instagram_url }}
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <label class="form-label"><i class="bi bi-facebook text-primary me-1"></i>Facebook</label>
+                        {{ form.facebook_url }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label"><i class="bi bi-briefcase me-1"></i>Portfolio Website</label>
                         {{ form.portfolio_url }}
                     </div>
-                    
-                    <h4 style="margin: 25px 0 15px 0; color: #6b7280;">Custom Links</h4>
-                    <div class="form-grid two-col">
-                        <div class="form-field">
-                            <label class="form-label">Custom Link 1 Title</label>
-                            {{ form.custom_link_1_title }}
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label">Custom Link 1 URL</label>
-                            {{ form.custom_link_1_url }}
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label">Custom Link 2 Title</label>
-                            {{ form.custom_link_2_title }}
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label">Custom Link 2 URL</label>
-                            {{ form.custom_link_2_url }}
-                        </div>
-                    </div>
                 </div>
 
-                <!-- Form Errors -->
-                {% if form.errors or phone_formset.errors %}
-                    <div style="background: #fee; padding: 20px; border-radius: 8px; color: #dc2626; border: 1px solid #fecaca; margin-bottom: 20px;">
-                        <h4 style="margin-top: 0;">❌ Please fix these errors:</h4>
-                        {% for field, errors in form.errors.items %}
-                            <div style="margin: 10px 0;">
-                                <strong>{{ field|title }}:</strong>
-                                {% for error in errors %}
-                                    <div style="margin-left: 15px;">• {{ error }}</div>
-                                {% endfor %}
-                            </div>
-                        {% endfor %}
-                        {% for form_error in phone_formset.errors %}
-                            {% if form_error %}
-                                <div style="margin: 10px 0;">
-                                    <strong>Phone Numbers:</strong>
-                                    {% for field, errors in form_error.items %}
-                                        {% for error in errors %}
-                                            <div style="margin-left: 15px;">• {{ error }}</div>
-                                        {% endfor %}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        {% endfor %}
+                <hr class="my-3">
+                <p class="text-muted small fw-semibold mb-3">Custom Links</p>
+                <div class="row g-3">
+                    <div class="col-12 col-sm-6">
+                        <label class="form-label">Custom Link 1 Title</label>{{ form.custom_link_1_title }}
                     </div>
-                {% endif %}
-
-                <!-- Action Buttons -->
-                <div style="display: flex; gap: 15px; justify-content: center; margin-top: 30px; flex-wrap: wrap;">
-                    <button type="submit" class="btn btn-primary" style="font-size: 16px; padding: 15px 30px;">
-                        💾 Save Changes
-                    </button>
-                    <a href="{{ card.get_absolute_url }}" target="_blank" class="btn" style="background: #10b981; color: white; font-size: 16px; padding: 15px 30px; text-decoration: none; border-radius: 6px;">
-                        👁️ Preview Card
-                    </a>
-                    <a href="{% url 'user_dashboard' %}" class="btn btn-secondary" style="font-size: 16px; padding: 15px 30px;">
-                        ❌ Cancel
-                    </a>
+                    <div class="col-12 col-sm-6">
+                        <label class="form-label">Custom Link 1 URL</label>{{ form.custom_link_1_url }}
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <label class="form-label">Custom Link 2 Title</label>{{ form.custom_link_2_title }}
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <label class="form-label">Custom Link 2 URL</label>{{ form.custom_link_2_url }}
+                    </div>
                 </div>
-            </form>
+            </div>
         </div>
+    </div>
+
+    <!-- Form Errors -->
+    {% if form.errors or phone_formset.errors %}
+    <div class="alert alert-danger mb-3">
+        <div class="d-flex align-items-start gap-2">
+            <i class="bi bi-exclamation-triangle-fill mt-1 flex-shrink-0"></i>
+            <div>
+                <div class="fw-semibold mb-1">Please fix these errors:</div>
+                {% for field, errors in form.errors.items %}
+                <div class="small"><strong>{{ field|title }}:</strong>{% for e in errors %} {{ e }}{% endfor %}</div>
+                {% endfor %}
+                {% for fe in phone_formset.errors %}{% if fe %}
+                {% for field, errors in fe.items %}
+                <div class="small"><strong>Phone — {{ field|title }}:</strong>{% for e in errors %} {{ e }}{% endfor %}</div>
+                {% endfor %}{% endif %}{% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Sticky Submit Bar -->
+    <div class="submit-bar">
+        <a href="{% url 'user_dashboard' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-x-lg me-1"></i>Cancel
+        </a>
+        <a href="{{ card.get_absolute_url }}" target="_blank" class="btn btn-outline-success">
+            <i class="bi bi-eye me-1"></i>Live Card
+        </a>
+        <button type="submit" class="btn btn-primary px-4">
+            <i class="bi bi-floppy me-2"></i>Save Changes
+        </button>
+    </div>
+
+</form>
+</div><!-- /col form -->
+
+
+<!-- ───────── RIGHT: LIVE PREVIEW (desktop) ───────── -->
+<div class="col-xl-5 d-none d-xl-block align-self-stretch preview-col">
+    <div class="preview-sticky" id="previewStickyPane"
+         data-photo-url="{% if card.profile_photo %}{{ card.profile_photo.url }}{% endif %}"
+         data-logo-url="{% if card.company_logo %}{{ card.company_logo.url }}{% endif %}"
+         data-banner-url="{% if card.banner_image %}{{ card.banner_image.url }}{% endif %}">
+        {% include "auth/_preview_card.html" %}
     </div>
 </div>
 
+</div><!-- /row -->
+
+
+<!-- ═══ MOBILE: floating preview button ═══ -->
+<button class="preview-fab" id="previewFab" aria-label="Preview card">
+    <i class="bi bi-eye"></i>
+</button>
+
+<!-- ═══ MOBILE: offcanvas preview ═══ -->
+<div class="offcanvas offcanvas-bottom preview-offcanvas"
+     tabindex="-1" id="previewOffcanvas" style="height:90vh; border-radius:20px 20px 0 0;">
+    <div class="offcanvas-header">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-eye-fill"></i>
+            <h6 class="mb-0 fw-bold">Card Preview</h6>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        {% include "auth/_preview_card.html" with mobile=True %}
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
 <script>
-// JavaScript for phone number management and color preview
-document.addEventListener('DOMContentLoaded', function() {
-    // Live color preview
-    const bgColor = document.querySelector('input[name="background_color"]');
-    const accentColor = document.querySelector('input[name="accent_color"]');
-    const textColor = document.querySelector('input[name="text_color"]');
-    const preview = document.getElementById('color-preview');
-    
-    function updatePreview() {
-        const bg = bgColor.value || '#667eea';
-        const accent = accentColor.value || '#764ba2';
-        const text = textColor.value || '#ffffff';
-        
-        preview.style.background = `linear-gradient(135deg, ${bg} 0%, ${accent} 100%)`;
-        preview.style.color = text;
-    }
-    
-    if (bgColor && accentColor && textColor && preview) {
-        bgColor.addEventListener('change', updatePreview);
-        accentColor.addEventListener('change', updatePreview);
-        textColor.addEventListener('change', updatePreview);
+(function () {
+'use strict';
+
+/* ─────────────────────────────────────────
+   HELPERS
+───────────────────────────────────────── */
+function $id(id)    { return document.getElementById(id); }
+function $qs(sel)   { return document.querySelector(sel); }
+function $qsa(sel)  { return document.querySelectorAll(sel); }
+
+function setText(el, val, fallback) { if (!el) return; el.textContent = val || fallback || ''; }
+function show(el)   { if (el) el.style.display = ''; }
+function hide(el)   { if (el) el.style.display = 'none'; }
+function toggle(el, condition) { condition ? show(el) : hide(el); }
+
+function readFileAsDataURL(file, callback) {
+    if (!file || !file.type.startsWith('image/')) return;
+    var reader = new FileReader();
+    reader.onload = function (e) { callback(e.target.result); };
+    reader.readAsDataURL(file);
+}
+
+/* ─────────────────────────────────────────
+   FIELD REFERENCES
+───────────────────────────────────────── */
+var f = {
+    firstName:   $qs('[name="first_name"]'),
+    lastName:    $qs('[name="last_name"]'),
+    jobTitle:    $qs('[name="job_title"]'),
+    company:     $qs('[name="company"]'),
+    email:       $qs('[name="email"]'),
+    phone:       $qs('[name="phone"]'),
+    website:     $qs('[name="website"]'),
+    address:     $qs('[name="address"]'),
+    bio:         $qs('[name="bio"]'),
+    skills:      $qs('[name="skills"]'),
+    bgColor:     $qs('[name="background_color"]'),
+    accentColor: $qs('[name="accent_color"]'),
+    textColor:   $qs('[name="text_color"]'),
+    photo:       $qs('[name="profile_photo"]'),
+    logo:        $qs('[name="company_logo"]'),
+    banner:      $qs('[name="banner_image"]'),
+    bannerText:  $qs('[name="banner_text"]'),
+    linkedin:    $qs('[name="linkedin_url"]'),
+    twitter:     $qs('[name="twitter_url"]'),
+    instagram:   $qs('[name="instagram_url"]'),
+    facebook:    $qs('[name="facebook_url"]'),
+    portfolio:   $qs('[name="portfolio_url"]'),
+    link1Title:  $qs('[name="custom_link_1_title"]'),
+    link1Url:    $qs('[name="custom_link_1_url"]'),
+    link2Title:  $qs('[name="custom_link_2_title"]'),
+    link2Url:    $qs('[name="custom_link_2_url"]'),
+};
+
+/* ─────────────────────────────────────────
+   CORE UPDATE FUNCTION
+───────────────────────────────────────── */
+function updateAll() {
+    var firstName = (f.firstName ? f.firstName.value.trim() : '');
+    var lastName  = (f.lastName  ? f.lastName.value.trim()  : '');
+    var fullName  = [firstName, lastName].filter(Boolean).join(' ') || 'Your Name';
+    var initials  = [(firstName[0] || ''), (lastName[0] || '')].join('').toUpperCase() || '?';
+
+    var jobTitle  = f.jobTitle ? f.jobTitle.value.trim() : '';
+    var company   = f.company  ? f.company.value.trim()  : '';
+    var titleLine = jobTitle && company ? jobTitle + ' · ' + company
+                  : jobTitle || company || '';
+
+    var bg       = f.bgColor     ? f.bgColor.value     : '#4f46e5';
+    var accent   = f.accentColor ? f.accentColor.value : '#7c3aed';
+    var txtCol   = f.textColor   ? f.textColor.value   : '#ffffff';
+    var gradient = 'linear-gradient(135deg,' + bg + ' 0%,' + accent + ' 100%)';
+
+    $qsa('.prev-hero').forEach(function (hero) { hero.style.background = gradient; });
+    $qsa('.prev-name').forEach(function (el) { el.textContent = fullName; el.style.color = txtCol; });
+    $qsa('.prev-title').forEach(function (el) { el.textContent = titleLine; el.style.color = txtCol; });
+    $qsa('.prev-avatar').forEach(function (el) { el.textContent = initials; });
+
+    /* Sync the inline color-preview-box */
+    var colorBox = $id('color-preview');
+    if (colorBox) {
+        colorBox.style.background = gradient;
+        colorBox.style.color = txtCol;
+        colorBox.textContent = fullName;
     }
 
-    // Phone number management
-    const addButton = document.getElementById('add-phone');
-    const formset = document.getElementById('phone-formset');
-    const totalForms = document.getElementById('id_phones-TOTAL_FORMS');
-    
-    if (addButton && formset && totalForms) {
-        addButton.addEventListener('click', function() {
-            const formCount = parseInt(totalForms.value);
-            const emptyForm = document.querySelector('.phone-form-row').cloneNode(true);
-            
-            // Update form index
-            const formRegex = /phones-\d+-/g;
-            emptyForm.innerHTML = emptyForm.innerHTML.replace(formRegex, `phones-${formCount}-`);
-            
-            // Clear values
-            const inputs = emptyForm.querySelectorAll('input, select');
-            inputs.forEach(function(input) {
-                if (input.type === 'checkbox') {
-                    input.checked = false;
-                } else if (input.type !== 'hidden') {
-                    input.value = '';
-                }
+    /* email */
+    var emailVal = f.email ? f.email.value.trim() : '';
+    $qsa('.prev-email').forEach(function (el) { el.style.display = emailVal ? 'flex' : 'none'; });
+    $qsa('.prev-email-val').forEach(function (el) { el.textContent = emailVal; });
+
+    /* phones — combines basic phone field + every phone formset row */
+    (function () {
+        var entries = [];
+
+        /* 1. Basic phone field (Contact section) */
+        var basicPhone = f.phone ? f.phone.value.trim() : '';
+        if (basicPhone) {
+            entries.push({ label: 'Phone', display: basicPhone, whatsapp: false, primary: false });
+        }
+
+        /* 2. Phone number formset rows */
+        $qsa('#phone-formset .phone-row').forEach(function (row) {
+            var delCb = row.querySelector('input[name*="-DELETE"]');
+            if (delCb && delCb.checked) return;
+
+            var numEl = row.querySelector('input[name*="-number"]');
+            var num   = numEl ? numEl.value.trim() : '';
+            if (!num) return;
+
+            var ccSel    = row.querySelector('select[name*="-country_code"]');
+            var dialCode = '';
+            if (ccSel && ccSel.selectedIndex >= 0) {
+                var parsed = parseCountryLabel(ccSel.options[ccSel.selectedIndex].text);
+                dialCode = parsed.code || '';
+            }
+
+            var labelSel = row.querySelector('select[name*="-label"]');
+            var label    = (labelSel && labelSel.selectedIndex >= 0)
+                           ? labelSel.options[labelSel.selectedIndex].text
+                           : 'Phone';
+
+            var isWa      = row.querySelector('input[name*="-is_whatsapp"]');
+            var isPrimary = row.querySelector('input[name*="-is_primary"]');
+
+            entries.push({
+                label:    label,
+                display:  dialCode ? dialCode + '\u00a0' + num : num,
+                whatsapp: !!(isWa && isWa.checked),
+                primary:  !!(isPrimary && isPrimary.checked)
             });
-            
-            // Remove delete checkbox from new forms
-            const deleteCheckbox = emptyForm.querySelector('input[name*="DELETE"]');
-            if (deleteCheckbox) {
-                deleteCheckbox.closest('.checkbox-group').remove();
-            }
-            
-            formset.appendChild(emptyForm);
-            totalForms.value = formCount + 1;
         });
-    }
-    
-    // Primary phone selection
-    document.addEventListener('change', function(e) {
-        if (e.target.name && e.target.name.includes('is_primary')) {
-            if (e.target.checked) {
-                const allPrimaryCheckboxes = document.querySelectorAll('input[name*="is_primary"]');
-                allPrimaryCheckboxes.forEach(function(checkbox) {
-                    if (checkbox !== e.target) {
-                        checkbox.checked = false;
-                    }
-                });
+
+        $qsa('.prev-phones-list').forEach(function (list) {
+            list.innerHTML = entries.map(function (p) {
+                var badge = p.primary
+                    ? '<span class="prev-primary-badge">Primary</span>' : '';
+                var waBtn = p.whatsapp
+                    ? '<span class="prev-phone-btn prev-wa"><i class="bi bi-whatsapp"></i></span>' : '';
+                return '<div class="prev-contact prev-phone" style="display:flex;align-items:center;gap:.55rem;padding:.5rem 0;border-bottom:1px solid #f3f4f6;">' +
+                    '<i class="bi bi-telephone-fill prev-icon"></i>' +
+                    '<div class="prev-info">' +
+                        '<div class="prev-label">' + p.label + badge + '</div>' +
+                        '<div class="prev-val prev-phone-val">' + p.display + '</div>' +
+                    '</div>' +
+                    '<div class="prev-phone-actions">' +
+                        '<span class="prev-phone-btn prev-call"><i class="bi bi-telephone-fill"></i></span>' +
+                        waBtn +
+                    '</div>' +
+                    '</div>';
+            }).join('');
+        });
+    }());
+
+    /* website */
+    var webVal     = f.website ? f.website.value.trim() : '';
+    var webDisplay = webVal.replace(/^https?:\/\//,'').replace(/\/$/,'');
+    $qsa('.prev-website').forEach(function (el) { el.style.display = webVal ? 'flex' : 'none'; });
+    $qsa('.prev-website-val').forEach(function (el) { el.textContent = webDisplay; });
+
+    /* address */
+    var addrVal = f.address ? f.address.value.trim() : '';
+    $qsa('.prev-address').forEach(function (el) { el.style.display = addrVal ? 'flex' : 'none'; });
+    $qsa('.prev-address-val').forEach(function (el) { el.textContent = addrVal; });
+
+    /* bio */
+    var bioVal = f.bio ? f.bio.value.trim() : '';
+    $qsa('.prev-bio').forEach(function (el) { el.style.display = bioVal ? 'block' : 'none'; });
+    $qsa('.prev-bio-text').forEach(function (el) { el.textContent = bioVal; });
+
+    /* skills */
+    var skillsVal = f.skills ? f.skills.value.trim() : '';
+    $qsa('.prev-skills').forEach(function (el) { el.style.display = skillsVal ? 'block' : 'none'; });
+    $qsa('.prev-skills-text').forEach(function (el) { el.textContent = skillsVal; });
+
+    /* banner text */
+    var bannerTxt = f.bannerText ? f.bannerText.value.trim() : '';
+    $qsa('.prev-banner-text').forEach(function (el) { el.textContent = bannerTxt; });
+
+    /* social */
+    updateSocial();
+
+    /* custom links */
+    updateCustomLinks();
+}
+
+/* ─────────────────────────────────────────
+   SOCIAL LINKS
+───────────────────────────────────────── */
+function updateSocial() {
+    var links = [
+        { key:'linkedin',  icon:'bi-linkedin',   cls:'prev-soc-linkedin'  },
+        { key:'twitter',   icon:'bi-twitter-x',  cls:'prev-soc-twitter'   },
+        { key:'instagram', icon:'bi-instagram',  cls:'prev-soc-instagram' },
+        { key:'facebook',  icon:'bi-facebook',   cls:'prev-soc-facebook'  },
+        { key:'portfolio', icon:'bi-briefcase',  cls:'prev-soc-portfolio' },
+    ];
+    $qsa('.prev-social-row').forEach(function (row) {
+        row.innerHTML = '';
+        var count = 0;
+        links.forEach(function (l) {
+            var fld = f[l.key];
+            if (fld && fld.value.trim()) {
+                var a = document.createElement('a');
+                a.href = '#'; a.className = 'prev-social-btn ' + l.cls; a.title = l.key;
+                a.innerHTML = '<i class="bi ' + l.icon + '"></i>';
+                row.appendChild(a);
+                count++;
             }
+        });
+        var socialWrap = row.closest('.prev-social');
+        if (socialWrap) socialWrap.style.display = count ? 'block' : 'none';
+    });
+}
+
+/* ─────────────────────────────────────────
+   CUSTOM LINKS
+───────────────────────────────────────── */
+function updateCustomLinks() {
+    $qsa('.prev-custom-links').forEach(function (wrap) {
+        wrap.innerHTML = '';
+        var pairs = [
+            { t: f.link1Title, u: f.link1Url },
+            { t: f.link2Title, u: f.link2Url },
+        ];
+        var count = 0;
+        pairs.forEach(function (p) {
+            if (p.t && p.t.value.trim()) {
+                var span = document.createElement('span');
+                span.className = 'prev-custom-link';
+                span.innerHTML = '<i class="bi bi-link-45deg"></i>' + p.t.value.trim();
+                wrap.appendChild(span);
+                count++;
+            }
+        });
+        var sect = wrap.closest('.prev-custom-sect');
+        if (sect) sect.style.display = count ? 'block' : 'none';
+    });
+}
+
+/* ─────────────────────────────────────────
+   IMAGE FILE READERS
+───────────────────────────────────────── */
+function applyPhotoPreview(src) {
+    $qsa('.prev-photo').forEach(function (img) { img.src = src; img.style.display = 'block'; });
+    $qsa('.prev-avatar').forEach(function (el)  { el.style.display = 'none'; });
+}
+function applyLogoPreview(src) {
+    $qsa('.prev-logo').forEach(function (img) { img.src = src; img.style.display = 'block'; });
+}
+function applyBannerPreview(src) {
+    $qsa('.prev-banner').forEach(function (el) {
+        el.style.backgroundImage = 'url(' + src + ')';
+        el.style.display = 'block';
+    });
+}
+
+function handlePhotoChange(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    readFileAsDataURL(file, applyPhotoPreview);
+}
+function handleLogoChange(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    readFileAsDataURL(file, applyLogoPreview);
+}
+function handleBannerChange(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    readFileAsDataURL(file, applyBannerPreview);
+}
+
+/* ─────────────────────────────────────────
+   SECTION COLLAPSE ICON
+───────────────────────────────────────── */
+function initCollapseIcons() {
+    $qsa('[data-bs-toggle="collapse"]').forEach(function (header) {
+        var target = $qs(header.getAttribute('data-bs-target'));
+        if (!target) return;
+        target.addEventListener('hide.bs.collapse', function () { header.classList.add('collapsed'); });
+        target.addEventListener('show.bs.collapse', function () { header.classList.remove('collapsed'); });
+    });
+}
+
+/* ─────────────────────────────────────────
+   PHONE NUMBER MANAGEMENT
+───────────────────────────────────────── */
+function initPhoneManager() {
+    var addBtn     = $id('add-phone');
+    var formset    = $id('phone-formset');
+    var totalForms = $id('id_phones-TOTAL_FORMS');
+    if (!addBtn || !formset || !totalForms) return;
+
+    addBtn.addEventListener('click', function () {
+        var count = parseInt(totalForms.value);
+        var rows  = formset.querySelectorAll('.phone-row');
+        if (!rows.length) return;
+
+        var clone = rows[0].cloneNode(true);
+        clone.innerHTML = clone.innerHTML.replace(/phones-\d+-/g, 'phones-' + count + '-');
+
+        clone.querySelectorAll('input, select, textarea').forEach(function (el) {
+            if (el.type === 'checkbox' || el.type === 'radio') el.checked = false;
+            else if (el.type !== 'hidden') el.value = '';
+        });
+        var del = clone.querySelector('.delete-label');
+        if (del) del.remove();
+
+        /* Strip cloned CS wrappers and re-enhance fresh */
+        clone.querySelectorAll('.cs-wrapper').forEach(function (w) {
+            var sel = w.querySelector('select');
+            if (sel) { sel.style.display = ''; delete sel.dataset.csInit; w.parentNode.insertBefore(sel, w); }
+            w.remove();
+        });
+
+        clone.style.opacity = '0';
+        clone.style.transform = 'translateY(-10px)';
+        formset.appendChild(clone);
+
+        initCountrySearches(clone);
+
+        requestAnimationFrame(function () {
+            clone.style.transition = 'opacity .25s ease, transform .25s ease';
+            clone.style.opacity = '1';
+            clone.style.transform = 'translateY(0)';
+        });
+
+        totalForms.value = count + 1;
+        var first = clone.querySelector('input[type="text"]');
+        if (first) first.focus();
+    });
+
+    /* Only one primary */
+    document.addEventListener('change', function (e) {
+        if (e.target.name && e.target.name.includes('is_primary') && e.target.checked) {
+            $qsa('input[name*="is_primary"]').forEach(function (cb) {
+                if (cb !== e.target) cb.checked = false;
+            });
         }
     });
+}
+
+/* ─────────────────────────────────────────
+   SEARCHABLE COUNTRY SELECT
+───────────────────────────────────────── */
+function parseCountryLabel(label) {
+    var m = label.match(/^(\S+)\s+(.*?)\s+\((\+[\d]+)\)$/);
+    if (m) {
+        return { flag: m[1], name: m[2], code: m[3], search: (m[2] + ' ' + m[3]).toLowerCase() };
+    }
+    return { flag: '', name: label, code: '', search: label.toLowerCase() };
+}
+
+function enhanceCountrySelect(select) {
+    if (!select || select.dataset.csInit) return;
+    select.dataset.csInit = '1';
+
+    var options = Array.from(select.options)
+        .filter(function (o) { return o.value !== ''; })
+        .map(function (o) {
+            var p = parseCountryLabel(o.text);
+            return { value: o.value, raw: o.text, flag: p.flag, name: p.name, code: p.code, search: p.search };
+        });
+
+    var wrapper = document.createElement('div'); wrapper.className = 'cs-wrapper';
+    select.parentNode.insertBefore(wrapper, select); wrapper.appendChild(select);
+    select.style.display = 'none';
+
+    var trigger  = document.createElement('button'); trigger.type = 'button'; trigger.className = 'cs-trigger';
+    trigger.setAttribute('aria-haspopup', 'listbox'); trigger.setAttribute('aria-expanded', 'false');
+    var trigFlag  = document.createElement('span'); trigFlag.className  = 'cs-trigger-flag';
+    var trigLabel = document.createElement('span'); trigLabel.className = 'cs-trigger-label';
+    var trigCode  = document.createElement('span'); trigCode.className  = 'cs-trigger-code';
+    var trigChev  = document.createElement('span'); trigChev.className  = 'cs-trigger-chevron';
+    trigChev.innerHTML = '<i class="bi bi-chevron-down"></i>';
+    trigger.appendChild(trigFlag); trigger.appendChild(trigLabel);
+    trigger.appendChild(trigCode); trigger.appendChild(trigChev);
+    wrapper.insertBefore(trigger, select);
+
+    var dropdown  = document.createElement('div'); dropdown.className = 'cs-dropdown'; dropdown.setAttribute('role','listbox');
+    var searchBox = document.createElement('div'); searchBox.className = 'cs-search-box';
+    var searchInput = document.createElement('input');
+    searchInput.type = 'text'; searchInput.className = 'cs-search-input';
+    searchInput.placeholder = 'Search country or code…'; searchInput.autocomplete = 'off';
+    searchInput.setAttribute('aria-label', 'Search countries');
+    searchBox.appendChild(searchInput); dropdown.appendChild(searchBox);
+    var list = document.createElement('div'); list.className = 'cs-list'; list.setAttribute('role','listbox');
+    dropdown.appendChild(list); wrapper.appendChild(dropdown);
+
+    var filtered = options.slice(); var hlIndex = -1;
+
+    function currentValue() { return select.value; }
+    function syncTrigger() {
+        var val = currentValue();
+        var found = options.find(function (o) { return String(o.value) === String(val); });
+        if (found) {
+            trigFlag.textContent = found.flag; trigLabel.textContent = found.name; trigCode.textContent = found.code;
+            trigCode.style.display = ''; trigFlag.style.display = '';
+            trigLabel.classList.remove('cs-trigger-placeholder');
+        } else {
+            trigFlag.style.display = 'none'; trigCode.style.display = 'none';
+            trigLabel.textContent = 'Select country…'; trigLabel.classList.add('cs-trigger-placeholder');
+        }
+    }
+    function open() {
+        dropdown.classList.add('show'); trigger.classList.add('open'); trigger.setAttribute('aria-expanded','true');
+        searchInput.value = ''; filtered = options.slice(); hlIndex = -1; renderList(); searchInput.focus();
+        var sel = list.querySelector('.cs-option.cs-selected'); if (sel) sel.scrollIntoView({block:'nearest'});
+    }
+    function close() {
+        dropdown.classList.remove('show'); trigger.classList.remove('open');
+        trigger.setAttribute('aria-expanded','false'); hlIndex = -1;
+    }
+    function selectOption(opt) {
+        select.value = opt.value; select.dispatchEvent(new Event('change', {bubbles:true}));
+        syncTrigger(); close(); trigger.focus();
+    }
+    function renderList() {
+        list.innerHTML = '';
+        if (!filtered.length) {
+            var noRes = document.createElement('div'); noRes.className = 'cs-no-results';
+            noRes.textContent = 'No countries found'; list.appendChild(noRes); return;
+        }
+        var val = currentValue();
+        filtered.forEach(function (opt, idx) {
+            var item = document.createElement('div'); item.className = 'cs-option';
+            if (String(opt.value) === String(val)) item.classList.add('cs-selected');
+            if (idx === hlIndex)                   item.classList.add('cs-hl');
+            item.setAttribute('role','option'); item.dataset.idx = idx;
+            var flag = document.createElement('span'); flag.className = 'cs-option-flag'; flag.textContent = opt.flag;
+            var name = document.createElement('span'); name.className = 'cs-option-name'; name.textContent = opt.name;
+            var code = document.createElement('span'); code.className = 'cs-option-code'; code.textContent = opt.code;
+            item.appendChild(flag); item.appendChild(name); item.appendChild(code);
+            item.addEventListener('mousedown', function (e) { e.preventDefault(); selectOption(opt); });
+            list.appendChild(item);
+        });
+    }
+    function filterList() {
+        var q = searchInput.value.toLowerCase().trim();
+        filtered = q ? options.filter(function (o) { return o.search.includes(q) || o.code.toLowerCase().includes(q); }) : options.slice();
+        hlIndex = -1; renderList();
+    }
+    function moveHighlight(dir) {
+        hlIndex = Math.max(-1, Math.min(filtered.length - 1, hlIndex + dir)); renderList();
+        var hlEl = list.querySelector('.cs-option.cs-hl'); if (hlEl) hlEl.scrollIntoView({block:'nearest'});
+    }
+    trigger.addEventListener('click', function () { dropdown.classList.contains('show') ? close() : open(); });
+    trigger.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') { e.preventDefault(); open(); }
+        else if (e.key === 'Escape') close();
+    });
+    searchInput.addEventListener('input', filterList);
+    searchInput.addEventListener('keydown', function (e) {
+        if      (e.key === 'ArrowDown') { e.preventDefault(); moveHighlight(+1); }
+        else if (e.key === 'ArrowUp')   { e.preventDefault(); moveHighlight(-1); }
+        else if (e.key === 'Enter')     { e.preventDefault(); if (hlIndex >= 0 && filtered[hlIndex]) selectOption(filtered[hlIndex]); }
+        else if (e.key === 'Escape')    { close(); trigger.focus(); }
+        else if (e.key === 'Tab')       { close(); }
+    });
+    document.addEventListener('mousedown', function outsideClick(e) {
+        if (!wrapper.contains(e.target)) close();
+    });
+    select.addEventListener('change', syncTrigger);
+    syncTrigger(); renderList();
+}
+
+function initCountrySearches(root) {
+    (root || document).querySelectorAll('select[name*="country_code"]').forEach(enhanceCountrySelect);
+}
+
+/* ─────────────────────────────────────────
+   MOBILE PREVIEW FAB
+───────────────────────────────────────── */
+function initMobileFab() {
+    var fab = $id('previewFab');
+    if (!fab) return;
+    fab.addEventListener('click', function () {
+        var oc = bootstrap.Offcanvas.getOrCreateInstance($id('previewOffcanvas'));
+        oc.show();
+    });
+}
+
+/* ─────────────────────────────────────────
+   BIND ALL LISTENERS
+───────────────────────────────────────── */
+function bindListeners() {
+    var textFields = [
+        f.firstName, f.lastName, f.jobTitle, f.company,
+        f.email, f.phone, f.website, f.address,
+        f.bio, f.skills, f.bannerText,
+        f.linkedin, f.twitter, f.instagram, f.facebook, f.portfolio,
+        f.link1Title, f.link1Url, f.link2Title, f.link2Url,
+    ];
+    textFields.forEach(function (el) { if (el) el.addEventListener('input', updateAll); });
+
+    var colorFields = [f.bgColor, f.accentColor, f.textColor];
+    colorFields.forEach(function (el) { if (el) el.addEventListener('input', updateAll); });
+
+    if (f.photo)  f.photo.addEventListener('change', handlePhotoChange);
+    if (f.logo)   f.logo.addEventListener('change', handleLogoChange);
+    if (f.banner) f.banner.addEventListener('change', handleBannerChange);
+
+    /* Phone formset — delegated so dynamic rows are covered */
+    var phoneFormset = $id('phone-formset');
+    if (phoneFormset) {
+        phoneFormset.addEventListener('input',  updateAll);
+        phoneFormset.addEventListener('change', updateAll);
+    }
+}
+
+/* ─────────────────────────────────────────
+   FLOATING PREVIEW SENTINEL
+───────────────────────────────────────── */
+function initFloatingPreview() {
+    var pane = $id('previewStickyPane');
+    if (!pane) return;
+    var sentinel = document.createElement('div');
+    sentinel.style.cssText = 'position:absolute;top:0;left:0;width:1px;height:1px;pointer-events:none;';
+    pane.parentNode.insertBefore(sentinel, pane);
+    var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            pane.classList.toggle('is-floating', !entry.isIntersecting);
+        });
+    }, { rootMargin: '-' + (58 + 20) + 'px 0px 0px 0px', threshold: 0 });
+    observer.observe(sentinel);
+}
+
+/* ─────────────────────────────────────────
+   BOOT
+───────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', function () {
+    initCollapseIcons();
+    initPhoneManager();
+    initCountrySearches();
+    initMobileFab();
+    initFloatingPreview();
+    bindListeners();
+
+    /* ── Pre-populate preview with existing card images ── */
+    var pane = $id('previewStickyPane');
+    if (pane) {
+        var photoUrl  = pane.dataset.photoUrl;
+        var logoUrl   = pane.dataset.logoUrl;
+        var bannerUrl = pane.dataset.bannerUrl;
+        if (photoUrl)  applyPhotoPreview(photoUrl);
+        if (logoUrl)   applyLogoPreview(logoUrl);
+        if (bannerUrl) applyBannerPreview(bannerUrl);
+    }
+
+    updateAll(); // initial render from pre-filled form values
 });
+
+})();
 </script>
 {% endblock %}

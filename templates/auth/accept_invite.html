@@ -1,0 +1,78 @@
+{% extends 'auth/base.html' %}
+
+{% block title %}Join {{ org.name }} — VCard Manager{% endblock %}
+
+{% block content %}
+<div style="max-width:460px;margin:3rem auto;">
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+
+        <!-- Header -->
+        <div style="background:linear-gradient(135deg,#4f46e5,#7c3aed);padding:2rem;text-align:center;">
+            <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                 style="width:60px;height:60px;background:rgba(255,255,255,.2);">
+                <i class="bi bi-people-fill text-white fs-3"></i>
+            </div>
+            <h5 class="fw-bold text-white mb-1">You're invited!</h5>
+            <p class="text-white mb-0" style="opacity:.85;font-size:.875rem;">
+                Join <strong>{{ org.name }}</strong> on VCard Manager
+            </p>
+        </div>
+
+        <div class="p-4">
+            <div class="d-flex align-items-center gap-3 p-3 rounded-3 mb-4"
+                 style="background:#f8faff;border:1px solid #e0e7ff;">
+                <i class="bi bi-building fs-4" style="color:#4f46e5;"></i>
+                <div>
+                    <div class="fw-semibold text-dark">{{ org.name }}</div>
+                    <div class="text-muted small">
+                        <span class="badge rounded-pill me-1"
+                              style="background:#d1fae5;color:#065f46;font-size:.65rem;">
+                            {{ org.get_plan_display }}
+                        </span>
+                        Invited as <strong>{{ invite.get_role_display }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            {% if user.is_authenticated %}
+            <!-- Logged-in: accept directly -->
+            <p class="text-muted small mb-3">
+                You're signed in as <strong>{{ user.get_full_name|default:user.username }}</strong>
+                ({{ user.email }}).
+                Click below to join the workspace.
+            </p>
+            <form method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn w-100 fw-semibold py-2 text-white"
+                        style="background:linear-gradient(135deg,#4f46e5,#7c3aed);font-size:1rem;">
+                    <i class="bi bi-check-circle-fill me-2"></i>Accept &amp; Join Workspace
+                </button>
+            </form>
+            <div class="text-center mt-3">
+                <a href="{% url 'user_logout' %}?next={{ request.path }}" class="text-muted small text-decoration-none">
+                    Not you? Sign in with a different account
+                </a>
+            </div>
+
+            {% else %}
+            <!-- Not logged in: prompt sign in or register -->
+            <div class="alert d-flex align-items-center gap-2 py-2 mb-3"
+                 style="background:#fef9ec;border:1px solid #fde68a;border-radius:8px;font-size:.82rem;">
+                <i class="bi bi-envelope-fill" style="color:#d97706;flex-shrink:0;"></i>
+                <span>This invite is for <strong>{{ invite.invited_email }}</strong>. Please use that email when signing in or registering.</span>
+            </div>
+            <a href="{% url 'user_login' %}?next={{ request.path }}&email={{ invite.invited_email }}"
+               class="btn w-100 fw-semibold py-2 text-white mb-2"
+               style="background:linear-gradient(135deg,#4f46e5,#7c3aed);">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Sign In to Accept
+            </a>
+            <a href="{% url 'user_register' %}?next={{ request.path }}&email={{ invite.invited_email }}"
+               class="btn w-100 btn-outline-secondary fw-semibold py-2">
+                <i class="bi bi-person-plus me-2"></i>Create an Account
+            </a>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

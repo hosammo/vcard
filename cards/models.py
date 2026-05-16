@@ -11,10 +11,155 @@ from django.utils.text import slugify
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from PIL import Image
 from .utils import process_uploaded_image
 
 User = get_user_model()
+
+
+# ── Plan configuration ────────────────────────────────────────────────────────
+
+class Plan(models.TextChoices):
+    FREE     = 'free',     'Free'
+    PRO      = 'pro',      'Pro'
+    BUSINESS = 'business', 'Business'
+
+
+PLAN_LIMITS = {
+    Plan.FREE:     {'cards': 1,   'seats': 1,  'analytics': False, 'csv_export': False},
+    Plan.PRO:      {'cards': 5,   'seats': 1,  'analytics': True,  'csv_export': True},
+    Plan.BUSINESS: {'cards': 999, 'seats': 10, 'analytics': True,  'csv_export': True},
+}
+
+
+# ── Organization ──────────────────────────────────────────────────────────────
+
+class Organization(models.Model):
+    """A workspace/team that owns business cards and has a subscription plan."""
+    id                     = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name                   = models.CharField(max_length=100)
+    slug                   = models.SlugField(max_length=60, unique=True)
+    plan                   = models.CharField(max_length=20, choices=Plan.choices, default=Plan.FREE)
+    stripe_customer_id     = models.CharField(max_length=100, blank=True)
+    stripe_subscription_id = models.CharField(max_length=100, blank=True)
+    is_active              = models.BooleanField(default=True)
+    created_at             = models.DateTimeField(auto_now_add=True)
+    updated_at             = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'Organization'
+        verbose_name_plural = 'Organizations'
+
+    def __str__(self):
+        return f"{self.name} ({self.plan})"
+
+    # ── Plan limits ──────────────────────────────────────────────────────────
+
+    @property
+    def limits(self):
+        return PLAN_LIMITS.get(self.plan, PLAN_LIMITS[Plan.FREE])
+
+    @property
+    def card_limit(self):
+        return self.limits['cards']
+
+    @property
+    def seat_limit(self):
+        return self.limits['seats']
+
+    @property
+    def has_analytics(self):
+        return self.limits['analytics']
+
+    @property
+    def has_csv_export(self):
+        return self.limits['csv_export']
+
+    # ── Capacity checks ──────────────────────────────────────────────────────
+
+    @property
+    def card_count(self):
+        return self.business_cards.count()
+
+    @property
+    def seat_count(self):
+        return self.members.filter(invite_accepted=True).count()
+
+    @property
+    def can_add_card(self):
+        return self.card_count < self.card_limit
+
+    @property
+    def can_add_member(self):
+        return self.seat_count < self.seat_limit
+
+    # ── Member helpers ───────────────────────────────────────────────────────
+
+    def get_member(self, user):
+        """Return OrganizationMember for this user, or None."""
+        return self.members.filter(user=user, invite_accepted=True).first()
+
+    def has_member(self, user):
+        return self.members.filter(user=user, invite_accepted=True).exists()
+
+    def get_owner(self):
+        m = self.members.filter(role=OrganizationMember.Role.OWNER).first()
+        return m.user if m else None
+
+
+# ── Organization Member ───────────────────────────────────────────────────────
+
+class OrganizationMember(models.Model):
+    """A user's membership (or pending invite) in an Organization."""
+
+    class Role(models.TextChoices):
+        OWNER  = 'owner',  'Owner'
+        ADMIN  = 'admin',  'Admin'
+        EDITOR = 'editor', 'Editor'
+        VIEWER = 'viewer', 'Viewer'
+
+    organization   = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='members')
+    user           = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True,
+                                       related_name='org_memberships')
+    role           = models.CharField(max_length=20, choices=Role.choices, default=Role.VIEWER)
+    invited_email  = models.EmailField(blank=True, help_text='Email used for pending invites')
+    invite_token   = models.UUIDField(default=uuid.uuid4, null=True, blank=True)
+    invite_accepted = models.BooleanField(default=False)
+    joined_at      = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['role', 'joined_at']
+        unique_together = [('organization', 'user')]
+        verbose_name = 'Organization Member'
+        verbose_name_plural = 'Organization Members'
+
+    def __str__(self):
+        name = self.user.username if self.user else self.invited_email
+        return f"{name} — {self.role} @ {self.organization.name}"
+
+    # ── Permission shortcuts ─────────────────────────────────────────────────
+
+    @property
+    def is_owner(self):
+        return self.role == self.Role.OWNER
+
+    @property
+    def can_edit(self):
+        """Can create / edit cards."""
+        return self.role in (self.Role.OWNER, self.Role.ADMIN, self.Role.EDITOR)
+
+    @property
+    def can_manage_members(self):
+        """Can invite / remove team members."""
+        return self.role in (self.Role.OWNER, self.Role.ADMIN)
+
+    @property
+    def can_manage_billing(self):
+        """Only the owner manages billing."""
+        return self.role == self.Role.OWNER
 
 
 def validate_hex_color(value):
@@ -54,7 +199,15 @@ class CountryCode(models.Model):
 
 
 class BusinessCard(models.Model):
-    # Owner relationship
+    # Organization relationship (primary ownership — Phase 1A)
+    organization = models.ForeignKey(
+        'Organization',
+        on_delete=models.CASCADE,
+        related_name='business_cards',
+        null=True, blank=True,
+        help_text='The organization/workspace this card belongs to',
+    )
+    # Legacy direct owner — kept for backward-compat until views are migrated (Phase 1B)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='business_cards', null=True, blank=True)
 
     # Basic Info
@@ -355,3 +508,161 @@ class ContactDownload(models.Model):
 
     def __str__(self):
         return f"Download of {self.card.full_name} - {self.download_type}"
+
+
+class CardInteraction(models.Model):
+    """Track individual link/button clicks on a business card"""
+    INTERACTION_TYPES = [
+        ('email_click',      'Email Click'),
+        ('phone_click',      'Phone Click'),
+        ('whatsapp_click',   'WhatsApp Click'),
+        ('website_click',    'Website Click'),
+        ('vcard_download',   'vCard Download'),
+        ('social_linkedin',  'LinkedIn'),
+        ('social_twitter',   'Twitter/X'),
+        ('social_instagram', 'Instagram'),
+        ('social_facebook',  'Facebook'),
+        ('social_portfolio', 'Portfolio'),
+        ('custom_link',      'Custom Link'),
+    ]
+    card             = models.ForeignKey(BusinessCard, on_delete=models.CASCADE, related_name='interactions')
+    interaction_type = models.CharField(max_length=50, choices=INTERACTION_TYPES)
+    ip_address       = models.GenericIPAddressField(null=True, blank=True)
+    timestamp        = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-timestamp']
+        verbose_name = "Card Interaction"
+        verbose_name_plural = "Card Interactions"
+
+    def __str__(self):
+        return f"{self.interaction_type} on {self.card.full_name} at {self.timestamp}"
+
+
+class CardLead(models.Model):
+    """A visitor-submitted contact enquiry from a public card page."""
+    card       = models.ForeignKey(BusinessCard, on_delete=models.CASCADE, related_name='leads')
+    name       = models.CharField(max_length=120)
+    email      = models.EmailField()
+    phone      = models.CharField(max_length=30, blank=True)
+    message    = models.TextField(max_length=1000)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    is_read    = models.BooleanField(default=False)
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-submitted_at']
+        verbose_name = 'Card Lead'
+        verbose_name_plural = 'Card Leads'
+
+    def __str__(self):
+        return f"Lead from {self.name} on {self.card.full_name}"
+
+
+# ── User Settings ─────────────────────────────────────────────────────────────
+
+class UserSettings(models.Model):
+    """Per-user notification and privacy preferences."""
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='settings')
+
+    # Notifications
+    email_notifications            = models.BooleanField(default=True)
+    card_view_alerts               = models.BooleanField(default=False)
+    contact_download_notifications = models.BooleanField(default=False)
+    marketing_emails               = models.BooleanField(default=False)
+    weekly_reports                 = models.BooleanField(default=True)
+    billing_updates                = models.BooleanField(default=True)
+
+    # Privacy
+    public_profile          = models.BooleanField(default=True)
+    search_engine_indexing  = models.BooleanField(default=True)
+    analytics_tracking      = models.BooleanField(default=True)
+    data_sharing            = models.BooleanField(default=False)
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'User Settings'
+        verbose_name_plural = 'User Settings'
+
+    def __str__(self):
+        return f"Settings for {self.user.username}"
+
+
+# ── Activity Log ───────────────────────────────────────────────────────────────
+
+class ActivityLog(models.Model):
+    """Track user activity for security and audit purposes."""
+
+    class ActionType(models.TextChoices):
+        LOGIN            = 'login',            'Logged In'
+        LOGOUT           = 'logout',           'Logged Out'
+        PASSWORD_CHANGED = 'password_changed', 'Password Changed'
+        PROFILE_UPDATED  = 'profile_updated',  'Profile Updated'
+        CARD_CREATED     = 'card_created',     'Card Created'
+        CARD_UPDATED     = 'card_updated',     'Card Updated'
+        CARD_DELETED     = 'card_deleted',     'Card Deleted'
+        SETTINGS_CHANGED = 'settings_changed', 'Settings Changed'
+
+    user        = models.ForeignKey(User, on_delete=models.CASCADE, related_name='activity_logs')
+    action      = models.CharField(max_length=50, choices=ActionType.choices)
+    description = models.CharField(max_length=255, blank=True)
+    ip_address  = models.GenericIPAddressField(null=True, blank=True)
+    timestamp   = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering     = ['-timestamp']
+        verbose_name = 'Activity Log'
+        verbose_name_plural = 'Activity Logs'
+
+    def __str__(self):
+        return f"{self.user.username} — {self.action} at {self.timestamp}"
+
+
+# ── Signals ───────────────────────────────────────────────────────────────────
+
+def _unique_org_slug(base):
+    """Return a slug derived from base that doesn't exist in Organization."""
+    slug = slugify(base) or 'workspace'
+    candidate = slug
+    n = 1
+    while Organization.objects.filter(slug=candidate).exists():
+        candidate = f"{slug}-{n}"
+        n += 1
+    return candidate
+
+
+@receiver(post_save, sender=User)
+def create_personal_organization(sender, instance, created, **kwargs):
+    """
+    Auto-create a Free personal Organization for every new user and make
+    them the owner. Existing cards (owner=user) are linked to this org
+    retroactively by the data migration.
+    """
+    if not created:
+        return
+    # Skip if the user already has an org membership (e.g. accepted an invite
+    # before their account was fully saved — edge case).
+    if OrganizationMember.objects.filter(user=instance).exists():
+        return
+
+    full_name = instance.get_full_name() or instance.username
+    org = Organization.objects.create(
+        name=f"{full_name}'s Workspace",
+        slug=_unique_org_slug(instance.username),
+        plan=Plan.FREE,
+    )
+    OrganizationMember.objects.create(
+        organization=org,
+        user=instance,
+        role=OrganizationMember.Role.OWNER,
+        invite_accepted=True,
+        invited_email=instance.email or '',
+    )
+
+
+@receiver(post_save, sender=User)
+def create_user_settings(sender, instance, created, **kwargs):
+    """Auto-create UserSettings for every new user."""
+    if created:
+        UserSettings.objects.get_or_create(user=instance)

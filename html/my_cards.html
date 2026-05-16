@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Cards - Virtual Business Card</title>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --accent-color: #764ba2;
+            --dark-color: #1f2937;
+            --light-color: #f9fafb;
+            --sidebar-width: 260px;
+        }
+        
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        body {
+            background: var(--light-color);
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            z-index: 1000;
+            transition: transform 0.3s;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .sidebar-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1.5rem;
+            color: #6b7280;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        .menu-item:hover {
+            background: var(--light-color);
+            color: var(--primary-color);
+        }
+        
+        .menu-item.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border-right: 3px solid var(--accent-color);
+        }
+        
+        .menu-item i {
+            font-size: 1.25rem;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+        
+        /* Top Bar */
+        .top-bar {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin: 0;
+        }
+        
+        .top-bar-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border: none;
+            color: white;
+            padding: 0.625rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+        
+        .mobile-menu-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--light-color);
+            border: none;
+            color: var(--dark-color);
+            font-size: 1.25rem;
+        }
+        
+        /* Content Area */
+        .content-area {
+            padding: 2rem;
+        }
+        
+        /* Filter Bar */
+        .filter-bar {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 2rem;
+        }
+        
+        .filter-row {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .filter-select {
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .view-toggle {
+            display: flex;
+            gap: 0.5rem;
+            margin-left: auto;
+        }
+        
+        .view-btn {
+            width: 36px;
+            height: 36px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .view-btn.active {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        /* Bulk Actions */
+        .bulk-actions {
+            background: white;
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 2rem;
+            display: none;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .bulk-actions.show {
+            display: flex;
+        }
+        
+        .bulk-selected {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .bulk-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            color: #6b7280;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .bulk-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .bulk-btn.danger:hover {
+            border-color: #ef4444;
+            color: #ef4444;
+            background: #fef2f2;
+        }
+        
+        /* Stats Summary */
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card-mini {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .stat-icon-mini {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+        }
+        
+        .stat-icon-mini.purple {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        }
+        
+        .stat-icon-mini.green {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        
+        .stat-icon-mini.orange {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+        
+        .stat-content {
+            flex: 1;
+        }
+        
+        .stat-value-mini {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+        
+        .stat-label-mini {
+            color: #6b7280;
+            font-size: 0.85rem;
+        }
+        
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .cards-grid.hidden {
+            display: none;
+        }
+        
+        .card-item {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .card-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .card-checkbox {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            z-index: 10;
+        }
+        
+        .card-banner {
+            height: 120px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            position: relative;
+        }
+        
+        .card-status {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.375rem 0.875rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(255,255,255,0.95);
+        }
+        
+        .card-status.active {
+            color: #065f46;
+        }
+        
+        .card-status.inactive {
+            color: #991b1b;
+        }
+        
+        .card-content {
+            padding: 1.5rem;
+            position: relative;
+            margin-top: -40px;
+        }
+        
+        .card-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid white;
+            background: white;
+            margin-bottom: 1rem;
+            object-fit: cover;
+        }
+        
+        .card-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.25rem;
+        }
+        
+        .card-title {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .card-stats {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #f3f4f6;
+        }
+        
+        .card-stat {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .card-stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+        
+        .card-stat-label {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .card-action-btn {
+            flex: 1;
+            padding: 0.625rem;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            color: #6b7280;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.375rem;
+            text-decoration: none;
+            position: relative;
+        }
+        
+        .card-action-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: #f9fafb;
+        }
+        
+        .card-action-btn.primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-color: transparent;
+            color: white;
+        }
+        
+        .card-action-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* Card Options Dropdown */
+        .card-options-dropdown {
+            position: absolute;
+            bottom: 100%;
+            right: 0;
+            margin-bottom: 0.5rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            padding: 0.5rem;
+            min-width: 180px;
+            display: none;
+            z-index: 10;
+        }
+        
+        .card-options-dropdown.show {
+            display: block;
+            animation: slideUpFade 0.2s ease-out;
+        }
+        
+        @keyframes slideUpFade {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .card-option-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            color: #6b7280;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        
+        .card-option-item:hover {
+            background: var(--light-color);
+            color: var(--primary-color);
+        }
+        
+        .card-option-item i {
+            font-size: 1.1rem;
+        }
+        
+        .card-option-divider {
+            height: 1px;
+            background: #e5e7eb;
+            margin: 0.5rem 0;
+        }
+        
+        .card-option-item.danger {
+            color: #ef4444;
+        }
+        
+        .card-option-item.danger:hover {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        /* List View */
+        .cards-list {
+            display: none;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .cards-list.active {
+            display: flex;
+        }
+        
+        .card-list-item {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .card-list-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateX(5px);
+        }
+        
+        .list-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        
+        .card-list-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        
+        .card-list-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .card-list-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .card-list-name {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin: 0;
+        }
+        
+        .card-list-title {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .card-list-stats {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .card-list-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+        
+        .card-list-stat i {
+            color: var(--primary-color);
+        }
+        
+        .card-list-stat strong {
+            color: var(--dark-color);
+            font-weight: 600;
+        }
+        
+        .card-list-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+        
+        .card-list-action-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            position: relative;
+        }
+        
+        .card-list-action-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: #f9fafb;
+        }
+        
+        .card-list-action-btn.primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-color: transparent;
+            color: white;
+        }
+        
+        .card-list-action-btn.primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 16px;
+            border: 2px dashed #e5e7eb;
+        }
+        
+        .empty-state-icon {
+            width: 100px;
+            height: 100px;
+            background: var(--light-color);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #9ca3af;
+            margin-bottom: 1.5rem;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-state p {
+            color: #6b7280;
+            margin-bottom: 2rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-menu-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .card-list-stats {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .stats-summary {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .content-area {
+                padding: 1rem;
+            }
+            
+            .top-bar {
+                padding: 1rem;
+            }
+            
+            .page-title {
+                font-size: 1.35rem;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-row {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .view-toggle {
+                margin-left: 0;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .card-list-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .card-list-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .bulk-actions {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+        
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        
+        .sidebar-overlay.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-logo">
+                <i class="bi bi-credit-card-2-front"></i>
+                VirtualCard
+            </a>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <a href="/dashboard/" class="menu-item">
+                <i class="bi bi-grid"></i>
+                Dashboard
+            </a>
+            <a href="/create-card/" class="menu-item">
+                <i class="bi bi-plus-circle"></i>
+                Create Card
+            </a>
+            <a href="/my-cards/" class="menu-item active">
+                <i class="bi bi-credit-card"></i>
+                My Cards
+            </a>
+            <a href="/analytics/" class="menu-item">
+                <i class="bi bi-graph-up"></i>
+                Analytics
+            </a>
+            <a href="/settings/" class="menu-item">
+                <i class="bi bi-gear"></i>
+                Settings
+            </a>
+            <a href="/help/" class="menu-item">
+                <i class="bi bi-question-circle"></i>
+                Help & Support
+            </a>
+        </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="d-flex align-items-center gap-3">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+                    <i class="bi bi-list"></i>
+                </button>
+                <h1 class="page-title">My Cards</h1>
+            </div>
+            
+            <div class="top-bar-actions">
+                <a href="/create-card/" class="btn-primary-custom">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>New Card</span>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Stats Summary -->
+            <div class="stats-summary">
+                <div class="stat-card-mini">
+                    <div class="stat-icon-mini purple">
+                        <i class="bi bi-credit-card"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value-mini">5</div>
+                        <div class="stat-label-mini">Total Cards</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card-mini">
+                    <div class="stat-icon-mini green">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value-mini">4</div>
+                        <div class="stat-label-mini">Active</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card-mini">
+                    <div class="stat-icon-mini orange">
+                        <i class="bi bi-eye"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value-mini">1,247</div>
+                        <div class="stat-label-mini">Total Views</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <div class="filter-row">
+                    <div class="search-box">
+                        <i class="bi bi-search search-icon"></i>
+                        <input type="text" class="search-input" placeholder="Search cards by name, title, or company..." id="searchInput">
+                    </div>
+                    
+                    <select class="filter-select" id="statusFilter">
+                        <option value="all">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                    
+                    <select class="filter-select" id="typeFilter">
+                        <option value="all">All Types</option>
+                        <option value="personal">Personal</option>
+                        <option value="business">Business</option>
+                        <option value="freelance">Freelance</option>
+                        <option value="academic">Academic</option>
+                        <option value="creative">Creative</option>
+                    </select>
+                    
+                    <select class="filter-select" id="sortFilter">
+                        <option value="recent">Most Recent</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="views">Most Views</option>
+                        <option value="name">Name A-Z</option>
+                    </select>
+                    
+                    <div class="view-toggle">
+                        <button class="view-btn active" onclick="switchView('grid')" title="Grid View">
+                            <i class="bi bi-grid-3x3-gap"></i>
+                        </button>
+                        <button class="view-btn" onclick="switchView('list')" title="List View">
+                            <i class="bi bi-list-ul"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bulk Actions Bar (Hidden by default) -->
+            <div class="bulk-actions" id="bulkActions">
+                <label>
+                    <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                </label>
+                <span class="bulk-selected" id="selectedCount">0 cards selected</span>
+                <button class="bulk-btn">
+                    <i class="bi bi-eye"></i>
+                    Activate
+                </button>
+                <button class="bulk-btn">
+                    <i class="bi bi-eye-slash"></i>
+                    Deactivate
+                </button>
+                <button class="bulk-btn">
+                    <i class="bi bi-download"></i>
+                    Export
+                </button>
+                <button class="bulk-btn danger">
+                    <i class="bi bi-trash"></i>
+                    Delete
+                </button>
+            </div>
+            
+            <!-- Cards Grid View -->
+            <div class="cards-grid" id="gridView">
+                <!-- Card 1 -->
+                <div class="card-item">
+                    <input type="checkbox" class="card-checkbox" onchange="updateBulkActions()">
+                    <div class="card-banner" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                        <span class="card-status active">
+                            <i class="bi bi-check-circle-fill"></i> Active
+                        </span>
+                    </div>
+                    <div class="card-content">
+                        <img src="https://via.placeholder.com/80/667eea/ffffff?text=JD" alt="Avatar" class="card-avatar">
+                        <h3 class="card-name">John Doe</h3>
+                        <p class="card-title">Senior Product Manager at TechCorp</p>
+                        
+                        <div class="card-stats">
+                            <div class="card-stat">
+                                <div class="card-stat-value">456</div>
+                                <div class="card-stat-label">Views</div>
+                            </div>
+                            <div class="card-stat">
+                                <div class="card-stat-value">89</div>
+                                <div class="card-stat-label">Downloads</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-actions">
+                            <a href="/card/john-doe/" class="card-action-btn primary">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                            <a href="/edit-card/1/" class="card-action-btn">
+                                <i class="bi bi-pencil"></i> Edit
+                            </a>
+                            <button class="card-action-btn" onclick="toggleCardOptions(event, 1)">
+                                <i class="bi bi-three-dots-vertical"></i>
+                                
+                                <div class="card-options-dropdown" id="cardOptions1">
+                                    <a href="/card/john-doe/analytics/" class="card-option-item">
+                                        <i class="bi bi-graph-up"></i>
+                                        View Analytics
+                                    </a>
+                                    <a href="/card/john-doe/qr/" class="card-option-item">
+                                        <i class="bi bi-qr-code"></i>
+                                        Download QR Code
+                                    </a>
+                                    <a href="/card/john-doe/share/" class="card-option-item">
+                                        <i class="bi bi-share"></i>
+                                        Share Card
+                                    </a>
+                                    <div class="card-option-divider"></div>
+                                    <a href="/card/john-doe/duplicate/" class="card-option-item">
+                                        <i class="bi bi-files"></i>
+                                        Duplicate
+                                    </a>
+                                    <a href="/card/john-doe/archive/" class="card-option-item">
+                                        <i class="bi bi-archive"></i>
+                                        Archive
+                                    </a>
+                                    <div class="card-option-divider"></div>
+                                    <a href="/card/john-doe/delete/" class="card-option-item danger">
+                                        <i class="bi bi-trash"></i>
+                                        Delete Card
+                                    </a>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Card 2 -->
+                <div class="card-item">
+                    <input type="checkbox" class="card-checkbox" onchange="updateBulkActions()">
+                    <div class="card-banner" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                        <span class="card-status active">
+                            <i class="bi bi-check-circle-fill"></i> Active
+                        </span>
+                    </div>
+                    <div class="card-content">
+                        <img src="https://via.placeholder.com/80/f59e0b/ffffff?text=JD" alt="Avatar" class="card-avatar">
+                        <h3 class="card-name">John Doe</h3>
+                        <p class="card-title">Freelance Designer</p>
+                        
+                        <div class="card-stats">
+                            <div class="card-stat">
+                                <div class="card-stat-value">234</div>
+                                <div class="card-stat-label">Views</div>
+                            </div>
+                            <div class="card-stat">
+                                <div class="card-stat-value">67</div>
+                                <div class="card-stat-label">Downloads</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-actions">
+                            <a href="/card/john-doe-design/" class="card-action-btn primary">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                            <a href="/edit-card/2/" class="card-action-btn">
+                                <i class="bi bi-pencil"></i> Edit
+                            </a>
+                            <button class="card-action-btn" onclick="toggleCardOptions(event, 2)">
+                                <i class="bi bi-three-dots-vertical"></i>
+                                
+                                <div class="card-options-dropdown" id="cardOptions2">
+                                    <a href="/card/john-doe-design/analytics/" class="card-option-item">
+                                        <i class="bi bi-graph-up"></i>
+                                        View Analytics
+                                    </a>
+                                    <a href="/card/john-doe-design/qr/" class="card-option-item">
+                                        <i class="bi bi-qr-code"></i>
+                                        Download QR Code
+                                    </a>
+                                    <a href="/card/john-doe-design/share/" class="card-option-item">
+                                        <i class="bi bi-share"></i>
+                                        Share Card
+                                    </a>
+                                    <div class="card-option-divider"></div>
+                                    <a href="/card/john-doe-design/duplicate/" class="card-option-item">
+                                        <i class="bi bi-files"></i>
+                                        Duplicate
+                                    </a>
+                                    <a href="/card/john-doe-design/archive/" class="card-option-item">
+                                        <i class="bi bi-archive"></i>
+                                        Archive
+                                    </a>
+                                    <div class="card-option-divider"></div>
+                                    <a href="/card/john-doe-design/delete/" class="card-option-item danger">
+                                        <i class="bi bi-trash"></i>
+                                        Delete Card
+                                    </a>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Card 3 -->
+                <div class="card-item">
+                    <input type="checkbox" class="card-checkbox" onchange="updateBulkActions()">
+                    <div class="card-banner" style="background: linear-gradient(135deg, #10b981, #059669);">
+                        <span class="card-status inactive">
+                            <i class="bi bi-x-circle-fill"></i> Inactive
+                        </span>
+                    </div>
+                    <div class="card-content">
+                        <img src="https://via.placeholder.com/80/10b981/ffffff?text=JD" alt="Avatar" class="card-avatar">
+                        <h3 class="card-name">John Doe</h3>
+                        <p class="card-title">CEO at StartupCo</p>
+                        
+                        <div class="card-stats">
+                            <div class="card-stat">
+                                <div class="card-stat-value">557</div>
+                                <div class="card-stat-label">Views</div>
+                            </div>
+                            <div class="card-stat">
+                                <div class="card-stat-value">186</div>
+                                <div class="card-stat-label">Downloads</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-actions">
+                            <a href="/card/john-doe-ceo/" class="card-action-btn primary">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                            <a href="/edit-card/3/" class="card-action-btn">
+                                <i class="bi bi-pencil"></i> Edit
+                            </a>
+                            <button class="card-action-btn" onclick="toggleCardOptions(event, 3)">
+                                <i class="bi bi-three-dots-vertical"></i>
+                                
+                                <div class="card-options-dropdown" id="cardOptions3">
+                                    <a href="/card/john-doe-ceo/analytics/" class="card-option-item">
+                                        <i class="bi bi-graph-up"></i>
+                                        View Analytics
+                                    </a>
+                                    <a href="/card/john-doe-ceo/qr/" class="card-option-item">
+                                        <i class="bi bi-qr-code"></i>
+                                        Download QR Code
+                                    </a>
+                                    <a href="/card/john-doe-ceo/share/" class="card-option-item">
+                                        <i class="bi bi-share"></i>
+                                        Share Card
+                                    </a>
+                                    <div class="card-option-divider"></div>
+                                    <a href="/card/john-doe-ceo/duplicate/" class="card-option-item">
+                                        <i class="bi bi-files"></i>
+                                        Duplicate
+                                    </a>
+                                    <a href="/card/john-doe-ceo/archive/" class="card-option-item">
+                                        <i class="bi bi-archive"></i>
+                                        Archive
+                                    </a>
+                                    <div class="card-option-divider"></div>
+                                    <a href="/card/john-doe-ceo/delete/" class="card-option-item danger">
+                                        <i class="bi bi-trash"></i>
+                                        Delete Card
+                                    </a>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Cards List View -->
+            <div class="cards-list" id="listView">
+                <!-- Card 1 List -->
+                <div class="card-list-item">
+                    <input type="checkbox" class="list-checkbox" onchange="updateBulkActions()">
+                    <img src="https://via.placeholder.com/70/667eea/ffffff?text=JD" alt="Avatar" class="card-list-avatar">
+                    <div class="card-list-info">
+                        <div class="card-list-header">
+                            <h3 class="card-list-name">John Doe</h3>
+                            <span class="card-status active">
+                                <i class="bi bi-check-circle-fill"></i> Active
+                            </span>
+                        </div>
+                        <p class="card-list-title">Senior Product Manager at TechCorp</p>
+                        <div class="card-list-stats">
+                            <div class="card-list-stat">
+                                <i class="bi bi-eye-fill"></i>
+                                <strong>456</strong> Views
+                            </div>
+                            <div class="card-list-stat">
+                                <i class="bi bi-download"></i>
+                                <strong>89</strong> Downloads
+                            </div>
+                            <div class="card-list-stat">
+                                <i class="bi bi-calendar3"></i>
+                                Created 2 days ago
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-list-actions">
+                        <a href="/card/john-doe/" class="card-list-action-btn primary" title="View">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="/edit-card/1/" class="card-list-action-btn" title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <button class="card-list-action-btn" title="More Options" onclick="toggleCardOptions(event, 'list1')">
+                            <i class="bi bi-three-dots-vertical"></i>
+                            
+                            <div class="card-options-dropdown" id="cardOptionslist1">
+                                <a href="/card/john-doe/analytics/" class="card-option-item">
+                                    <i class="bi bi-graph-up"></i>
+                                    View Analytics
+                                </a>
+                                <a href="/card/john-doe/qr/" class="card-option-item">
+                                    <i class="bi bi-qr-code"></i>
+                                    Download QR Code
+                                </a>
+                                <a href="/card/john-doe/share/" class="card-option-item">
+                                    <i class="bi bi-share"></i>
+                                    Share Card
+                                </a>
+                                <div class="card-option-divider"></div>
+                                <a href="/card/john-doe/duplicate/" class="card-option-item">
+                                    <i class="bi bi-files"></i>
+                                    Duplicate
+                                </a>
+                                <a href="/card/john-doe/archive/" class="card-option-item">
+                                    <i class="bi bi-archive"></i>
+                                    Archive
+                                </a>
+                                <div class="card-option-divider"></div>
+                                <a href="/card/john-doe/delete/" class="card-option-item danger">
+                                    <i class="bi bi-trash"></i>
+                                    Delete Card
+                                </a>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Card 2 List -->
+                <div class="card-list-item">
+                    <input type="checkbox" class="list-checkbox" onchange="updateBulkActions()">
+                    <img src="https://via.placeholder.com/70/f59e0b/ffffff?text=JD" alt="Avatar" class="card-list-avatar">
+                    <div class="card-list-info">
+                        <div class="card-list-header">
+                            <h3 class="card-list-name">John Doe</h3>
+                            <span class="card-status active">
+                                <i class="bi bi-check-circle-fill"></i> Active
+                            </span>
+                        </div>
+                        <p class="card-list-title">Freelance Designer</p>
+                        <div class="card-list-stats">
+                            <div class="card-list-stat">
+                                <i class="bi bi-eye-fill"></i>
+                                <strong>234</strong> Views
+                            </div>
+                            <div class="card-list-stat">
+                                <i class="bi bi-download"></i>
+                                <strong>67</strong> Downloads
+                            </div>
+                            <div class="card-list-stat">
+                                <i class="bi bi-calendar3"></i>
+                                Created 1 week ago
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-list-actions">
+                        <a href="/card/john-doe-design/" class="card-list-action-btn primary" title="View">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="/edit-card/2/" class="card-list-action-btn" title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <button class="card-list-action-btn" title="More Options" onclick="toggleCardOptions(event, 'list2')">
+                            <i class="bi bi-three-dots-vertical"></i>
+                            
+                            <div class="card-options-dropdown" id="cardOptionslist2">
+                                <a href="/card/john-doe-design/analytics/" class="card-option-item">
+                                    <i class="bi bi-graph-up"></i>
+                                    View Analytics
+                                </a>
+                                <a href="/card/john-doe-design/qr/" class="card-option-item">
+                                    <i class="bi bi-qr-code"></i>
+                                    Download QR Code
+                                </a>
+                                <a href="/card/john-doe-design/share/" class="card-option-item">
+                                    <i class="bi bi-share"></i>
+                                    Share Card
+                                </a>
+                                <div class="card-option-divider"></div>
+                                <a href="/card/john-doe-design/duplicate/" class="card-option-item">
+                                    <i class="bi bi-files"></i>
+                                    Duplicate
+                                </a>
+                                <a href="/card/john-doe-design/archive/" class="card-option-item">
+                                    <i class="bi bi-archive"></i>
+                                    Archive
+                                </a>
+                                <div class="card-option-divider"></div>
+                                <a href="/card/john-doe-design/delete/" class="card-option-item danger">
+                                    <i class="bi bi-trash"></i>
+                                    Delete Card
+                                </a>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Card 3 List -->
+                <div class="card-list-item">
+                    <input type="checkbox" class="list-checkbox" onchange="updateBulkActions()">
+                    <img src="https://via.placeholder.com/70/10b981/ffffff?text=JD" alt="Avatar" class="card-list-avatar">
+                    <div class="card-list-info">
+                        <div class="card-list-header">
+                            <h3 class="card-list-name">John Doe</h3>
+                            <span class="card-status inactive">
+                                <i class="bi bi-x-circle-fill"></i> Inactive
+                            </span>
+                        </div>
+                        <p class="card-list-title">CEO at StartupCo</p>
+                        <div class="card-list-stats">
+                            <div class="card-list-stat">
+                                <i class="bi bi-eye-fill"></i>
+                                <strong>557</strong> Views
+                            </div>
+                            <div class="card-list-stat">
+                                <i class="bi bi-download"></i>
+                                <strong>186</strong> Downloads
+                            </div>
+                            <div class="card-list-stat">
+                                <i class="bi bi-calendar3"></i>
+                                Created 2 weeks ago
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-list-actions">
+                        <a href="/card/john-doe-ceo/" class="card-list-action-btn primary" title="View">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="/edit-card/3/" class="card-list-action-btn" title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <button class="card-list-action-btn" title="More Options" onclick="toggleCardOptions(event, 'list3')">
+                            <i class="bi bi-three-dots-vertical"></i>
+                            
+                            <div class="card-options-dropdown" id="cardOptionslist3">
+                                <a href="/card/john-doe-ceo/analytics/" class="card-option-item">
+                                    <i class="bi bi-graph-up"></i>
+                                    View Analytics
+                                </a>
+                                <a href="/card/john-doe-ceo/qr/" class="card-option-item">
+                                    <i class="bi bi-qr-code"></i>
+                                    Download QR Code
+                                </a>
+                                <a href="/card/john-doe-ceo/share/" class="card-option-item">
+                                    <i class="bi bi-share"></i>
+                                    Share Card
+                                </a>
+                                <div class="card-option-divider"></div>
+                                <a href="/card/john-doe-ceo/duplicate/" class="card-option-item">
+                                    <i class="bi bi-files"></i>
+                                    Duplicate
+                                </a>
+                                <a href="/card/john-doe-ceo/archive/" class="card-option-item">
+                                    <i class="bi bi-archive"></i>
+                                    Archive
+                                </a>
+                                <div class="card-option-divider"></div>
+                                <a href="/card/john-doe-ceo/delete/" class="card-option-item danger">
+                                    <i class="bi bi-trash"></i>
+                                    Delete Card
+                                </a>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Toggle Sidebar (Mobile)
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+        
+        // Switch between Grid and List View
+        function switchView(view) {
+            const gridView = document.getElementById('gridView');
+            const listView = document.getElementById('listView');
+            const viewButtons = document.querySelectorAll('.view-btn');
+            
+            if (view === 'grid') {
+                gridView.style.display = 'grid';
+                listView.classList.remove('active');
+                viewButtons[0].classList.add('active');
+                viewButtons[1].classList.remove('active');
+            } else {
+                gridView.style.display = 'none';
+                listView.classList.add('active');
+                viewButtons[0].classList.remove('active');
+                viewButtons[1].classList.add('active');
+            }
+        }
+        
+        // Toggle Card Options Dropdown
+        function toggleCardOptions(event, cardId) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('cardOptions' + cardId);
+            
+            // Close all other dropdowns
+            document.querySelectorAll('.card-options-dropdown').forEach(d => {
+                if (d.id !== 'cardOptions' + cardId) {
+                    d.classList.remove('show');
+                }
+            });
+            
+            dropdown.classList.toggle('show');
+        }
+        
+        // Close card options when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.card-action-btn') && !e.target.closest('.card-list-action-btn')) {
+                document.querySelectorAll('.card-options-dropdown').forEach(dropdown => {
+                    dropdown.classList.remove('show');
+                });
+            }
+        });
+        
+        // Update Bulk Actions Bar
+        function updateBulkActions() {
+            const checkboxes = document.querySelectorAll('.card-checkbox, .list-checkbox');
+            const checkedBoxes = Array.from(checkboxes).filter(cb => cb.checked);
+            const bulkActions = document.getElementById('bulkActions');
+            const selectedCount = document.getElementById('selectedCount');
+            const selectAll = document.getElementById('selectAll');
+            
+            if (checkedBoxes.length > 0) {
+                bulkActions.classList.add('show');
+                selectedCount.textContent = `${checkedBoxes.length} card${checkedBoxes.length > 1 ? 's' : ''} selected`;
+                selectAll.checked = checkedBoxes.length === checkboxes.length;
+                selectAll.indeterminate = checkedBoxes.length > 0 && checkedBoxes.length < checkboxes.length;
+            } else {
+                bulkActions.classList.remove('show');
+                selectAll.checked = false;
+                selectAll.indeterminate = false;
+            }
+        }
+        
+        // Toggle Select All
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.card-checkbox, .list-checkbox');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+            
+            updateBulkActions();
+        }
+        
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('keyup', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            console.log('Searching for:', searchTerm);
+            // Implement search filtering here
+        });
+        
+        // Filter functionality
+        document.getElementById('statusFilter').addEventListener('change', function(e) {
+            console.log('Filter by status:', e.target.value);
+            // Implement status filtering here
+        });
+        
+        document.getElementById('typeFilter').addEventListener('change', function(e) {
+            console.log('Filter by type:', e.target.value);
+            // Implement type filtering here
+        });
+        
+        document.getElementById('sortFilter').addEventListener('change', function(e) {
+            console.log('Sort by:', e.target.value);
+            // Implement sorting here
+        });
+    </script>
+</body>
+</html>

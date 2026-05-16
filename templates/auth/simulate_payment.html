@@ -1,0 +1,172 @@
+{% extends 'auth/base.html' %}
+
+{% block title %}Checkout — {{ plan_label }} Plan{% endblock %}
+
+{% block breadcrumbs %}
+<nav class="app-breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'user_dashboard' %}"><i class="bi bi-credit-card-2-front-fill"></i> VCard Manager</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{% url 'upgrade_plan' %}"><i class="bi bi-lightning-fill"></i> Upgrade</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            <i class="bi bi-credit-card-fill"></i> Checkout
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .checkout-card {
+        max-width: 500px;
+        margin: 0 auto;
+        border-radius: 16px;
+    }
+    .card-input-group {
+        position: relative;
+    }
+    .card-input-group .card-icon {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        pointer-events: none;
+    }
+    .sim-badge {
+        background: repeating-linear-gradient(
+            45deg,
+            #fef3c7, #fef3c7 8px,
+            #fde68a 8px, #fde68a 16px
+        );
+        border: 1px solid #f59e0b;
+        border-radius: 8px;
+        font-size: 0.78rem;
+        color: #92400e;
+    }
+    .order-summary {
+        background: #f8faff;
+        border: 1px solid #e0e7ff;
+        border-radius: 12px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="checkout-card">
+
+    <!-- Simulator notice -->
+    <div class="sim-badge d-flex align-items-center gap-2 px-3 py-2 mb-4">
+        <i class="bi bi-cone-striped flex-shrink-0"></i>
+        <span><strong>Simulator mode</strong> — no real charge. Any card number works.</span>
+    </div>
+
+    <!-- Order summary -->
+    <div class="order-summary p-4 mb-4">
+        <h6 class="fw-bold text-dark mb-3">
+            <i class="bi bi-receipt me-2" style="color:#4f46e5;"></i>Order Summary
+        </h6>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="text-muted">Plan</span>
+            <span class="fw-semibold">VCard Manager {{ plan_label }}</span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="text-muted">Billing</span>
+            <span class="fw-semibold">Monthly</span>
+        </div>
+        <hr class="my-2">
+        <div class="d-flex justify-content-between align-items-center">
+            <span class="fw-bold text-dark">Total today</span>
+            <span class="fw-bold fs-5" style="color:#4f46e5;">{{ plan_price }}</span>
+        </div>
+    </div>
+
+    <!-- Payment form -->
+    <div class="card border-0 shadow-sm rounded-3 p-4">
+        <h5 class="fw-bold text-dark mb-4">
+            <i class="bi bi-lock-fill text-success me-2"></i>Payment Details
+        </h5>
+
+        <form method="POST" action="{% url 'simulate_payment' plan %}">
+            {% csrf_token %}
+
+            <!-- Card holder -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold small text-dark">Cardholder Name</label>
+                <input type="text" class="form-control"
+                       value="{{ user.get_full_name|default:user.username }}"
+                       placeholder="Name on card">
+            </div>
+
+            <!-- Card number -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold small text-dark">Card Number</label>
+                <div class="card-input-group">
+                    <input type="text" class="form-control pe-5"
+                           value="4242 4242 4242 4242"
+                           maxlength="19"
+                           placeholder="0000 0000 0000 0000"
+                           id="cardNumber">
+                    <i class="bi bi-credit-card card-icon fs-5"></i>
+                </div>
+                <div class="form-text text-muted" style="font-size:0.72rem;">
+                    Any number works in simulator mode.
+                </div>
+            </div>
+
+            <!-- Expiry + CVV -->
+            <div class="row g-3 mb-4">
+                <div class="col-6">
+                    <label class="form-label fw-semibold small text-dark">Expiry</label>
+                    <input type="text" class="form-control"
+                           value="12/29" maxlength="5" placeholder="MM/YY">
+                </div>
+                <div class="col-6">
+                    <label class="form-label fw-semibold small text-dark">CVV</label>
+                    <input type="text" class="form-control"
+                           value="123" maxlength="4" placeholder="•••">
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="btn w-100 fw-semibold py-2 text-white"
+                    style="background:linear-gradient(135deg,#4f46e5,#7c3aed);font-size:1rem;">
+                <i class="bi bi-lock-fill me-2"></i>
+                Confirm & Subscribe — {{ plan_price }}
+            </button>
+
+        </form>
+
+        <p class="text-center text-muted mt-3 mb-0" style="font-size:0.75rem;">
+            <i class="bi bi-shield-check me-1 text-success"></i>
+            Simulator — no real payment is processed
+        </p>
+    </div>
+
+    <!-- Cancel link -->
+    <div class="text-center mt-3">
+        <a href="{% url 'upgrade_plan' %}" class="text-muted small text-decoration-none">
+            <i class="bi bi-arrow-left me-1"></i>Back to plans
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Format card number with spaces as user types
+    const cardInput = document.getElementById('cardNumber');
+    if (cardInput) {
+        cardInput.addEventListener('input', function () {
+            let val = this.value.replace(/\D/g, '').substring(0, 16);
+            this.value = val.replace(/(.{4})/g, '$1 ').trim();
+        });
+    }
+</script>
+{% endblock %}

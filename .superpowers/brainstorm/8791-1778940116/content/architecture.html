@@ -1,0 +1,89 @@
+<h2>Overall Architecture</h2>
+<p class="subtitle">How the four workstreams fit together into one Django project</p>
+
+<div class="section">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+
+    <!-- URL Routing -->
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:1.2rem;">
+      <div style="font-size:10px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">URL Routing</div>
+      <div style="font-family:monospace;font-size:11px;line-height:2;color:#374151;">
+        <div><span style="color:#6366f1;font-weight:600;">/</span> → Wagtail CMS (HomePage)</div>
+        <div><span style="color:#6366f1;font-weight:600;">/blog/</span> → Wagtail (BlogIndexPage)</div>
+        <div><span style="color:#6366f1;font-weight:600;">/about/</span> → Wagtail (AboutPage)</div>
+        <div><span style="color:#6366f1;font-weight:600;">/pricing/</span> → Wagtail (PricingPage)</div>
+        <div><span style="color:#6366f1;font-weight:600;">/privacy/</span> → Wagtail (LegalPage)</div>
+        <div><span style="color:#6366f1;font-weight:600;">/terms/</span> → Wagtail (LegalPage)</div>
+        <div style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0;">
+        <div><span style="color:#10b981;font-weight:600;">/dashboard/</span> → Django SaaS app</div>
+        <div><span style="color:#10b981;font-weight:600;">/login/</span> → Django SaaS app</div>
+        <div><span style="color:#10b981;font-weight:600;">/register/</span> → Django SaaS app</div>
+        <div><span style="color:#10b981;font-weight:600;">/cards/</span> → Django SaaS app</div>
+        <div><span style="color:#10b981;font-weight:600;">/api/</span> → Django REST API</div>
+        <div><span style="color:#f59e0b;font-weight:600;">/cms/</span> → Wagtail Admin</div>
+        <div><span style="color:#f59e0b;font-weight:600;">/admin/</span> → Django Admin</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wagtail Page Hierarchy -->
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:1.2rem;">
+      <div style="font-size:10px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Wagtail Page Tree</div>
+      <div style="font-family:monospace;font-size:11px;line-height:2;color:#374151;">
+        <div style="color:#6b7280;">Root Page</div>
+        <div style="padding-left:12px;">└─ <span style="color:#6366f1;">HomePage</span> /</div>
+        <div style="padding-left:24px;">├─ <span style="color:#374151;">BlogIndexPage</span> /blog/</div>
+        <div style="padding-left:36px;">└─ <span style="color:#9ca3af;">BlogPostPage</span> /blog/slug/</div>
+        <div style="padding-left:24px;">├─ <span style="color:#374151;">AboutPage</span> /about/</div>
+        <div style="padding-left:24px;">├─ <span style="color:#374151;">PricingPage</span> /pricing/</div>
+        <div style="padding-left:24px;">├─ <span style="color:#374151;">LegalPage</span> /privacy/</div>
+        <div style="padding-left:24px;">└─ <span style="color:#374151;">LegalPage</span> /terms/</div>
+      </div>
+      <div style="margin-top:12px;padding-top:10px;border-top:1px solid #e2e8f0;font-size:10px;color:#6b7280;">
+        Each page editable via /cms/ — no code needed for content changes
+      </div>
+    </div>
+
+    <!-- uv + Packages -->
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:1.2rem;">
+      <div style="font-size:10px;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">uv + Package Changes</div>
+      <div style="font-size:11px;line-height:1.8;color:#374151;">
+        <div style="margin-bottom:6px;"><span style="background:#dcfce7;color:#166534;padding:2px 6px;border-radius:4px;font-size:10px;">NEW</span> <code>pyproject.toml</code> replaces requirements.txt</div>
+        <div style="margin-bottom:6px;"><span style="background:#dcfce7;color:#166534;padding:2px 6px;border-radius:4px;font-size:10px;">NEW</span> <code>uv.lock</code> for reproducible installs</div>
+        <div style="margin-bottom:6px;"><span style="background:#fef3c7;color:#92400e;padding:2px 6px;border-radius:4px;font-size:10px;">UPDATE</span> Django 5.1 → 5.2 LTS</div>
+        <div style="margin-bottom:6px;"><span style="background:#fef3c7;color:#92400e;padding:2px 6px;border-radius:4px;font-size:10px;">UPDATE</span> Wagtail 6.3 → 6.4</div>
+        <div style="margin-bottom:6px;"><span style="background:#fef3c7;color:#92400e;padding:2px 6px;border-radius:4px;font-size:10px;">UPDATE</span> All other outdated packages</div>
+        <div style="margin-bottom:6px;"><span style="background:#fee2e2;color:#991b1b;padding:2px 6px;border-radius:4px;font-size:10px;">REMOVE</span> Unused requirements-local.txt</div>
+        <div><span style="font-size:10px;color:#6b7280;">Dev extras (django-debug-toolbar etc.) as optional group</span></div>
+      </div>
+    </div>
+
+    <!-- Homepage Sections -->
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:1.2rem;">
+      <div style="font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">New Homepage Sections</div>
+      <div style="font-size:11px;line-height:2;color:#374151;">
+        <div>① <strong>Nav</strong> — Logo, Features, Pricing, Blog + CTA buttons</div>
+        <div>② <strong>Hero</strong> — Headline, subtext, two CTAs + social proof</div>
+        <div>③ <strong>Features</strong> — 6-card grid with icons & descriptions</div>
+        <div>④ <strong>How it works</strong> — 3-step process</div>
+        <div>⑤ <strong>Pricing</strong> — 3 tiers (Free / Pro / Business)</div>
+        <div>⑥ <strong>Testimonials</strong> — 3 social proof quotes</div>
+        <div>⑦ <strong>Final CTA</strong> — "Start your free card" banner</div>
+        <div>⑧ <strong>Footer</strong> — Links, socials, legal, copyright</div>
+        <div style="margin-top:6px;font-size:10px;color:#6b7280;">All text/content editable in Wagtail StreamFields</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="section" style="margin-top:8px;">
+  <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:1rem;font-size:11px;color:#1e40af;line-height:1.7;">
+    <strong>Implementation order:</strong>
+    &nbsp;① uv migration + package updates &nbsp;→&nbsp;
+    ② Wagtail page models + CMS setup &nbsp;→&nbsp;
+    ③ Homepage redesign (B-style) &nbsp;→&nbsp;
+    ④ Blog + About + Pricing + Legal pages &nbsp;→&nbsp;
+    ⑤ Stripe billing (next phase)
+  </div>
+</div>

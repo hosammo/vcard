@@ -5,7 +5,7 @@ from django.utils.html import format_html
 from django.urls import reverse, path
 from django.utils.safestring import mark_safe
 from django.shortcuts import redirect
-from .models import BusinessCard, CardView, ContactDownload, CountryCode, PhoneNumber
+from .models import BusinessCard, CardView, ContactDownload, CountryCode, PhoneNumber, UserSettings, ActivityLog
 from .forms import BusinessCardAdminForm, PhoneNumberAdminForm
 
 
@@ -286,6 +286,29 @@ class ContactDownloadAdmin(admin.ModelAdmin):
     list_filter = ['download_type', 'timestamp']
     search_fields = ['card__first_name', 'card__last_name', 'ip_address']
     readonly_fields = ['card', 'ip_address', 'download_type', 'timestamp']
+    date_hierarchy = 'timestamp'
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(UserSettings)
+class UserSettingsAdmin(admin.ModelAdmin):
+    list_display = ['user', 'email_notifications', 'weekly_reports', 'public_profile', 'updated_at']
+    list_filter  = ['email_notifications', 'weekly_reports', 'public_profile']
+    search_fields = ['user__username', 'user__email']
+    readonly_fields = ['user', 'updated_at']
+
+
+@admin.register(ActivityLog)
+class ActivityLogAdmin(admin.ModelAdmin):
+    list_display  = ['user', 'action', 'description', 'ip_address', 'timestamp']
+    list_filter   = ['action', 'timestamp']
+    search_fields = ['user__username', 'user__email', 'description', 'ip_address']
+    readonly_fields = ['user', 'action', 'description', 'ip_address', 'timestamp']
     date_hierarchy = 'timestamp'
 
     def has_add_permission(self, request):

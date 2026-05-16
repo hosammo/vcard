@@ -1,45 +1,57 @@
+import re
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from .models import BusinessCard, ProfileType, PhoneNumber, CountryCode
 from django.forms import inlineformset_factory
 
+
+def _generate_username(email):
+    """Derive a unique username from an email address."""
+    base = re.sub(r'[^a-zA-Z0-9_]', '', email.split('@')[0])[:20] or 'user'
+    username = base
+    counter = 1
+    while User.objects.filter(username=username).exists():
+        username = f"{base}{counter}"
+        counter += 1
+    return username
+
+
 class CustomUserRegistrationForm(UserCreationForm):
-    email = forms.EmailField(required=True)
+    email      = forms.EmailField(required=True)
     first_name = forms.CharField(max_length=30, required=True)
-    last_name = forms.CharField(max_length=30, required=True)
+    last_name  = forms.CharField(max_length=30, required=True)
 
     class Meta:
-        model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
+        model  = User
+        fields = ('first_name', 'last_name', 'email', 'password1', 'password2')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Add CSS classes to make forms look better
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
             field.widget.attrs['placeholder'] = field.label
 
     def save(self, commit=True):
-        user = super().save(commit=False)
-        user.email = self.cleaned_data['email']
+        user            = super().save(commit=False)
+        user.username   = _generate_username(self.cleaned_data['email'])
+        user.email      = self.cleaned_data['email']
         user.first_name = self.cleaned_data['first_name']
-        user.last_name = self.cleaned_data['last_name']
+        user.last_name  = self.cleaned_data['last_name']
         if commit:
             user.save()
         return user
 
 
 class UserLoginForm(forms.Form):
-    username = forms.CharField(max_length=150, label='Username')
+    email    = forms.EmailField(label='Email Address')
     password = forms.CharField(widget=forms.PasswordInput, label='Password')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # FIXED: Handle the label properly
-        self.fields['username'].widget.attrs.update({
+        self.fields['email'].widget.attrs.update({
             'class': 'form-control',
-            'placeholder': 'Username'
+            'placeholder': 'Email Address'
         })
         self.fields['password'].widget.attrs.update({
             'class': 'form-control',
