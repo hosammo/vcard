@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
 
 'cards',
+    'cms',
 
 ]
 
@@ -216,7 +217,7 @@ LOGGING = {
 }
 
 # Wagtail settings
-WAGTAIL_SITE_NAME = 'Virtual Business Card'
+WAGTAIL_SITE_NAME = 'VCard'
 
 # Base URL to use when referring to full URLs within the Wagtail admin backend
 # e.g. in notification emails. Don't include '/admin' or a trailing slash
