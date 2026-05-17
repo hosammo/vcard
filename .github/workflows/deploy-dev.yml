@@ -18,21 +18,21 @@ jobs:
           port: ${{ secrets.DEV_SSH_PORT }}
           script: |
             set -e
-            cd ~/devvcard
+            cd /var/www/devvcard.hosammo.com
 
             echo "▶ Pulling latest dev branch..."
             git pull origin dev
 
             echo "▶ Installing dependencies..."
-            uv sync --frozen
+            ~/.local/bin/uv sync --frozen
 
             echo "▶ Running migrations..."
-            uv run python manage.py migrate --settings=vcard_project.settings_dev
+            DJANGO_SETTINGS_MODULE=vcard_project.settings_dev .venv/bin/python manage.py migrate
 
             echo "▶ Collecting static files..."
-            uv run python manage.py collectstatic --noinput --settings=vcard_project.settings_dev
+            DJANGO_SETTINGS_MODULE=vcard_project.settings_dev .venv/bin/python manage.py collectstatic --noinput
 
-            echo "▶ Restarting Passenger..."
-            mkdir -p tmp && touch tmp/restart.txt
+            echo "▶ Restarting gunicorn..."
+            systemctl restart devvcard
 
             echo "✅ Deploy complete → https://devvcard.hosammo.com"
