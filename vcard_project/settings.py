@@ -12,7 +12,11 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,hosammo.com
 
 # Application definition
 INSTALLED_APPS = [
-     # Django apps   
+    # Our apps first so template overrides take precedence over Wagtail's defaults
+    'cms',
+    'cards',
+
+    # Django apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -21,7 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
 
-    # Wagtail apps - ADD THESE
+    # Wagtail apps
     'wagtail.contrib.forms',
     'wagtail.contrib.redirects',
     'wagtail.embeds',
@@ -40,10 +44,6 @@ INSTALLED_APPS = [
     # Third party apps
     'crispy_forms',
     'crispy_bootstrap5',
-
-'cards',
-    'cms',
-
 ]
 
 MIDDLEWARE = [
